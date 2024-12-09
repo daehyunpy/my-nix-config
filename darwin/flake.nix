@@ -27,6 +27,10 @@
     };
   in
   {
+    darwinConfigurations.morpheus = nix-darwin.lib.darwinSystem {
+      modules = [ configuration ];
+    };
+
     darwinConfigurations.thales = nix-darwin.lib.darwinSystem {
       modules = [ configuration ];
     };
