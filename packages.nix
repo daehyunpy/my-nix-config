@@ -1,6 +1,21 @@
 pkgs: [
+  pkgs.awscli2
+  pkgs.duckdb
+  pkgs.dvc
   pkgs.fish
+  pkgs.git-lfs
+  pkgs.htop
+  pkgs.k9s
+  pkgs.kubectx
+  pkgs.kubernetes-helm
+  pkgs.kustomize
+  pkgs.mosh
   pkgs.neovim
+  pkgs.nix-direnv
+  pkgs.poetry
+  pkgs.rclone
+  pkgs.tenv
+  pkgs.terraform
   pkgs.tmux
   pkgs.vscode
 ]
