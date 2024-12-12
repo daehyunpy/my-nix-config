@@ -20,6 +20,5 @@
   "rustc"
   "tailscale"
   "tenv"
-  "terraform"
   "tmux"
 ]
