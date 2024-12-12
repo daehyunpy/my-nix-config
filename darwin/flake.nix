@@ -16,12 +16,14 @@
       environment.systemPackages =
         builtins.map
         (name: pkgs.${name})
-        (import ../packages.nix);
+        ((import ../packages.nix) ++ (import ./packages.nix));
       environment.shells = [ pkgs.fish ];
 
       homebrew = {
         enable = true;
+        brews = ["mas"];
         casks = import ./casks.nix;
+        masApps = import ./mas-apps.nix;
       };
 
       programs.fish.enable = true;
@@ -50,7 +52,16 @@
     };
 
     darwinConfigurations.thales = nix-darwin.lib.darwinSystem {
-      modules = [ configuration ];
+      modules = [
+        configuration
+        nix-homebrew.darwinModules.nix-homebrew {
+          nix-homebrew = {
+            enable = true;
+            enableRosetta = true;
+            user = "daehyun";
+          };
+        }
+      ];
     };
   };
 }
