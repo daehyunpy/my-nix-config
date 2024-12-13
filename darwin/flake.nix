@@ -1,44 +1,45 @@
 {
-  description = "Daehyun's nix-darwin system flake";
-
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-24.11-darwin";
     nix-darwin.url = "github:LnL7/nix-darwin";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
+    home-manager.url = "github:nix-community/home-manager/release-24.11";
+    home-manager.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nix-darwin, nixpkgs, nix-homebrew }:
+  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, home-manager }:
   let
     configuration = { pkgs, ... }: {
       nix.settings.experimental-features = "nix-command flakes";
 
-      environment.systemPackages =
-        builtins.map
-        (name: pkgs.${name})
-        ((import ../packages.nix) ++ (import ./packages.nix));
+      environment.systemPackages = [ pkgs.fish ];
       environment.shells = [ pkgs.fish ];
 
       homebrew = {
         enable = true;
-        brews = ["mas"];
+        brews = [ "mas" ];
         casks = import ./casks.nix;
         masApps = import ./mas-apps.nix;
       };
 
+      programs.zsh.enable = true;
       programs.fish.enable = true;
 
       system.configurationRevision = self.rev or self.dirtyRev or null;
       system.stateVersion = 5;
 
       nixpkgs.config.allowUnfree = true;
-      nixpkgs.hostPlatform = "aarch64-darwin";
 
-      users.users.daehyun.shell = "${pkgs.fish}/bin/fish";
+      users.users.daehyun = {
+        home = "/Users/daehyun";
+        shell = "${pkgs.fish}/bin/fish";
+      };
     };
   in
   {
     darwinConfigurations.morpheus = nix-darwin.lib.darwinSystem {
+      system = "aarch64-darwin";
       modules = [
         configuration
         nix-homebrew.darwinModules.nix-homebrew {
@@ -48,10 +49,18 @@
             user = "daehyun";
           };
         }
+        home-manager.darwinModules.home-manager {
+          home-manager = {
+            useGlobalPkgs = true;
+            useUserPackages = true;
+            users.daehyun = import ./home.nix;
+          };
+        }
       ];
     };
 
     darwinConfigurations.thales = nix-darwin.lib.darwinSystem {
+      system = "aarch64-darwin";
       modules = [
         configuration
         nix-homebrew.darwinModules.nix-homebrew {
@@ -59,6 +68,13 @@
             enable = true;
             enableRosetta = true;
             user = "daehyun";
+          };
+        }
+        home-manager.darwinModules.home-manager {
+          home-manager = {
+            useGlobalPkgs = true;
+            useUserPackages = true;
+            users.daehyun = import ./home.nix;
           };
         }
       ];
