@@ -19,9 +19,13 @@
           builtins.map
           (name: pkgs.${name})
           (import ../packages.nix ++ import ./packages.nix);
+        file = {
+          ".config/direnv/direnv.toml".source = ../home-files/direnv.toml;
+        };
       };
 
       programs.fish.enable = true;
+      programs.direnv.enable = true;
       programs.home-manager.enable = true;
 
       nixpkgs.config.allowUnfree = true;

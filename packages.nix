@@ -1,5 +1,6 @@
 [
   "awscli2"
+  "direnv"
   "duckdb"
   "dvc"
   "fish"
@@ -13,7 +14,6 @@
   "mosh"
   "mutt"
   "neovim"
-  "nix-direnv"
   "poetry"
   "rclone"
   "restic"

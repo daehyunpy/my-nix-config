@@ -7,6 +7,9 @@
       builtins.map
       (name: pkgs.${name})
       (import ../packages.nix ++ import ./packages.nix);
+    file = {
+      ".config/direnv/direnv.toml".source = ../home-files/direnv.toml;
+    };
   };
 
   programs.git = {
@@ -14,4 +17,5 @@
     userName = "Daehyun You";
     userEmail = "daehyun.park.you@proton.me";
   };
+  programs.direnv.enable = true;
 }
