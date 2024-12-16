@@ -26,6 +26,30 @@
       programs.zsh.enable = true;
       programs.fish.enable = true;
 
+      system.defaults = {
+        dock.persistent-apps = [
+          "/System/Cryptexes/App/System/Applications/Safari.app"
+          "/Applications/ChatGPT.app"
+          "/System/Applications/Messages.app"
+          "/Applications/Slack.app"
+          "/System/Applications/Mail.app"
+          "/System/Applications/Calendar.app"
+          "/System/Applications/Reminders.app"
+          "/System/Applications/Notes.app"
+          "/System/Applications/Freeform.app"
+          "/System/Applications/iPhone Mirroring.app"
+          "/System/Applications/Utilities/Screen Sharing.app"
+          "/System/Applications/Utilities/Activity Monitor.app"
+          "/System/Applications/Utilities/Terminal.app"
+          "/Applications/Visual Studio Code.app"
+          "/Applications/Fork.app"
+        ];
+        finder.ShowPathbar = true;
+        finder.ShowStatusBar = true;
+        menuExtraClock.Show24Hour = true;
+        NSGlobalDomain.AppleShowAllExtensions = true;
+        NSGlobalDomain.AppleWindowTabbingMode = "always";
+      };
       system.configurationRevision = self.rev or self.dirtyRev or null;
       system.stateVersion = 5;
 
