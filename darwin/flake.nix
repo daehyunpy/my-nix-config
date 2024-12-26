@@ -43,6 +43,7 @@
           "/System/Applications/Utilities/Terminal.app"
           "/Applications/Visual Studio Code.app"
           "/Applications/Fork.app"
+          "/Applications/DBeaver.app"
         ];
         finder.ShowPathbar = true;
         finder.ShowStatusBar = true;
