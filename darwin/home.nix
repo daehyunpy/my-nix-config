@@ -1,11 +1,15 @@
-{ pkgs, ... }: {
+{ pkgs, lib, ... }:
+let
+  splitByDot = with builtins; string: filter isString (split "\\." string);
+  getAttrFromStrPath = string: lib.attrsets.getAttrFromPath (splitByDot string);
+in {
   home = {
     stateVersion = "24.11";
     username = "daehyun";
     homeDirectory = "/Users/daehyun";
     packages =
       builtins.map
-      (name: pkgs."${name}")
+      (name: getAttrFromStrPath name pkgs)
       (import ../packages.nix ++ import ./packages.nix);
     sessionPath = [ "$HOME/.local/bin" ];
     sessionVariables = {

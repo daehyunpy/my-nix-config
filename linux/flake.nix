@@ -7,6 +7,9 @@
 
   outputs = { self, nixpkgs, home-manager }:
   let
+    splitByDot = with builtins; string: filter isString (split "\\." string);
+    getAttrFromStrPath = string: lib.attrsets.getAttrFromPath (splitByDot string);
+
     configuration = { pkgs, ... }: {
       nix.settings.experimental-features = "nix-command flakes";
       nix.package = pkgs.nix;
@@ -17,7 +20,7 @@
         homeDirectory = "/home/dhyou";
         packages =
           builtins.map
-          (name: pkgs."${name}")
+          (name: getAttrFromStrPath name pkgs)
           (import ../packages.nix ++ import ./packages.nix);
         sessionPath = [ "$HOME/.local/bin" ];
         sessionVariables = {
