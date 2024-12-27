@@ -10,7 +10,6 @@
   "kubectx"
   "kubernetes-helm"
   "kustomize"
-  "llvmPackages.openmp"
   "mosh"
   "mutt"
   "neovim"

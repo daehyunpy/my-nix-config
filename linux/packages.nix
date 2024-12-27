@@ -1,3 +1,4 @@
 [
+  "llvmPackages.openmp"
   "vscode"
 ]
