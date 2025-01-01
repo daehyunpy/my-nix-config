@@ -12,6 +12,7 @@
   "jordanbaird-ice"
   "jump-desktop-connect"
   "launchcontrol"
+  "microsoft-edge"
   "miniconda"
   "notion"
   "plex-media-server"
