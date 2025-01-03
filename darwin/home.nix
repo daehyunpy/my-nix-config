@@ -13,7 +13,7 @@ in {
       (import ../packages.nix ++ import ./packages.nix);
     sessionPath = [ "$HOME/.local/bin" ];
     sessionVariables = {
-      EDITOR = "${pkgs.neovim}/bin/nvim";
+      EDITOR = "${pkgs.vim}/bin/vim";
     };
     file = {
       ".config/direnv/direnv.toml".source = ../home-files/direnv.toml;
@@ -32,6 +32,15 @@ in {
     enable = true;
     userName = "Daehyun You";
     userEmail = "daehyun.park.you@proton.me";
+  };
+  programs.vim = {
+    enable = true;
+    extraConfig = ''
+      set number
+      set relativenumber
+      set list
+      set listchars=tab:┊·,lead:·,trail:·
+    '';
   };
   programs.direnv.enable = true;
   programs.home-manager.enable = true;
