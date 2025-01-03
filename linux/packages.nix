@@ -1,4 +1,5 @@
 [
+  "conda"
   "llvmPackages.openmp"
   "vscode"
 ]

@@ -17,11 +17,17 @@ in {
     };
     file = {
       ".config/direnv/direnv.toml".source = ../home-files/direnv.toml;
+      ".condarc".source = ../home-files/conda.yaml;
     };
   };
 
   programs.zsh.enable = true;
-  programs.fish.enable = true;
+  programs.fish = {
+    enable = true;
+    interactiveShellInit = ''
+      eval /opt/homebrew/Caskroom/miniconda/base/bin/conda shell.fish hook | source
+    '';
+  };
   programs.git = {
     enable = true;
     userName = "Daehyun You";
