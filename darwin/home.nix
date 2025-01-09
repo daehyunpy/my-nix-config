@@ -9,7 +9,7 @@ in {
     homeDirectory = "/Users/daehyun";
     packages =
       builtins.map
-      (name: getAttrFromStrPath name pkgs)
+      (name: pkgs."${name}")
       (import ../packages.nix ++ import ./packages.nix);
     sessionPath = [ "$HOME/.local/bin" ];
     sessionVariables = {

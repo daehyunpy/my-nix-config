@@ -7,9 +7,6 @@
 
   outputs = { self, nixpkgs, home-manager }:
   let
-    splitByDot = with builtins; string: filter isString (split "\\." string);
-    getAttrFromStrPath = string: lib.attrsets.getAttrFromPath (splitByDot string);
-
     configuration = { pkgs, ... }: {
       nix.settings.experimental-features = "nix-command flakes";
       nix.package = pkgs.nix;
@@ -20,11 +17,11 @@
         homeDirectory = "/home/dhyou";
         packages =
           builtins.map
-          (name: getAttrFromStrPath name pkgs)
+          (name: pkgs."${name}")
           (import ../packages.nix ++ import ./packages.nix);
         sessionPath = [ "$HOME/.local/bin" ];
         sessionVariables = {
-          EDITOR = "${pkgs.neovim}/bin/nvim";
+          EDITOR = "${pkgs.neovim}/bin/vim";
         };
         file = {
           ".config/direnv/direnv.toml".source = ../home-files/direnv.toml;
@@ -38,6 +35,15 @@
         userName = "Daehyun You";
         userEmail = "daehyun.park.you@proton.me";
       };
+      programs.vim = {
+        enable = true;
+        extraConfig = ''
+          set number
+          set relativenumber
+          set list
+          set listchars=tab:┊·,lead:·,trail:·
+        '';
+      };
       programs.direnv.enable = true;
       programs.home-manager.enable = true;
 
@@ -47,7 +53,16 @@
   {
     homeConfigurations."dhyou@octo60" = home-manager.lib.homeManagerConfiguration {
       pkgs = import nixpkgs { system = "x86_64-linux"; };
-      modules = [ configuration ];
+      modules = [
+        configuration
+        (
+          { pkgs, ... }: {
+            programs.fish.interactiveShellInit = ''
+              eval /opt/anaconda3/bin/conda shell.fish hook | source
+            '';
+          }
+        )
+      ];
     };
   };
 }
