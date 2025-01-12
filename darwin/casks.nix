@@ -27,5 +27,6 @@
   "tor-browser"
   "transmission"
   "visual-studio-code"
+  "zed"
   "zotero"
 ]

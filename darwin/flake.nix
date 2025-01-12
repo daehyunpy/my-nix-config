@@ -29,6 +29,7 @@
       system.defaults = {
         dock.persistent-apps = [
           "/System/Cryptexes/App/System/Applications/Safari.app"
+          "/System/Applications/Launchpad.app"
           "/Applications/ChatGPT.app"
           "/System/Applications/Messages.app"
           "/Applications/Slack.app"
@@ -41,7 +42,7 @@
           "/System/Applications/Utilities/Screen Sharing.app"
           "/System/Applications/Utilities/Activity Monitor.app"
           "/System/Applications/Utilities/Terminal.app"
-          "/Applications/Visual Studio Code.app"
+          "/Applications/Zed.app"
           "/Applications/Fork.app"
           "/Applications/DBeaver.app"
         ];
