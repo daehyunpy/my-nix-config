@@ -28,8 +28,8 @@
 
       system.defaults = {
         dock.persistent-apps = [
-          "/System/Cryptexes/App/System/Applications/Safari.app"
           "/System/Applications/Launchpad.app"
+          "/System/Cryptexes/App/System/Applications/Safari.app"
           "/Applications/ChatGPT.app"
           "/System/Applications/Messages.app"
           "/Applications/Slack.app"
