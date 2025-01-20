@@ -3,6 +3,7 @@
   "direnv"
   "duckdb"
   "fira-code-nerdfont"
+  "fzf"
   "git-lfs"
   "htop"
   "jq"
