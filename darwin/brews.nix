@@ -1,4 +1,5 @@
 [
   "libomp"
   "mas"
+  "mosh"
 ]
