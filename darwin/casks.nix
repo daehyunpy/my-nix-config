@@ -7,6 +7,7 @@
   "dbeaver-community"
   "docker"
   "figma"
+  "font-zed-mono-nerd-font"
   "fork"
   "google-drive"
   "jordanbaird-ice"
@@ -27,6 +28,7 @@
   "tor-browser"
   "transmission"
   "visual-studio-code"
+  "wezterm"
   "zed"
   "zotero"
 ]

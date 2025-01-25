@@ -41,7 +41,7 @@
           "/System/Applications/iPhone Mirroring.app"
           "/System/Applications/Utilities/Screen Sharing.app"
           "/System/Applications/Utilities/Activity Monitor.app"
-          "/System/Applications/Utilities/Terminal.app"
+          "/Applications/WezTerm.app"
           "/Applications/Zed.app"
           "/Applications/Fork.app"
           "/Applications/DBeaver.app"

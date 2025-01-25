@@ -7,6 +7,7 @@
   "git-lfs"
   "htop"
   "jq"
+  "jupyter"
   "k9s"
   "kubectx"
   "kubernetes-helm"
@@ -25,4 +26,5 @@
   "tailscale"
   "tenv"
   "tmux"
+  "uv"
 ]
