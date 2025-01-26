@@ -16,6 +16,7 @@
       ".config/conda".source = ../home-files/conda;
       ".config/direnv".source = ../home-files/direnv;
       ".config/nvim".source = ../home-files/nvim;
+      ".config/zed".source = ../home-files/zed;
     };
   };
 

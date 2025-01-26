@@ -1,0 +1,42 @@
+{
+  "assistant": {
+    "default_model": {
+      "provider": "copilot_chat",
+      "model": "o1-preview"
+    },
+    "version": "2"
+  },
+  "wrap_guides": [72, 79],
+  "vim_mode": true,
+  "relative_line_numbers": true,
+  "ui_font_size": 15,
+  "buffer_font_size": 12,
+  "theme": {
+    "mode": "system",
+    "light": "One Light",
+    "dark": "One Dark"
+  },
+  "languages": {
+    "Python": {
+      "language_servers": ["!pyright", "ruff", "..."],
+      "code_actions_on_format": {
+        "source.fixAll.ruff": true,
+        "source.organizeImports.ruff": true
+      }
+    }
+  },
+  "ssh_connections": [
+    {
+      "host": "octo60",
+      "username": "dhyou",
+      "projects": [
+        {
+          "paths": ["~/Workspaces/60hz-cloud-match"]
+        }
+      ]
+    }
+  ],
+  "telemetry": {
+    "metrics": false
+  }
+}
