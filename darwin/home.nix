@@ -13,8 +13,8 @@
       EDITOR = "${pkgs.neovim}/bin/nvim";
     };
     file = {
-      ".config/direnv/direnv.toml".source = ../home-files/direnv.toml;
-      ".condarc".source = ../home-files/conda.yaml;
+      ".config/direnv".source = ../home-files/direnv;
+      ".config/conda".source = ../home-files/conda;
     };
   };
 
