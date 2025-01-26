@@ -1,8 +1,5 @@
-{ pkgs, lib, ... }:
-let
-  splitByDot = with builtins; string: filter isString (split "\\." string);
-  getAttrFromStrPath = string: lib.attrsets.getAttrFromPath (splitByDot string);
-in {
+{ pkgs, ... }:
+{
   home = {
     stateVersion = "24.11";
     username = "daehyun";

@@ -8,7 +8,7 @@
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, home-manager }:
+  outputs = { self, nix-darwin, nix-homebrew, home-manager }:
   let
     configuration = { pkgs, ... }: {
       nix.settings.experimental-features = "nix-command flakes";
