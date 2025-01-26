@@ -16,6 +16,7 @@
   "mosh"
   "mutt"
   "neovim"
+  "nodejs"
   "openblas"
   "opencommit"
   "poetry"
@@ -27,4 +28,5 @@
   "tenv"
   "tmux"
   "uv"
+  "yq"
 ]
