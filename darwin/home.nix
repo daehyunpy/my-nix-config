@@ -1,4 +1,8 @@
-{ pkgs, ... }:
+{ pkgs, config, ... }:
+let
+  homePathString = config.home.homeDirectory;
+  makeOutOfStore = config.lib.file.mkOutOfStoreSymlink;
+in
 {
   home = {
     stateVersion = "24.11";
@@ -15,8 +19,8 @@
     file = {
       ".config/conda".source = ../home-files/conda;
       ".config/direnv".source = ../home-files/direnv;
-      ".config/nvim".source = ../home-files/nvim;
-      ".config/zed".source = ../home-files/zed;
+      ".config/nvim".source = makeOutOfStore "${homePathString}/.config/nix/home-files/nvim";
+      ".config/zed".source = makeOutOfStore "${homePathString}/.config/nix/home-files/zed";
     };
   };
 
