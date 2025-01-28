@@ -13,6 +13,7 @@
   "kubernetes-helm"
   "kustomize"
   "lazygit"
+  "lua"
   "luarocks"
   "mosh"
   "mutt"
@@ -31,5 +32,6 @@
   "tenv"
   "tmux"
   "uv"
+  "wget"
   "yq"
 ]
