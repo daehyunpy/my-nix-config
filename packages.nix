@@ -13,6 +13,7 @@
   "kubernetes-helm"
   "kustomize"
   "lazygit"
+  "luarocks"
   "mosh"
   "mutt"
   "neovim"
