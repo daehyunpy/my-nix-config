@@ -20,6 +20,7 @@ in
       ".config/conda".source = ../home-files/conda;
       ".config/direnv".source = ../home-files/direnv;
       ".config/nvim".source = makeOutOfStore "${homePathString}/.config/nix/home-files/nvim";
+      ".config/tmux".source = ../home-files/tmux;
       ".config/zed".source = makeOutOfStore "${homePathString}/.config/nix/home-files/zed";
     };
   };
