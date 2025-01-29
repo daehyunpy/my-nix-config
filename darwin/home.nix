@@ -21,6 +21,7 @@ in
       ".config/direnv".source = ../home-files/direnv;
       ".config/nvim".source = makeOutOfStore "${homePathString}/.config/nix/home-files/nvim";
       ".config/tmux".source = ../home-files/tmux;
+      ".config/wezterm".source = ../home-files/wezterm;
       ".config/zed".source = makeOutOfStore "${homePathString}/.config/nix/home-files/zed";
     };
   };
