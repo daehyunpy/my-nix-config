@@ -7,24 +7,33 @@
 
   outputs = { self, nixpkgs, home-manager }:
   let
-    configuration = { pkgs, ... }: {
+    configuration = { pkgs, config, lib, ... }:
+    let
+      homePathString = config.home.homeDirectory;
+      makeOutOfStore = config.lib.file.mkOutOfStoreSymlink;
+    in
+    {
       nix.settings.experimental-features = "nix-command flakes";
       nix.package = pkgs.nix;
 
       home = {
         stateVersion = "24.11";
-        username = "dhyou";
-        homeDirectory = "/home/dhyou";
+        username = lib.mkDefault "daehyun";
+        homeDirectory = lib.mkDefault "/home/daehyun";
         packages =
           builtins.map
           (name: pkgs."${name}")
           (import ../packages.nix ++ import ./packages.nix);
         sessionPath = [ "$HOME/.local/bin" ];
         sessionVariables = {
-          EDITOR = "${pkgs.neovim}/bin/vim";
+          EDITOR = "${pkgs.neovim}/bin/nvim";
         };
         file = {
-          ".config/direnv/direnv.toml".source = ../home-files/direnv.toml;
+          ".config/conda".source = ../home-files/conda;
+          ".config/direnv".source = ../home-files/direnv;
+          ".config/lazygit".source = ../home-files/lazygit;
+          ".config/nvim".source = makeOutOfStore "${homePathString}/.config/nix/home-files/nvim";
+          ".config/tmux".source = ../home-files/tmux;
         };
       };
 
@@ -33,16 +42,7 @@
       programs.git = {
         enable = true;
         userName = "Daehyun You";
-        userEmail = "daehyun.park.you@proton.me";
-      };
-      programs.vim = {
-        enable = true;
-        extraConfig = ''
-          set number
-          set relativenumber
-          set list
-          set listchars=tab:┊·,lead:·,trail:·
-        '';
+        userEmail = lib.mkDefault "daehyun.park.you@proton.me";
       };
       programs.direnv.enable = true;
       programs.home-manager.enable = true;
@@ -57,6 +57,9 @@
         configuration
         (
           { pkgs, ... }: {
+            home.username = "dhyou";
+            home.homeDirectory = "/home/dhyou";
+            programs.git.userEmail = "dhyou@60hz.io";
             programs.fish.interactiveShellInit = ''
               eval /opt/anaconda3/bin/conda shell.fish hook | source
             '';

@@ -1,4 +1,4 @@
-{ pkgs, config, ... }:
+{ pkgs, config, lib, ... }:
 let
   homePathString = config.home.homeDirectory;
   makeOutOfStore = config.lib.file.mkOutOfStoreSymlink;
@@ -6,8 +6,8 @@ in
 {
   home = {
     stateVersion = "24.11";
-    username = "daehyun";
-    homeDirectory = "/Users/daehyun";
+    username = lib.mkDefault "daehyun";
+    homeDirectory = lib.mkDefault "/Users/daehyun";
     packages =
       builtins.map
       (name: pkgs."${name}")
@@ -19,6 +19,7 @@ in
     file = {
       ".config/conda".source = ../home-files/conda;
       ".config/direnv".source = ../home-files/direnv;
+      ".config/lazygit".source = ../home-files/lazygit;
       ".config/nvim".source = makeOutOfStore "${homePathString}/.config/nix/home-files/nvim";
       ".config/tmux".source = ../home-files/tmux;
       ".config/wezterm".source = ../home-files/wezterm;
@@ -36,7 +37,7 @@ in
   programs.git = {
     enable = true;
     userName = "Daehyun You";
-    userEmail = "daehyun.park.you@proton.me";
+    userEmail = lib.mkDefault "daehyun.park.you@proton.me";
   };
   programs.direnv.enable = true;
   programs.home-manager.enable = true;
