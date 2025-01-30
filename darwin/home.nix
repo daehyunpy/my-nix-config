@@ -9,9 +9,8 @@ in
     username = lib.mkDefault "daehyun";
     homeDirectory = lib.mkDefault "/Users/daehyun";
     packages =
-      builtins.map
-      (name: pkgs."${name}")
-      (import ../packages.nix ++ import ./packages.nix);
+      import ../packages.nix pkgs
+      ++ import ./packages.nix pkgs;
     sessionPath = [ "$HOME/.local/bin" ];
     sessionVariables = {
       EDITOR = "${pkgs.neovim}/bin/nvim";
