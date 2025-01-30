@@ -30,6 +30,7 @@
   "ripgrep"
   "ripgrep-all"
   "ruff"
+  "rust-analyzer"
   "rustc"
   "tailscale"
   "tenv"

@@ -2,13 +2,3 @@
 require("config.lazy")
 
 require("lspconfig").ruff.setup({})
-
-require("lspconfig").pyright.setup({
-  settings = {
-    python = {
-      analysis = {
-        typeCheckingMode = "off",
-      },
-    },
-  },
-})
