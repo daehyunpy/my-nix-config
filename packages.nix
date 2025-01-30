@@ -1,5 +1,6 @@
 [
   "awscli2"
+  "cargo"
   "direnv"
   "duckdb"
   "fd"
@@ -33,6 +34,7 @@
   "tailscale"
   "tenv"
   "tmux"
+  "tree-sitter"
   "uv"
   "wget"
   "yq"
