@@ -35,10 +35,14 @@ return {
           mark_motion = "<leader>Rmc",
           mark_visual = "<leader>Rmc",
           remove_mark = "<leader>Rmd",
+          cr = "<leader>Rs<cr>",
+          interrupt = "<leader>Rs<space>",
           exit = "<leader>Rsq",
           clear = "<leader>Rcl",
         },
       })
+      vim.keymap.set("n", "<leader>Rrf", "<cmd>IronFocus<cr>")
+      vim.keymap.set("n", "<leader>Rrh", "<cmd>IronHide<cr>")
     end,
   },
   {
