@@ -26,6 +26,7 @@ pkgs:
   pkgs.nodejs
   pkgs.openblas
   pkgs.opencommit
+  pkgs.packer
   pkgs.poetry
   pkgs.rclone
   pkgs.restic
