@@ -25,6 +25,8 @@
           ++ import ./packages.nix pkgs;
         sessionPath = [ "$HOME/.local/bin" ];
         sessionVariables = {
+          LANG = "en_US.UTF-8";
+          LC_ALL = "en_US.UTF-8";
           EDITOR = "${pkgs.neovim}/bin/nvim";
         };
         file = {
