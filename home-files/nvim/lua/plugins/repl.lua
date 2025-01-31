@@ -1,18 +1,25 @@
 return {
   {
     "Vigemus/iron.nvim",
+    event = "VeryLazy",
     opts = function()
       require("iron.core").setup({
-        repl_definition = {
-          python = {
-            command = { "ipython", "--no-autoindent" },
-            format = require("iron.fts.common").bracketed_paste_python,
-            block_deviders = { "# %%" },
+        config = {
+          repl_definition = {
+            sh = {
+              command = "zsh",
+              block_deviders = { "# %%" },
+            },
+            python = {
+              command = { "ipython", "--no-autoindent" },
+              format = require("iron.fts.common").bracketed_paste_python,
+              block_deviders = { "# %%" },
+            },
           },
+          scratch_repl = true,
+          repl_open_cmd = require("iron.view").bottom(20),
         },
-        scratch_repl = true,
         ignore_blank_lines = true,
-        repl_open_cmd = require("iron.view").bottom(20),
         keymaps = {
           toggle_repl = "<leader>Rrr",
           restart_repl = "<leader>RrR",
@@ -33,5 +40,16 @@ return {
         },
       })
     end,
+  },
+  {
+    {
+      "benlubas/molten-nvim",
+      version = "^1.9.2",
+      event = "VeryLazy",
+      build = ":UpdateRemotePlugins",
+      init = function()
+        vim.g.molten_output_win_max_height = 20
+      end,
+    },
   },
 }
