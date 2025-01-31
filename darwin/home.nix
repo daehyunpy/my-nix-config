@@ -23,6 +23,8 @@ in
       ".config/tmux".source = ../home-files/tmux;
       ".config/wezterm".source = ../home-files/wezterm;
       ".config/zed".source = makeOutOfStore "${homePathString}/.config/nix/home-files/zed";
+      ".ssh/authorized_keys".source = ../home-files/ssh/authorized_keys;
+      ".ssh/config".source = ../home-files/ssh/config;
     };
   };
 
