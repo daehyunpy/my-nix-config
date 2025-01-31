@@ -3,3 +3,6 @@ Host octo60 octo60.*
 
 Host mobilint mobilint.*
   User dhyou
+
+Host *
+  User daehyun

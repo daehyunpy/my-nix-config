@@ -33,7 +33,6 @@
           ".config/lazygit".source = ../home-files/lazygit;
           ".config/nvim".source = makeOutOfStore "${homePathString}/.config/nix/home-files/nvim";
           ".config/tmux".source = ../home-files/tmux;
-          ".ssh/authorized_keys".source = ../home-files/ssh/authorized_keys;
           ".ssh/config".source = ../home-files/ssh/config;
         };
       };
