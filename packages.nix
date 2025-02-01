@@ -40,7 +40,7 @@ pkgs:
   pkgs.tenv
   pkgs.tmux
   pkgs.tree-sitter
-  pkgs.ueberzug
+  pkgs.ueberzugpp
   pkgs.uv
   pkgs.viu
   pkgs.wget
