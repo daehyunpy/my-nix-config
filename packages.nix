@@ -2,6 +2,7 @@ pkgs:
 [
   pkgs.awscli2
   pkgs.cargo
+  pkgs.chafa
   pkgs.direnv
   pkgs.duckdb
   pkgs.fd
@@ -39,7 +40,9 @@ pkgs:
   pkgs.tenv
   pkgs.tmux
   pkgs.tree-sitter
+  pkgs.ueberzug
   pkgs.uv
+  pkgs.viu
   pkgs.wget
   pkgs.yq
 ]
