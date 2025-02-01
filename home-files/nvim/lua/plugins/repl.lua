@@ -43,7 +43,7 @@ return {
       })
     end,
     keys = {
-      { "<leader>R", "", desc = "+repl" },
+      { "<leader>R", "", mode = { "n", "v" }, desc = "+repl" },
       { "<leader>Rf", "<cmd>IronFocus<cr>" },
       { "<leader>Rh", "<cmd>IronHide<cr>" },
     },
