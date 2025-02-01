@@ -1,0 +1,19 @@
+version: "0.2"
+language: en
+ignorePaths:
+  - .git/**
+words:
+  - conda
+  - daehyun
+  - dhyou
+  - direnv
+  - lazydocker
+  - lazygit
+  - lazyvim
+  - miniconda
+  - nix
+  - nixpkg
+  - nixpkgs
+  - nvim
+  - pkg
+  - pkgs

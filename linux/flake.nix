@@ -35,6 +35,7 @@
           ".config/lazygit".source = ../home-files/lazygit;
           ".config/nvim".source = makeOutOfStore "${homePathString}/.config/nix/home-files/nvim";
           ".config/tmux".source = ../home-files/tmux;
+          ".cspell.yaml".source = ../home-files/cspell/cspell.yaml;
           ".ssh/config".source = ../home-files/ssh/config;
         };
       };
