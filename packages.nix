@@ -30,6 +30,7 @@ pkgs:
   pkgs.opencommit
   pkgs.packer
   pkgs.poetry
+  pkgs.quarto
   pkgs.rclone
   pkgs.restic
   pkgs.ripgrep
