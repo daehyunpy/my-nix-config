@@ -79,6 +79,15 @@
           home-manager = {
             useGlobalPkgs = true;
             useUserPackages = true;
+          };
+        }
+        home-manager.darwinModules.home-manager {
+          home-manager = {
+            users.daehyun = import ../home.nix;
+          };
+        }
+        home-manager.darwinModules.home-manager {
+          home-manager = {
             users.daehyun = import ./home.nix;
           };
         }
@@ -100,6 +109,15 @@
           home-manager = {
             useGlobalPkgs = true;
             useUserPackages = true;
+          };
+        }
+        home-manager.darwinModules.home-manager {
+          home-manager = {
+            users.daehyun = import ../home.nix;
+          };
+        }
+        home-manager.darwinModules.home-manager {
+          home-manager = {
             users.daehyun = import ./home.nix;
           };
         }
