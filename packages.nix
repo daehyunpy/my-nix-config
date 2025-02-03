@@ -30,6 +30,7 @@ pkgs:
   pkgs.opencommit
   pkgs.packer
   pkgs.poetry
+  pkgs.python3Packages.pynvim
   pkgs.quarto
   pkgs.rclone
   pkgs.restic
