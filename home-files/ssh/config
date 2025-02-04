@@ -1,7 +1,4 @@
-Host octo60 octo60.*
-  User dhyou
-
-Host mobilint mobilint.*
+Host octo* mobilint mobilint.*
   User dhyou
 
 Host *
