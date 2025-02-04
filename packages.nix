@@ -3,6 +3,7 @@ pkgs:
   pkgs.awscli2
   pkgs.cargo
   pkgs.chafa
+  pkgs.clang
   pkgs.direnv
   pkgs.duckdb
   pkgs.fd
