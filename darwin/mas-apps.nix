@@ -10,6 +10,7 @@
   "microsoft-powerpoint" = 462062816;
   "microsoft-remote-desktop" = 715768417;
   "microsoft-word" = 462054704;
+  "mountain-duck" = 1024974133;
   "numbers" = 409203825;
   "pages" = 409201541;
   "pdf-expert" = 1055273043;
