@@ -20,7 +20,7 @@ pkgs:
   pkgs.lazydocker
   pkgs.lazygit
   pkgs.lazysql
-  pkgs.lua
+  pkgs.lua5_1
   pkgs.luarocks
   pkgs.mosh
   pkgs.mutt
