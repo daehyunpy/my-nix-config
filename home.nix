@@ -15,7 +15,6 @@ in
       OCO_DESCRIPTION = "true";
       OCO_ONE_LINE_COMMIT = "true";
       OCO_GITPUSH = "false";
-      OCO_WHY = "true";
     };
     file = {
       ".config/conda".source = ./home-files/conda;
