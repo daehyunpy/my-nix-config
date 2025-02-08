@@ -30,12 +30,7 @@ in
   };
 
   programs.zsh.enable = true;
-  programs.fish = {
-    enable = true;
-    interactiveShellInit = ''
-      fish_hybrid_key_bindings
-    '';
-  };
+  programs.fish.enable = true;
   programs.git = {
     enable = true;
     userName = "Daehyun You";
