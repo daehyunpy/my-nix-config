@@ -35,6 +35,7 @@ in
     enable = true;
     userName = "Daehyun You";
     userEmail = lib.mkDefault "daehyun.park.you@proton.me";
+    lfs.enable = true;
   };
   programs.direnv.enable = true;
   programs.home-manager.enable = true;
