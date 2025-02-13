@@ -25,7 +25,7 @@ in
       ".config/wezterm".source = ./home-files/wezterm;
       ".config/zed".source = makeOutOfStore "${homePathString}/.config/nix/home-files/zed";
       ".cspell.yaml".source = ./home-files/cspell/cspell.yaml;
-      ".ssh/config".source = ./home-files/ssh/config;
+      ".ssh/config".source = makeOutOfStore "${homePathString}/.config/nix/home-files/ssh/config";
     };
   };
 
