@@ -7,7 +7,6 @@ pkgs:
   pkgs.direnv
   pkgs.duckdb
   pkgs.fd
-  pkgs.fishPlugins.fzf
   pkgs.fzf
   pkgs.git-lfs
   pkgs.htop

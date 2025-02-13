@@ -1,4 +1,5 @@
 [
+  "flang"
   "libomp"
   "mas"
   "mosh"
