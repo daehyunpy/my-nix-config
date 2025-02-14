@@ -15,6 +15,15 @@ return {
               format = require("iron.fts.common").bracketed_paste_python,
               block_deviders = { "# %%" },
             },
+            sql = {
+              command = { "duckdb" },
+              format = function(lines)
+                table.insert(lines, ";")
+                table.insert(lines, "")
+                return lines
+              end,
+              block_deviders = { "-- %%" },
+            },
           },
           scratch_repl = true,
           repl_open_cmd = "bot split",
