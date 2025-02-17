@@ -12,6 +12,7 @@
   let
     configuration = { pkgs, ... }: {
       nix.settings.experimental-features = "nix-command flakes";
+      nixpkgs.config.allowUnfree = true;
 
       environment.systemPackages = [ pkgs.fish ];
       environment.shells = [ pkgs.fish ];
@@ -55,7 +56,9 @@
       system.configurationRevision = self.rev or self.dirtyRev or null;
       system.stateVersion = 5;
 
-      nixpkgs.config.allowUnfree = true;
+      security.sudo.extraConfig = ''
+          %admin ALL=(ALL) NOPASSWD: ALL
+        '';
 
       users.users.daehyun = {
         home = "/Users/daehyun";
