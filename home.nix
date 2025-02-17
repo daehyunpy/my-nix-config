@@ -36,6 +36,9 @@ in
     userName = "Daehyun You";
     userEmail = lib.mkDefault "daehyun.park.you@proton.me";
     lfs.enable = true;
+    extraConfig = {
+      init.defaultBranch = "main";
+    };
   };
   programs.direnv.enable = true;
   programs.home-manager.enable = true;
