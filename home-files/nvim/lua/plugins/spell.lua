@@ -5,7 +5,6 @@ return {
   },
   {
     "nvimtools/none-ls.nvim",
-    optional = true,
     event = "VeryLazy",
     depends = { "davidmh/cspell.nvim" },
     opts = function(_, opts)
