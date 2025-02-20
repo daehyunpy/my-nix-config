@@ -6,6 +6,7 @@ pkgs:
   pkgs.clang
   pkgs.direnv
   pkgs.duckdb
+  pkgs.eternal-terminal
   pkgs.fd
   pkgs.fzf
   pkgs.git-lfs
