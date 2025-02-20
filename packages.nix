@@ -1,6 +1,7 @@
 pkgs:
 [
   pkgs.awscli2
+  pkgs.bat
   pkgs.cargo
   pkgs.chafa
   pkgs.clang
