@@ -13,6 +13,7 @@
   "jordanbaird-ice"
   "jump-desktop-connect"
   "launchcontrol"
+  "microsoft-teams"
   "miniconda"
   "notion"
   "plex-media-server"
