@@ -5,12 +5,6 @@ return {
   version = false,
   opts = {
     provider = "copilot",
-    copilot = {
-      model = "o3-mini",
-      temperature = 0,
-      max_tokens = 64000,
-      reasoning_effort = "high",
-    },
   },
   build = "make",
   keys = {
