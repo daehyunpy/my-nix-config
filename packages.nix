@@ -1,15 +1,14 @@
 pkgs:
 [
   pkgs.awscli2
-  pkgs.bat
-  pkgs.cargo
-  pkgs.chafa
+  pkgs.bat  # enhanced cat
+  pkgs.cargo  # Rust package manager
   pkgs.clang
   pkgs.direnv
   pkgs.duckdb
-  pkgs.eternal-terminal
-  pkgs.fd
-  pkgs.fzf
+  pkgs.eternal-terminal  # remote terminal tool
+  pkgs.fd  # simple, fast and user-friendly alternative to find
+  pkgs.fzf  # command-line fuzzy finder
   pkgs.git-lfs
   pkgs.htop
   pkgs.jq
@@ -20,34 +19,31 @@ pkgs:
   pkgs.kustomize
   pkgs.lazydocker
   pkgs.lazygit
-  pkgs.lazysql
   pkgs.lua5_1
-  pkgs.luarocks
-  pkgs.mosh
-  pkgs.mutt
+  pkgs.luarocks  # package manager for Lua modules
+  pkgs.mosh  # mobile shell for remote connections
+  pkgs.mutt  # text-based email client
   pkgs.neovim
   pkgs.nodePackages.cspell
   pkgs.nodejs
-  pkgs.openblas
+  pkgs.nushell  # modern shell for structured data
+  pkgs.openblas  # optimized BLAS library
   pkgs.opencommit
-  pkgs.packer
-  pkgs.poetry
+  pkgs.packer  # machine image builder
+  pkgs.poetry  # dependency management and packaging for Python
   pkgs.python3Packages.pynvim
-  pkgs.quarto
   pkgs.rclone
-  pkgs.restic
-  pkgs.ripgrep
-  pkgs.ripgrep-all
+  pkgs.restic  # fast, efficient backup program
+  pkgs.ripgrep  # fast search tool
+  pkgs.ripgrep-all  # ripgrep extension supporting binary file searches
   pkgs.ruff
-  pkgs.rust-analyzer
+  pkgs.rust-analyzer  # IDE support for Rust
   pkgs.rustc
   pkgs.tailscale
   pkgs.tenv
   pkgs.tmux
   pkgs.tree-sitter
-  pkgs.ueberzugpp
   pkgs.uv
-  pkgs.viu
   pkgs.wget
-  pkgs.yq
+  pkgs.yq  # command-line YAML processor
 ]
