@@ -9,9 +9,15 @@ in
     username = lib.mkDefault "daehyun";
     homeDirectory = lib.mkDefault "/Users/daehyun";
     packages = import ./packages.nix pkgs;
-    sessionPath = [ "$HOME/.local/bin" ];
+    sessionPath = [
+      "$HOME/.local/bin"
+      "$HOME/.local/share/npm/bin"
+      "$HOME/.local/share/pnpm"
+    ];
     sessionVariables = {
       EDITOR = "${pkgs.neovim}/bin/nvim";
+      NPM_CONFIG_PREFIX = "${homePathString}/.local/share/npm";
+      PNPM_HOME = "${homePathString}/.local/share/pnpm";
       OCO_DESCRIPTION = "true";
       OCO_ONE_LINE_COMMIT = "true";
       OCO_GITPUSH = "false";
