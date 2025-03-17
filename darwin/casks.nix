@@ -1,9 +1,8 @@
 [
-  "anytype"
   "appcleaner"
-  "carbon-copy-cloner"
   "chatgpt"
   "claude"
+  "cursor"
   "dbeaver-community"
   "docker"
   "figma"
@@ -24,7 +23,6 @@
   "protonmail-bridge"
   "protonvpn"
   "qgis"
-  "rustrover"
   "tor-browser"
   "transmission"
   "visual-studio-code"

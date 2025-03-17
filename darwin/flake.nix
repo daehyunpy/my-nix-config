@@ -41,6 +41,7 @@
           "/System/Applications/Launchpad.app"
           "/System/Cryptexes/App/System/Applications/Safari.app"
           "/Applications/ChatGPT.app"
+          "/Applications/Claude.app"
           "/System/Applications/Messages.app"
           "/Applications/Slack.app"
           "/System/Applications/Mail.app"
@@ -53,6 +54,7 @@
           "/System/Applications/Utilities/Activity Monitor.app"
           "/Applications/WezTerm.app"
           "/Applications/Visual Studio Code.app"
+          "/Applications/Cursor.app"
           "/Applications/Fork.app"
           "/Applications/DBeaver.app"
         ];
