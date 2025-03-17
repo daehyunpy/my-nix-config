@@ -13,6 +13,7 @@
   let
     configuration = { pkgs, ... }: {
       nix.settings.experimental-features = "nix-command flakes";
+
       nixpkgs.config.allowUnfree = true;
       nixpkgs.overlays = [
         (final: prev: {
