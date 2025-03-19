@@ -65,12 +65,24 @@
           magnification = true;
           mru-spaces = false;
         };
+
         finder.ShowPathbar = true;
         finder.ShowStatusBar = true;
+
         menuExtraClock.Show24Hour = true;
+
         NSGlobalDomain.AppleShowAllExtensions = true;
         NSGlobalDomain.AppleWindowTabbingMode = "always";
+        CustomUserPreferences = {
+          "NSGlobalDomain" = {
+            NSQuitAlwaysKeepsWindows = true;
+          };
+          "com.apple.dock" = {
+            workspaces-auto-swoosh = false;
+          };
+        };
       };
+
       system.configurationRevision = self.rev or self.dirtyRev or null;
       system.stateVersion = 5;
 
