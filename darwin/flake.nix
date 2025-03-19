@@ -38,27 +38,33 @@
       programs.fish.enable = true;
 
       system.defaults = {
-        dock.persistent-apps = [
-          "/System/Applications/Launchpad.app"
-          "/System/Cryptexes/App/System/Applications/Safari.app"
-          "/Applications/ChatGPT.app"
-          "/Applications/Claude.app"
-          "/System/Applications/Messages.app"
-          "/Applications/Slack.app"
-          "/System/Applications/Mail.app"
-          "/System/Applications/Calendar.app"
-          "/System/Applications/Reminders.app"
-          "/System/Applications/Notes.app"
-          "/System/Applications/Freeform.app"
-          "/System/Applications/iPhone Mirroring.app"
-          "/System/Applications/Utilities/Screen Sharing.app"
-          "/System/Applications/Utilities/Activity Monitor.app"
-          "/Applications/WezTerm.app"
-          "/Applications/Visual Studio Code.app"
-          "/Applications/Cursor.app"
-          "/Applications/Fork.app"
-          "/Applications/DBeaver.app"
-        ];
+        dock = {
+          persistent-apps = [
+            "/System/Applications/Launchpad.app"
+            "/System/Cryptexes/App/System/Applications/Safari.app"
+            "/Applications/ChatGPT.app"
+            "/Applications/Claude.app"
+            "/System/Applications/Messages.app"
+            "/Applications/Slack.app"
+            "/System/Applications/Mail.app"
+            "/System/Applications/Calendar.app"
+            "/System/Applications/Reminders.app"
+            "/System/Applications/Notes.app"
+            "/System/Applications/Freeform.app"
+            "/System/Applications/iPhone Mirroring.app"
+            "/System/Applications/Utilities/Screen Sharing.app"
+            "/System/Applications/Utilities/Activity Monitor.app"
+            "/Applications/WezTerm.app"
+            "/Applications/Visual Studio Code.app"
+            "/Applications/Cursor.app"
+            "/Applications/Fork.app"
+            "/Applications/DBeaver.app"
+          ];
+          appswitcher-all-displays = true;
+          largesize = 128;
+          magnification = true;
+          mru-spaces = false;
+        };
         finder.ShowPathbar = true;
         finder.ShowStatusBar = true;
         menuExtraClock.Show24Hour = true;
