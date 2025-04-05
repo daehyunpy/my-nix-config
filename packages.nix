@@ -1,5 +1,6 @@
 pkgs:
 [
+  pkgs.aider-chat
   pkgs.awscli2
   pkgs.bat  # enhanced cat
   pkgs.cargo  # Rust package manager
@@ -31,6 +32,7 @@ pkgs:
   pkgs.opencommit
   pkgs.packer  # machine image builder
   pkgs.pnpm
+  pkgs.podman
   pkgs.poetry  # dependency management and packaging for Python
   pkgs.python3Packages.pynvim
   pkgs.rclone

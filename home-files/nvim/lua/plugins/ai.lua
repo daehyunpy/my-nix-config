@@ -5,6 +5,9 @@ return {
   version = false,
   opts = {
     provider = "copilot",
+    behaviour = {
+      auto_focus_sidebar = false,
+    },
   },
   build = "make",
   keys = {

@@ -4,7 +4,6 @@
   "claude"
   "cursor"
   "dbeaver-community"
-  "docker"
   "figma"
   "font-zed-mono-nerd-font"
   "fork"

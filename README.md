@@ -20,6 +20,12 @@
    darwin-rebuild switch --flake ~/.config/nix/darwin
    ```
 
+1. To upgrade the system, you can run:
+
+   ```sh
+   nix flake update --flake ~/.config/nix/darwin
+   ```
+
 ## Linux
 
 1. Install `nix`
