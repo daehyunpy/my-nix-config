@@ -11,6 +11,7 @@
   "jordanbaird-ice"
   "jump-desktop-connect"
   "launchcontrol"
+  "microsoft-edge"
   "microsoft-teams"
   "miniconda"
   "notion"

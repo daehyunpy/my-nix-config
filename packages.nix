@@ -1,8 +1,9 @@
 pkgs:
 [
-  pkgs.aider-chat
+  pkgs.aider-chat  # AI pair programming tool
   pkgs.awscli2
   pkgs.bat  # enhanced cat
+  pkgs.caddy
   pkgs.cargo  # Rust package manager
   pkgs.clang
   pkgs.direnv
@@ -25,8 +26,8 @@ pkgs:
   pkgs.mosh  # mobile shell for remote connections
   pkgs.mutt  # text-based email client
   pkgs.neovim
-  pkgs.nodePackages.cspell
   pkgs.nodejs
+  pkgs.nodePackages.cspell
   pkgs.nushell  # modern shell for structured data
   pkgs.openblas  # optimized BLAS library
   pkgs.opencommit
