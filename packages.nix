@@ -7,6 +7,7 @@ pkgs:
   pkgs.cargo  # Rust package manager
   pkgs.clang
   pkgs.direnv
+  pkgs.docker-client
   pkgs.duckdb
   pkgs.eternal-terminal  # remote terminal tool
   pkgs.fd  # simple, fast and user-friendly alternative to find
@@ -26,8 +27,8 @@ pkgs:
   pkgs.mosh  # mobile shell for remote connections
   pkgs.mutt  # text-based email client
   pkgs.neovim
-  pkgs.nodejs
   pkgs.nodePackages.cspell
+  pkgs.nodejs
   pkgs.nushell  # modern shell for structured data
   pkgs.openblas  # optimized BLAS library
   pkgs.opencommit
