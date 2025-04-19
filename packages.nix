@@ -12,7 +12,9 @@ pkgs:
   pkgs.eternal-terminal  # remote terminal tool
   pkgs.fd  # simple, fast and user-friendly alternative to find
   pkgs.fzf  # command-line fuzzy finder
+  pkgs.git-crypt
   pkgs.git-lfs
+  pkgs.gnupg
   pkgs.htop
   pkgs.jq
   pkgs.jupyter
@@ -27,8 +29,8 @@ pkgs:
   pkgs.mosh  # mobile shell for remote connections
   pkgs.mutt  # text-based email client
   pkgs.neovim
-  pkgs.nodePackages.cspell
   pkgs.nodejs
+  pkgs.nodePackages.cspell
   pkgs.nushell  # modern shell for structured data
   pkgs.openblas  # optimized BLAS library
   pkgs.opencommit
