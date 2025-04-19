@@ -52,5 +52,6 @@ pkgs:
   pkgs.wget
   pkgs.yq  # command-line YAML processor
 
+  # pkgs.unstable.codex  # soon to be available in unstable
   pkgs.unstable.claude-code
 ]

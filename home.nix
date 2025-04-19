@@ -22,7 +22,7 @@ in
       OCO_DESCRIPTION = "true";
       OCO_ONE_LINE_COMMIT = "true";
       OCO_GITPUSH = "false";
-    };
+    } // builtins.fromJSON (builtins.readFile ./secret-envs.json);
     file = {
       ".config/conda".source = ./home-files/conda;
       ".config/direnv".source = ./home-files/direnv;
