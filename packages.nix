@@ -8,6 +8,7 @@ pkgs:
   pkgs.clang
   pkgs.direnv
   pkgs.docker-client
+  pkgs.docker-credential-helpers
   pkgs.duckdb
   pkgs.eternal-terminal  # remote terminal tool
   pkgs.fd  # simple, fast and user-friendly alternative to find
