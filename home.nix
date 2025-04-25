@@ -44,7 +44,33 @@ in
     userEmail = lib.mkDefault "daehyun.park.you@proton.me";
     lfs.enable = true;
     extraConfig = {
+      branch.sort = "-committerdate";
+      column.ui = "auto";
+      diff = {
+        algorithm = "histogram";
+        colorMoved = "plain";
+        mnemonicPrefix = "true";
+        renames = "true";
+      };
+      fetch = {
+        prune = "true";
+        pruneTags = "true";
+        all = "true";
+      };
       init.defaultBranch = "main";
+      merge.conflictstyle = "zdiff3";
+      pull.rebase = "true";
+      push.autoSetupRemote = "true";
+      rebase = {
+        autoSquash = "true";
+        autoStash = "true";
+        updateRefs = "true";
+      };
+      rerere = {
+        enabled = "true";
+        autoupdate = "true";
+      };
+      tag.sort = "version:refname";
     };
   };
   programs.direnv.enable = true;
