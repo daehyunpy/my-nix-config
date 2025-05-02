@@ -16,7 +16,6 @@ in
     ];
     sessionVariables = {
       EDITOR = "${pkgs.neovim}/bin/nvim";
-      DOCKER_HOST = "unix:///var/run/docker.sock";
       NPM_CONFIG_PREFIX = "${homePathString}/.local/share/npm";
       PNPM_HOME = "${homePathString}/.local/share/pnpm";
       OCO_DESCRIPTION = "true";
