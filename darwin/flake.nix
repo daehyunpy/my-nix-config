@@ -57,7 +57,7 @@
             "/Applications/WezTerm.app"
             "/Applications/Visual Studio Code.app"
             "/Applications/Fork.app"
-            "/Applications/DBeaver.app"
+            "/Applications/TablePlus.app"
           ];
           appswitcher-all-displays = true;
           largesize = 128;
