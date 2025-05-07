@@ -26,7 +26,6 @@
   "protonmail-bridge"
   "protonvpn"
   "qgis"
-  "tableplus"
   "tor-browser"
   "transmission"
   "visual-studio-code"
