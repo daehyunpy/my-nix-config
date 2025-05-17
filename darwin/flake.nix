@@ -64,6 +64,7 @@
             "/System/Applications/Utilities/Activity Monitor.app"
             "/Applications/WezTerm.app"
             "/Applications/Visual Studio Code.app"
+            "/Applications/Zed.app"
             "/Applications/Fork.app"
             "/Applications/DBeaver.app"
           ];
@@ -137,6 +138,14 @@
             users.daehyun = import ./home.nix;
           };
         }
+        {
+          homebrew.casks = [
+            "bitwarden"
+            "docker"
+            "latexit"
+            "mactex-no-gui"
+          ];
+        }
       ];
     };
 
@@ -196,6 +205,11 @@
           home-manager = {
             users.daehyun = import ./home.nix;
           };
+        }
+        {
+          homebrew.casks = [
+            "plex-media-server"
+          ];
         }
       ];
     };
