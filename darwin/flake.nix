@@ -106,7 +106,7 @@
 
       users.users.daehyun = {
         home = "/Users/daehyun";
-        shell = "${pkgs.fish}/bin/fish";
+        shell = pkgs.fish;
       };
     };
   in
@@ -144,6 +144,7 @@
             "docker"
             "latexit"
             "mactex-no-gui"
+            "qgis"
           ];
         }
       ];

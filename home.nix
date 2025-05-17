@@ -15,6 +15,7 @@ in
       "$HOME/.local/share/pnpm"
     ];
     sessionVariables = {
+      EDITOR = "/usr/bin/vim";
       NPM_CONFIG_PREFIX = "${homePathString}/.local/share/npm";
       PNPM_HOME = "${homePathString}/.local/share/pnpm";
     } // builtins.fromJSON (builtins.readFile ./secret-envs.json);
