@@ -11,7 +11,7 @@
 
   outputs = {
     self,
-    nixpkgs,
+    nixpkgs,  # Expected warning
     nixpkgs-unstable,
     nix-darwin,
     nix-homebrew,
