@@ -78,8 +78,14 @@
 
         menuExtraClock.Show24Hour = true;
 
-        NSGlobalDomain.AppleShowAllExtensions = true;
-        NSGlobalDomain.AppleWindowTabbingMode = "always";
+        NSGlobalDomain = {
+          AppleMetricUnits = 1;
+          AppleTemperatureUnit = "Celsius";
+
+          AppleShowAllExtensions = true;
+          AppleWindowTabbingMode = "always";
+        };
+
         CustomUserPreferences = {
           "NSGlobalDomain" = {
             NSQuitAlwaysKeepsWindows = true;
