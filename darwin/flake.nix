@@ -80,6 +80,7 @@
         menuExtraClock.Show24Hour = true;
 
         NSGlobalDomain = {
+          AppleICUForce24HourTime = true;
           AppleMetricUnits = 1;
           AppleTemperatureUnit = "Celsius";
 
