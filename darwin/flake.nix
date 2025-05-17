@@ -9,7 +9,14 @@
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, nixpkgs-unstable, nix-darwin, nix-homebrew, home-manager }:
+  outputs = {
+    self,
+    nixpkgs,
+    nixpkgs-unstable,
+    nix-darwin,
+    nix-homebrew,
+    home-manager
+  }:
   let
     configuration = { pkgs, ... }: {
       nix.settings.experimental-features = "nix-command flakes";
@@ -50,6 +57,7 @@
             "/System/Applications/Calendar.app"
             "/System/Applications/Reminders.app"
             "/System/Applications/Notes.app"
+            "/System/Applications/Stickies.app"
             "/System/Applications/Freeform.app"
             "/System/Applications/iPhone Mirroring.app"
             "/System/Applications/Utilities/Screen Sharing.app"
