@@ -134,6 +134,36 @@
       ];
     };
 
+    darwinConfigurations.apollo = nix-darwin.lib.darwinSystem {
+      system = "aarch64-darwin";
+      modules = [
+        configuration
+        nix-homebrew.darwinModules.nix-homebrew {
+          nix-homebrew = {
+            enable = true;
+            enableRosetta = true;
+            user = "daehyun";
+          };
+        }
+        home-manager.darwinModules.home-manager {
+          home-manager = {
+            useGlobalPkgs = true;
+            useUserPackages = true;
+          };
+        }
+        home-manager.darwinModules.home-manager {
+          home-manager = {
+            users.daehyun = import ../home.nix;
+          };
+        }
+        home-manager.darwinModules.home-manager {
+          home-manager = {
+            users.daehyun = import ./home.nix;
+          };
+        }
+      ];
+    };
+
     darwinConfigurations.thales = nix-darwin.lib.darwinSystem {
       system = "aarch64-darwin";
       modules = [
