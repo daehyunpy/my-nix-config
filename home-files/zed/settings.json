@@ -1,8 +1,8 @@
 {
-  "assistant": {
+  "agent": {
     "default_model": {
-      "provider": "copilot_chat",
-      "model": "o1-preview"
+      "provider": "anthropic",
+      "model": "claude-3-7-sonnet-thinking-latest"
     },
     "version": "2"
   },

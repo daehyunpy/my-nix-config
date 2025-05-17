@@ -30,8 +30,9 @@ pkgs:
   pkgs.mosh  # mobile shell for remote connections
   pkgs.mutt  # text-based email client
   pkgs.neovim
-  pkgs.nodejs
+  pkgs.nixd
   pkgs.nodePackages.cspell
+  pkgs.nodejs
   pkgs.nushell  # modern shell for structured data
   pkgs.openblas  # optimized BLAS library
   pkgs.opencommit
@@ -55,6 +56,6 @@ pkgs:
   pkgs.wget
   pkgs.yq  # command-line YAML processor
 
-  # pkgs.unstable.codex  # soon to be available in unstable
   pkgs.unstable.claude-code
+  pkgs.unstable.codex
 ]
