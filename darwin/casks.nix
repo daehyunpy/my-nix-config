@@ -31,6 +31,5 @@
   "visual-studio-code"
   "wezterm"
   "zed"
-  "zen-browser"
   "zotero"
 ]

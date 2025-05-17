@@ -4,5 +4,4 @@
   "libomp"
   "mas"
   "mosh"
-  "postgresql"
 ]
