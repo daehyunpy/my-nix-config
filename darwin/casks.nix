@@ -2,7 +2,6 @@
   "appcleaner"
   "chatgpt"
   "claude"
-  "cursor"
   "dbeaver-community"
   "figma"
   "font-zed-mono-nerd-font"
