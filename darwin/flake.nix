@@ -63,8 +63,8 @@
             "/System/Applications/Utilities/Screen Sharing.app"
             "/System/Applications/Utilities/Activity Monitor.app"
             "/Applications/WezTerm.app"
-            "/Applications/Visual Studio Code.app"
             "/Applications/Zed.app"
+            "/Applications/Visual Studio Code.app"
             "/Applications/Fork.app"
             "/Applications/DBeaver.app"
           ];
