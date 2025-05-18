@@ -23,19 +23,21 @@
         "source.fixAll.ruff": true,
         "source.organizeImports.ruff": true
       }
+    },
+    "Nix": {
+      "language_servers": ["!nil", "nixd", "..."]
     }
   },
-  "ssh_connections": [
-    {
-      "host": "octo60",
-      "username": "dhyou",
-      "projects": [
-        {
-          "paths": ["~/Workspaces/60hz-cloud-match"]
+  "lsp": {
+    "nil": {
+      "initialization_options": {
+        "formatting": {
+          "command": ["nixfmt"]
         }
-      ]
+      }
     }
-  ],
+  },
+  "ssh_connections": [],
   "telemetry": {
     "metrics": false
   }

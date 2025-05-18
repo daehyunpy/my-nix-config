@@ -24,8 +24,8 @@ pkgs:
   pkgs.lazygit
   pkgs.mosh  # mobile shell for remote connections
   pkgs.mutt  # text-based email client
-  pkgs.nil  # Nix language server
-  pkgs.nixd  # Nix language server
+  pkgs.nixd
+  pkgs.nixfmt
   pkgs.openblas  # optimized BLAS library
   pkgs.podman
   pkgs.poetry
