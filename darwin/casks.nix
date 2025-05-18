@@ -20,6 +20,7 @@
   "proton-pass"
   "protonmail-bridge"
   "protonvpn"
+  "tableplus"
   "tor-browser"
   "transmission"
   "visual-studio-code"
