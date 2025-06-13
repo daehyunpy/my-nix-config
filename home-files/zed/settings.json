@@ -2,7 +2,7 @@
   "agent": {
     "default_model": {
       "provider": "anthropic",
-      "model": "claude-3-7-sonnet-thinking-latest"
+      "model": "claude-sonnet-4-thinking-latest"
     },
     "version": "2"
   },
@@ -37,7 +37,12 @@
       }
     }
   },
-  "ssh_connections": [],
+  "ssh_connections": [
+    {
+      "host": "octo61",
+      "projects": []
+    }
+  ],
   "telemetry": {
     "metrics": false
   }

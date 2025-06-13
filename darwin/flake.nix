@@ -1,105 +1,120 @@
 {
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-24.11-darwin";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-25.05-darwin";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    nix-darwin.url = "github:LnL7/nix-darwin/nix-darwin-24.11";
+    nix-darwin.url = "github:LnL7/nix-darwin/nix-darwin-25.05";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
-    home-manager.url = "github:nix-community/home-manager/release-24.11";
+    home-manager.url = "github:nix-community/home-manager/release-25.05";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, # Expected warning
-    nixpkgs-unstable, nix-darwin, nix-homebrew, home-manager }:
+  outputs =
+    {
+      self,
+      nixpkgs, # Expected warning
+      nixpkgs-unstable,
+      nix-darwin,
+      nix-homebrew,
+      home-manager,
+    }:
     let
-      configuration = { pkgs, ... }: {
-        nix.settings.experimental-features = "nix-command flakes";
+      configuration =
+        { pkgs, ... }:
+        {
+          nix.settings.experimental-features = "nix-command flakes";
 
-        nixpkgs.config.allowUnfree = true;
-        nixpkgs.overlays = [
-          (final: prev: {
-            unstable = import nixpkgs-unstable {
-              system = prev.system;
-              config.allowUnfree = true;
+          nixpkgs.config.allowUnfree = true;
+          nixpkgs.overlays = [
+            (final: prev: {
+              unstable = import nixpkgs-unstable {
+                system = prev.system;
+                config.allowUnfree = true;
+              };
+            })
+          ];
+
+          environment.systemPackages = [ pkgs.fish ];
+          environment.shells = [ pkgs.fish ];
+
+          homebrew = {
+            enable = true;
+            brews = import ./brews.nix;
+            casks = import ./casks.nix;
+            masApps = import ./mas-apps.nix;
+          };
+
+          programs.zsh.enable = true;
+          programs.fish.enable = true;
+
+          system.defaults = {
+            dock = {
+              persistent-apps = [
+                "/System/Cryptexes/App/System/Applications/Safari.app"
+                "/Applications/ChatGPT.app"
+                "/Applications/Claude.app"
+                "/System/Applications/Messages.app"
+                "/Applications/Slack.app"
+                "/System/Applications/Mail.app"
+                "/System/Applications/Calendar.app"
+                "/System/Applications/Reminders.app"
+                "/System/Applications/Notes.app"
+                "/System/Applications/Stickies.app"
+                "/System/Applications/Freeform.app"
+                "/System/Applications/iPhone Mirroring.app"
+                "/System/Applications/Utilities/Screen Sharing.app"
+                "/System/Applications/Utilities/Activity Monitor.app"
+                "/Applications/WezTerm.app"
+                "/Applications/Zed.app"
+                "/Applications/Visual Studio Code.app"
+                "/Applications/Fork.app"
+                "/Applications/DBeaver.app"
+              ];
+              appswitcher-all-displays = true;
+              largesize = 128;
+              magnification = true;
+              mru-spaces = false;
             };
-          })
-        ];
 
-        environment.systemPackages = [ pkgs.fish ];
-        environment.shells = [ pkgs.fish ];
+            finder.ShowPathbar = true;
+            finder.ShowStatusBar = true;
 
-        homebrew = {
-          enable = true;
-          brews = import ./brews.nix;
-          casks = import ./casks.nix;
-          masApps = import ./mas-apps.nix;
-        };
+            menuExtraClock.Show24Hour = true;
 
-        programs.zsh.enable = true;
-        programs.fish.enable = true;
+            NSGlobalDomain = {
+              AppleICUForce24HourTime = true;
+              AppleMetricUnits = 1;
+              AppleTemperatureUnit = "Celsius";
 
-        system.defaults = {
-          dock = {
-            persistent-apps = [
-              "/System/Cryptexes/App/System/Applications/Safari.app"
-              "/Applications/ChatGPT.app"
-              "/Applications/Claude.app"
-              "/System/Applications/Messages.app"
-              "/Applications/Slack.app"
-              "/System/Applications/Mail.app"
-              "/System/Applications/Calendar.app"
-              "/System/Applications/Reminders.app"
-              "/System/Applications/Notes.app"
-              "/System/Applications/Stickies.app"
-              "/System/Applications/Freeform.app"
-              "/System/Applications/iPhone Mirroring.app"
-              "/System/Applications/Utilities/Screen Sharing.app"
-              "/System/Applications/Utilities/Activity Monitor.app"
-              "/Applications/WezTerm.app"
-              "/Applications/Zed.app"
-              "/Applications/Visual Studio Code.app"
-              "/Applications/Fork.app"
-              "/Applications/DBeaver.app"
-            ];
-            appswitcher-all-displays = true;
-            largesize = 128;
-            magnification = true;
-            mru-spaces = false;
+              AppleShowAllExtensions = true;
+              AppleWindowTabbingMode = "always";
+            };
+
+            CustomUserPreferences = {
+              "NSGlobalDomain" = {
+                NSQuitAlwaysKeepsWindows = true;
+              };
+              "com.apple.dock" = {
+                workspaces-auto-swoosh = false;
+              };
+            };
           };
 
-          finder.ShowPathbar = true;
-          finder.ShowStatusBar = true;
+          system.primaryUser = "daehyun";
+          system.configurationRevision = self.rev or self.dirtyRev or null;
+          system.stateVersion = 5;
 
-          menuExtraClock.Show24Hour = true;
+          security.sudo.extraConfig = ''
+            %admin ALL=(ALL) NOPASSWD: ALL
+          '';
 
-          NSGlobalDomain = {
-            AppleICUForce24HourTime = true;
-            AppleMetricUnits = 1;
-            AppleTemperatureUnit = "Celsius";
-
-            AppleShowAllExtensions = true;
-            AppleWindowTabbingMode = "always";
-          };
-
-          CustomUserPreferences = {
-            "NSGlobalDomain" = { NSQuitAlwaysKeepsWindows = true; };
-            "com.apple.dock" = { workspaces-auto-swoosh = false; };
+          users.users.daehyun = {
+            home = "/Users/daehyun";
+            shell = pkgs.fish;
           };
         };
-
-        system.configurationRevision = self.rev or self.dirtyRev or null;
-        system.stateVersion = 5;
-
-        security.sudo.extraConfig = ''
-          %admin ALL=(ALL) NOPASSWD: ALL
-        '';
-
-        users.users.daehyun = {
-          home = "/Users/daehyun";
-          shell = pkgs.fish;
-        };
-      };
-    in {
+    in
+    {
       darwinConfigurations.morpheus = nix-darwin.lib.darwinSystem {
         system = "aarch64-darwin";
         modules = [
@@ -119,13 +134,24 @@
               useUserPackages = true;
             };
           }
-          home-manager.darwinModules.home-manager
-          { home-manager = { users.daehyun = import ../home.nix; }; }
-          home-manager.darwinModules.home-manager
-          { home-manager = { users.daehyun = import ./home.nix; }; }
           {
-            homebrew.casks =
-              [ "bitwarden" "docker" "latexit" "mactex-no-gui" "qgis" ];
+            home-manager = {
+              users.daehyun = import ../home.nix;
+            };
+          }
+          {
+            home-manager = {
+              users.daehyun = import ./home.nix;
+            };
+          }
+          {
+            homebrew.casks = [
+              "bitwarden"
+              "docker"
+              "latexit"
+              "mactex-no-gui"
+              "qgis"
+            ];
           }
         ];
       };
@@ -149,10 +175,16 @@
               useUserPackages = true;
             };
           }
-          home-manager.darwinModules.home-manager
-          { home-manager = { users.daehyun = import ../home.nix; }; }
-          home-manager.darwinModules.home-manager
-          { home-manager = { users.daehyun = import ./home.nix; }; }
+          {
+            home-manager = {
+              users.daehyun = import ../home.nix;
+            };
+          }
+          {
+            home-manager = {
+              users.daehyun = import ./home.nix;
+            };
+          }
         ];
       };
 
@@ -175,10 +207,16 @@
               useUserPackages = true;
             };
           }
-          home-manager.darwinModules.home-manager
-          { home-manager = { users.daehyun = import ../home.nix; }; }
-          home-manager.darwinModules.home-manager
-          { home-manager = { users.daehyun = import ./home.nix; }; }
+          {
+            home-manager = {
+              users.daehyun = import ../home.nix;
+            };
+          }
+          {
+            home-manager = {
+              users.daehyun = import ./home.nix;
+            };
+          }
           { homebrew.casks = [ "plex-media-server" ]; }
         ];
       };

@@ -2,10 +2,9 @@
 let
   homePathString = config.home.homeDirectory;
   makeOutOfStore = config.lib.file.mkOutOfStoreSymlink;
-in
-{
+in {
   home = {
-    stateVersion = "24.11";
+    stateVersion = "25.05";
     username = lib.mkDefault "daehyun";
     homeDirectory = lib.mkDefault "/Users/daehyun";
     packages = import ./packages.nix pkgs;
@@ -24,8 +23,10 @@ in
       ".config/direnv".source = ./home-files/direnv;
       ".config/tmux".source = ./home-files/tmux;
       ".config/wezterm".source = ./home-files/wezterm;
-      ".config/zed".source = makeOutOfStore "${homePathString}/.config/nix/home-files/zed";
-      ".ssh/config".source = makeOutOfStore "${homePathString}/.config/nix/home-files/ssh/config";
+      ".config/zed".source =
+        makeOutOfStore "${homePathString}/.config/nix/home-files/zed";
+      ".ssh/config".source =
+        makeOutOfStore "${homePathString}/.config/nix/home-files/ssh/config";
     };
   };
 
