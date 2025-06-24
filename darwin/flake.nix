@@ -66,7 +66,7 @@
                 "/System/Applications/Utilities/Activity Monitor.app"
                 "/Applications/WezTerm.app"
                 "/Applications/Zed.app"
-                "/Applications/Visual Studio Code.app"
+                "/Applications/Cursor.app"
                 "/Applications/Fork.app"
                 "/Applications/DBeaver.app"
               ];
