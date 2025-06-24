@@ -1,6 +1,7 @@
 {
   "amphetamine" = 937984704;
   "daisydisk" = 411643860;
+  "grammarly" = 1462114288;
   "jump-desktop" = 524141863;
   "kakaotalk" = 869223134;
   "keka" = 470158793;
