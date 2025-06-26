@@ -1,5 +1,6 @@
 {
   "agent": {
+    "default_profile": "write",
     "default_model": {
       "provider": "anthropic",
       "model": "claude-sonnet-4-thinking-latest"
@@ -18,14 +19,14 @@
   },
   "languages": {
     "Python": {
-      "language_servers": ["!pyright", "ruff", "..."],
+      "language_servers": ["ruff", "..."],
       "code_actions_on_format": {
         "source.fixAll.ruff": true,
         "source.organizeImports.ruff": true
       }
     },
-    "Nix": {
-      "language_servers": ["!nil", "nixd", "..."]
+    "SQL": {
+      "tab_size": 2
     }
   },
   "lsp": {
@@ -41,6 +42,16 @@
     {
       "host": "octo61",
       "projects": []
+    },
+    {
+      "host": "octo61",
+      "username": "trino",
+      "projects": [
+        {
+          "paths": ["/home/trino/deploy"]
+        }
+      ],
+      "nickname": "trino@octo61"
     }
   ],
   "telemetry": {
