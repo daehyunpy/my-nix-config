@@ -2,6 +2,7 @@ pkgs: [
   pkgs.aider-chat # AI pair programming tool
   pkgs.awscli2
   pkgs.bat # enhanced cat
+  pkgs.bmon
   pkgs.caddy
   pkgs.clang
   pkgs.claude-code
