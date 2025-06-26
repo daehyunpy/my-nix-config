@@ -147,7 +147,7 @@
           {
             homebrew.casks = [
               "bitwarden"
-              "docker"
+              "docker-desktop"
               "latexit"
               "mactex-no-gui"
               "qgis"
