@@ -2,6 +2,7 @@
   "appcleaner"
   "chatgpt"
   "claude"
+  "container"
   "cursor"
   "dbeaver-community"
   "figma"
