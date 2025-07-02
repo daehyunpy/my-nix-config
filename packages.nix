@@ -13,6 +13,7 @@ pkgs: [
   pkgs.duckdb
   pkgs.fd # simple, fast and user-friendly alternative to find
   pkgs.fzf # command-line fuzzy finder
+  pkgs.gemini-cli
   pkgs.git-crypt
   pkgs.git-lfs
   pkgs.gnupg
@@ -28,7 +29,9 @@ pkgs: [
   pkgs.mutt # text-based email client
   pkgs.nixd
   pkgs.nixfmt-rfc-style
+  pkgs.nodejs
   pkgs.openblas # optimized BLAS library
+  pkgs.pnpm
   pkgs.podman
   pkgs.poetry
   pkgs.rclone
