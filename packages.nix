@@ -4,7 +4,6 @@ pkgs: [
   pkgs.bat # enhanced cat
   pkgs.bmon
   pkgs.caddy
-  pkgs.clang
   pkgs.claude-code
   pkgs.codex
   pkgs.direnv
