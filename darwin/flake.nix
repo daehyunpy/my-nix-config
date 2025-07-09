@@ -145,6 +145,9 @@
             };
           }
           {
+            homebrew.brews = [
+              "gdal"
+            ];
             homebrew.casks = [
               "bitwarden"
               "docker-desktop"
@@ -152,15 +155,6 @@
               "mactex-no-gui"
               "qgis"
             ];
-            home-manager = {
-              users.daehyun =
-                { pkgs, ... }:
-                {
-                  home.packages = [
-                    pkgs.gdal
-                  ];
-                };
-            };
           }
         ];
       };
