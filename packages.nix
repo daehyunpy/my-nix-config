@@ -8,7 +8,6 @@ pkgs: [
   pkgs.codex
   pkgs.direnv
   pkgs.docker-client
-  pkgs.docker-credential-helpers
   pkgs.duckdb
   pkgs.fd # simple, fast and user-friendly alternative to find
   pkgs.fzf # command-line fuzzy finder
