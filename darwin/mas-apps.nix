@@ -8,7 +8,6 @@
   "keynote" = 409183694;
   "microsoft-excel" = 462058435;
   "microsoft-powerpoint" = 462062816;
-  "microsoft-remote-desktop" = 715768417;
   "microsoft-word" = 462054704;
   "mountain-duck" = 1024974133;
   "numbers" = 409203825;
@@ -17,5 +16,6 @@
   "slack" = 803453959;
   "tailscale" = 1475387142;
   "utm" = 1515205960;
+  "windows-app" = 1295203466;
   "xcode" = 497799835;
 }
