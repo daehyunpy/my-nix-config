@@ -1,8 +1,14 @@
-{ pkgs, config, lib, ... }:
+{
+  pkgs,
+  config,
+  lib,
+  ...
+}:
 let
   homePathString = config.home.homeDirectory;
   makeOutOfStore = config.lib.file.mkOutOfStoreSymlink;
-in {
+in
+{
   home = {
     stateVersion = "25.05";
     username = lib.mkDefault "daehyun";
@@ -17,16 +23,15 @@ in {
       EDITOR = "/usr/bin/vim";
       NPM_CONFIG_PREFIX = "${homePathString}/.local/share/npm";
       PNPM_HOME = "${homePathString}/.local/share/pnpm";
-    } // builtins.fromJSON (builtins.readFile ./secret-envs.json);
+    }
+    // builtins.fromJSON (builtins.readFile ./secret-envs.json);
     file = {
       ".config/conda".source = ./home-files/conda;
       ".config/direnv".source = ./home-files/direnv;
       ".config/tmux".source = ./home-files/tmux;
       ".config/wezterm".source = ./home-files/wezterm;
-      ".config/zed".source =
-        makeOutOfStore "${homePathString}/.config/nix/home-files/zed";
-      ".ssh/config".source =
-        makeOutOfStore "${homePathString}/.config/nix/home-files/ssh/config";
+      ".config/zed".source = makeOutOfStore "${homePathString}/.config/nix/home-files/zed";
+      ".ssh/config".source = makeOutOfStore "${homePathString}/.config/nix/home-files/ssh/config";
     };
   };
 

@@ -98,6 +98,10 @@
                 workspaces-auto-swoosh = false;
               };
             };
+
+            NSGlobalDomain.KeyRepeat = 1;
+            NSGlobalDomain."com.apple.trackpad.scaling" = 3.0;
+            ".GlobalPreferences"."com.apple.mouse.scaling" = 3.0;
           };
 
           system.primaryUser = "daehyun";
