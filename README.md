@@ -1,5 +1,29 @@
 # my-nix-config
 
+## How to decrypt on a new machine
+
+1. Generate a GPG key on the new machine and publish the key
+
+   ```sh
+   gpg --full-generate-key
+   gpg --send-keys $KEY_ID
+   ```
+
+1. Get the public key on the decrypted machine and register it
+
+   ```sh
+   gpg --receive-keys $KEY_ID
+   echo $KEY_ID:6: | gpg --import-ownertrust
+   git-crypt add-gpg-user $KEY_ID
+   ```
+
+1. Decrypt the repository on the new machine
+
+   ```sh
+   git-crypt unlock
+   ```
+
+
 ## macOS
 
 1. Install `nix`
@@ -33,6 +57,7 @@
    nix flake update --flake ~/.config/nix/darwin
    ```
 
+
 ## Linux
 
 1. Install `nix`
@@ -65,5 +90,6 @@
    ```sh
    nix flake update --flake ~/.config/nix/darwin
    ```
+
 
 ## NixOS
