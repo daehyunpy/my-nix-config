@@ -1,5 +1,6 @@
 pkgs: [
   pkgs.aider-chat # AI pair programming tool
+  pkgs.autossh
   pkgs.awscli2
   pkgs.bat # enhanced cat
   pkgs.bmon
@@ -7,7 +8,6 @@ pkgs: [
   pkgs.claude-code
   pkgs.codex
   pkgs.direnv
-  pkgs.docker-client
   pkgs.duckdb
   pkgs.fd # simple, fast and user-friendly alternative to find
   pkgs.fzf # command-line fuzzy finder
