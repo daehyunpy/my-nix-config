@@ -12,6 +12,8 @@
   "jordanbaird-ice"
   "jump-desktop-connect"
   "launchcontrol"
+  "macos-fuse-t/cask/fuse-t"
+  "macos-fuse-t/cask/fuse-t-sshfs"
   "microsoft-edge"
   "microsoft-teams"
   "miniconda"
