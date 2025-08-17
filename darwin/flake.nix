@@ -52,7 +52,6 @@
               persistent-apps = [
                 "/System/Cryptexes/App/System/Applications/Safari.app"
                 "/Applications/ChatGPT.app"
-                "/Applications/Claude.app"
                 "/System/Applications/Messages.app"
                 "/Applications/Slack.app"
                 "/System/Applications/Mail.app"
