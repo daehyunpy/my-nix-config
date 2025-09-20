@@ -26,6 +26,7 @@ pkgs: [
   pkgs.lazygit
   pkgs.mosh # mobile shell for remote connections
   pkgs.mutt # text-based email client
+  pkgs.nil # yet another language server for Nix
   pkgs.nixd
   pkgs.nixfmt-rfc-style
   pkgs.nodejs
