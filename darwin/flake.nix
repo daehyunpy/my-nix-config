@@ -20,7 +20,7 @@
     }:
     let
       configuration =
-        { pkgs, ... }:
+        { pkgs, lib, ... }:
         {
           nix.settings.experimental-features = "nix-command flakes";
 
@@ -49,7 +49,7 @@
 
           system.defaults = {
             dock = {
-              persistent-apps = [
+              persistent-apps = lib.mkDefault [
                 "/System/Cryptexes/App/System/Applications/Safari.app"
                 "/Applications/ChatGPT.app"
                 "/System/Applications/Messages.app"
@@ -59,7 +59,6 @@
                 "/System/Applications/Reminders.app"
                 "/System/Applications/Notes.app"
                 "/System/Applications/Stickies.app"
-                "/System/Applications/Freeform.app"
                 "/System/Applications/iPhone Mirroring.app"
                 "/System/Applications/Utilities/Screen Sharing.app"
                 "/System/Applications/Utilities/Activity Monitor.app"
@@ -223,7 +222,28 @@
               users.daehyun = import ./home.nix;
             };
           }
-          { homebrew.casks = [ "plex-media-server" ]; }
+          {
+            homebrew.casks = [ "plex-media-server" ];
+            system.defaults.dock.persistent-apps = [
+              "/System/Cryptexes/App/System/Applications/Safari.app"
+              "/Applications/Tor Browser.app"
+              "/Applications/ChatGPT.app"
+              "/System/Applications/Messages.app"
+              "/System/Applications/Mail.app"
+              "/System/Applications/Calendar.app"
+              "/System/Applications/Reminders.app"
+              "/System/Applications/Notes.app"
+              "/System/Applications/Stickies.app"
+              "/System/Applications/iPhone Mirroring.app"
+              "/System/Applications/Utilities/Screen Sharing.app"
+              "/System/Applications/Utilities/Activity Monitor.app"
+              "/Applications/WezTerm.app"
+              "/Applications/Zed.app"
+              "/Applications/Cursor.app"
+              "/Applications/Fork.app"
+              "/Applications/Transmission.app"
+            ];
+          }
         ];
       };
     };
