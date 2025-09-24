@@ -17,10 +17,10 @@
     "editor.defaultFormatter": "hashicorp.terraform"
   },
   "[toml]": {
-    "editor.formatOnSave": true
+    "editor.tabSize": 2
   },
   "[yaml]": {
-    "editor.formatOnSave": true
+    "editor.tabSize": 2
   },
   "cursor.windowSwitcher.sidebarHoverCollapsed": true,
   "debug.console.fontFamily": "'ZedMono Nerd Font Mono', monospace",
@@ -32,7 +32,9 @@
   "editor.largeFileOptimizations": false,
   "editor.renderWhitespace": "all",
   "editor.rulers": [72, 79],
-  "explorer.excludeGitIgnore": true,
+  "files.exclude": {
+    "**/.venv": true
+  },
   "files.insertFinalNewline": true,
   "files.trimTrailingWhitespace": true,
   "git.autofetch": true,
