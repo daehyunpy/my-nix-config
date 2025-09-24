@@ -1,0 +1,50 @@
+{
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2
+  },
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff"
+  },
+  "[sql]": {
+    "editor.tabSize": 2
+  },
+  "[terraform]": {
+    "editor.defaultFormatter": "hashicorp.terraform"
+  },
+  "[toml]": {
+    "editor.formatOnSave": true
+  },
+  "[yaml]": {
+    "editor.formatOnSave": true
+  },
+  "cursor.windowSwitcher.sidebarHoverCollapsed": true,
+  "debug.console.fontFamily": "'ZedMono Nerd Font Mono', monospace",
+  "debugpy.debugJustMyCode": false,
+  "editor.codeLensFontFamily": "'ZedMono Nerd Font Mono', monospace",
+  "editor.fontFamily": "'ZedMono Nerd Font Mono', monospace",
+  "editor.fontLigatures": true,
+  "editor.formatOnSave": true,
+  "editor.largeFileOptimizations": false,
+  "editor.renderWhitespace": "all",
+  "editor.rulers": [72, 79],
+  "explorer.excludeGitIgnore": true,
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
+  "git.autofetch": true,
+  "git.blame.editorDecoration.enabled": true,
+  "git.blame.statusBarItem.enabled": false,
+  "notebook.formatOnSave.enabled": true,
+  "terminal.integrated.defaultProfile.linux": "fish",
+  "terminal.integrated.defaultProfile.osx": "fish",
+  "terminal.integrated.fontLigatures.enabled": false,
+  "update.releaseTrack": "prerelease",
+  "window.autoDetectColorScheme": true,
+  "window.systemColorTheme": "auto",
+  "workbench.preferredDarkColorTheme": "Default Dark Modern",
+  "workbench.preferredLightColorTheme": "Default Light Modern"
+}

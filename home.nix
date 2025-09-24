@@ -33,6 +33,8 @@ in
       ".config/wezterm".source = ./home-files/wezterm;
       ".config/zed".source = makeOutOfStore "${homePathString}/.config/nix/home-files/zed";
       ".ssh/config".source = makeOutOfStore "${homePathString}/.config/nix/home-files/ssh/config";
+      "Library/Application Support/Cursor/User".source =
+        makeOutOfStore "${homePathString}/.config/nix/home-files/cursor";
     };
   };
 
