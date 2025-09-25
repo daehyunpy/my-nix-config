@@ -57,5 +57,22 @@
             })
           ];
         };
+      homeConfigurations."dhyou@octo62" =
+        home-manager.lib.homeManagerConfiguration {
+          pkgs = import nixpkgs { system = "x86_64-linux"; };
+          modules = [
+            configuration
+            (import ../home.nix)
+            (import ./home.nix)
+            ({ pkgs, ... }: {
+              home.username = "dhyou";
+              home.homeDirectory = "/home/dhyou";
+              programs.git.userEmail = "dhyou@60hz.io";
+              programs.fish.interactiveShellInit = ''
+                eval /opt/anaconda3/bin/conda shell.fish hook | source
+              '';
+            })
+          ];
+        };
     };
 }
