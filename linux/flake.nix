@@ -34,9 +34,6 @@
               home.username = "dhyou";
               home.homeDirectory = "/home/dhyou";
               programs.git.userEmail = "dhyou@60hz.io";
-              programs.fish.interactiveShellInit = ''
-                eval /opt/anaconda3/bin/conda shell.fish hook | source
-              '';
             })
           ];
         };
@@ -51,9 +48,6 @@
               home.username = "dhyou";
               home.homeDirectory = "/home/dhyou";
               programs.git.userEmail = "dhyou@60hz.io";
-              programs.fish.interactiveShellInit = ''
-                eval /opt/anaconda3/bin/conda shell.fish hook | source
-              '';
             })
           ];
         };
@@ -68,9 +62,6 @@
               home.username = "dhyou";
               home.homeDirectory = "/home/dhyou";
               programs.git.userEmail = "dhyou@60hz.io";
-              programs.fish.interactiveShellInit = ''
-                eval /opt/anaconda3/bin/conda shell.fish hook | source
-              '';
             })
           ];
         };

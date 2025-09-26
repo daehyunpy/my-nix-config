@@ -60,6 +60,8 @@
 
 ## Linux
 
+1. Install `fish` and add it to `/etc/shells`
+
 1. Install `nix`
 
 1. Leave the copy of this code at `~/.config/nix`
