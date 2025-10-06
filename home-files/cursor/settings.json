@@ -48,5 +48,7 @@
   "window.autoDetectColorScheme": true,
   "window.systemColorTheme": "auto",
   "workbench.preferredDarkColorTheme": "Default Dark Modern",
-  "workbench.preferredLightColorTheme": "Default Light Modern"
+  "workbench.preferredLightColorTheme": "Default Light Modern",
+  "geminicodeassist.project": "gen-lang-client-0193920743",
+  "geminicodeassist.displayInlineContextHint": false
 }
