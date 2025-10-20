@@ -17,8 +17,8 @@ pkgs: [
   pkgs.git-crypt
   pkgs.git-lfs
   pkgs.gnupg
+  pkgs.gtop
   pkgs.helix
-  pkgs.htop
   pkgs.jq
   pkgs.k9s
   pkgs.kubectx
