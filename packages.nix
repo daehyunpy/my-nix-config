@@ -1,5 +1,6 @@
 pkgs: [
   pkgs.aider-chat # AI pair programming tool
+  pkgs.amp-cli
   pkgs.autossh
   pkgs.awscli2
   pkgs.bat # enhanced cat
