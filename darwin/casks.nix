@@ -1,6 +1,7 @@
 [
   "appcleaner"
   "chatgpt"
+  "chatgpt-atlas"
   "claude"
   "container"
   "cursor"
