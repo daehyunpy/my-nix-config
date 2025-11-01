@@ -51,6 +51,7 @@
             dock = {
               persistent-apps = lib.mkDefault [
                 "/System/Cryptexes/App/System/Applications/Safari.app"
+                "/Applications/ChatGPT Atlas.app"
                 "/Applications/ChatGPT.app"
                 "/System/Applications/Messages.app"
                 "/Applications/Slack.app"
@@ -227,6 +228,7 @@
             system.defaults.dock.persistent-apps = [
               "/System/Cryptexes/App/System/Applications/Safari.app"
               "/Applications/Tor Browser.app"
+              "/Applications/ChatGPT Atlas.app"
               "/Applications/ChatGPT.app"
               "/System/Applications/Messages.app"
               "/System/Applications/Mail.app"
