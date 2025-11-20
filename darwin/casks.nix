@@ -10,7 +10,6 @@
   "font-zed-mono-nerd-font"
   "fork"
   "google-drive"
-  "jordanbaird-ice"
   "jump-desktop-connect"
   "launchcontrol"
   "macos-fuse-t/cask/fuse-t"
