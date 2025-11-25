@@ -90,7 +90,7 @@
 1. To upgrade the system, you can run:
 
    ```sh
-   nix flake update --flake ~/.config/nix/darwin
+   nix flake update --flake ~/.config/nix/linux
    ```
 
 
