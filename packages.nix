@@ -41,6 +41,7 @@ pkgs: [
   pkgs.ripgrep # fast search tool
   pkgs.ripgrep-all # ripgrep extension supporting binary file searches
   pkgs.ruff
+  pkgs.temurin-jre-bin
   pkgs.tenv
   pkgs.tmux
   pkgs.uv
