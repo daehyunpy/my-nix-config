@@ -28,6 +28,7 @@
   "tor-browser"
   "transmission"
   "visual-studio-code"
+  "warp"
   "wezterm"
   "zed"
   "zotero"
