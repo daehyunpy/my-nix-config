@@ -51,6 +51,7 @@
             dock = {
               persistent-apps = lib.mkDefault [
                 "/System/Cryptexes/App/System/Applications/Safari.app"
+                "/Applications/Dia.app"
                 "/Applications/ChatGPT Atlas.app"
                 "/Applications/ChatGPT.app"
                 "/System/Applications/Messages.app"
@@ -63,6 +64,7 @@
                 "/System/Applications/iPhone Mirroring.app"
                 "/System/Applications/Utilities/Screen Sharing.app"
                 "/System/Applications/Utilities/Activity Monitor.app"
+                "/Applications/Warp.app"
                 "/Applications/WezTerm.app"
                 "/Applications/Zed.app"
                 "/Applications/Cursor.app"
