@@ -22,7 +22,7 @@
   "proton-drive"
   "proton-mail"
   "proton-pass"
-  "protonmail-bridge"
+  "proton-mail-bridge"
   "protonvpn"
   "tableplus"
   "tor-browser"
