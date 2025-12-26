@@ -40,10 +40,10 @@ in
   programs.fish.enable = true;
   programs.git = {
     enable = true;
-    userName = "Daehyun You";
-    userEmail = lib.mkDefault "daehyun.park.you@proton.me";
     lfs.enable = true;
-    extraConfig = {
+    settings = {
+      user.name = "Daehyun You";
+      user.email = lib.mkDefault "daehyun.park.you@proton.me";
       branch.sort = "-committerdate";
       column.ui = "auto";
       diff = {
