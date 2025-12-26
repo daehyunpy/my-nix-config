@@ -1,15 +1,17 @@
 {
+  "features": {
+    "edit_prediction_provider": "zed"
+  },
   "agent": {
-    "default_profile": "write",
     "default_model": {
       "provider": "anthropic",
-      "model": "claude-sonnet-4-thinking-latest"
+      "model": "claude-sonnet-4-5-thinking-latest"
     },
-    "version": "2"
+    "model_parameters": []
   },
   "wrap_guides": [72, 79],
   "vim_mode": true,
-  "relative_line_numbers": true,
+  "relative_line_numbers": "enabled",
   "ui_font_size": 15,
   "buffer_font_size": 12,
   "theme": {

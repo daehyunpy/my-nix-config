@@ -50,5 +50,9 @@
   "workbench.preferredDarkColorTheme": "Default Dark Modern",
   "workbench.preferredLightColorTheme": "Default Light Modern",
   "geminicodeassist.project": "gen-lang-client-0193920743",
-  "geminicodeassist.displayInlineContextHint": false
+  "geminicodeassist.displayInlineContextHint": false,
+  "remote.SSH.remotePlatform": {
+    "octo62": "linux",
+    "octo61": "linux"
+  }
 }
