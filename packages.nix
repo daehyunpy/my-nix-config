@@ -4,6 +4,7 @@ pkgs: [
   pkgs.autossh
   pkgs.awscli2
   pkgs.bat # enhanced cat
+  pkgs.bun # fast JavaScript runtime
   pkgs.bmon
   pkgs.caddy
   pkgs.claude-code
