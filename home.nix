@@ -35,7 +35,12 @@ in
     };
   };
 
-  programs.zsh.enable = true;
+  programs.zsh = {
+    enable = true;
+    envExtra = ''
+      eval "$(direnv export zsh 2>/dev/null)"
+    '';
+  };
   programs.fish = {
     enable = true;
     shellInit = ''
