@@ -36,7 +36,12 @@ in
   };
 
   programs.zsh.enable = true;
-  programs.fish.enable = true;
+  programs.fish = {
+    enable = true;
+    shellInit = ''
+      direnv export fish | source
+    '';
+  };
   programs.git = {
     enable = true;
     lfs.enable = true;
