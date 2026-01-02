@@ -28,7 +28,6 @@ in
     file = {
       ".config/conda".source = ./home-files/conda;
       ".config/direnv".source = ./home-files/direnv;
-      ".config/kitty".source = makeOutOfStore "${homePathString}/.config/nix/home-files/kitty";
       ".config/tmux".source = ./home-files/tmux;
       ".config/wezterm".source = ./home-files/wezterm;
       ".config/zed".source = makeOutOfStore "${homePathString}/.config/nix/home-files/zed";
