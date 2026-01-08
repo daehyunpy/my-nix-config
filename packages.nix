@@ -1,9 +1,5 @@
 pkgs: [
-  pkgs.aider-chat # AI pair programming tool
-  pkgs.amp-cli
-  pkgs.autossh
   pkgs.awscli2
-  pkgs.bat # enhanced cat
   pkgs.bun # fast JavaScript runtime
   pkgs.bmon
   pkgs.caddy
@@ -18,8 +14,6 @@ pkgs: [
   pkgs.git-crypt
   pkgs.git-lfs
   pkgs.gnupg
-  pkgs.gtop
-  pkgs.helix
   pkgs.jq
   pkgs.k9s
   pkgs.kubectx
@@ -34,7 +28,6 @@ pkgs: [
   pkgs.nixfmt-rfc-style
   pkgs.nodejs
   pkgs.openblas # optimized BLAS library
-  pkgs.pnpm
   pkgs.podman
   pkgs.poetry
   pkgs.rclone
@@ -48,6 +41,4 @@ pkgs: [
   pkgs.uv
   pkgs.wget
   pkgs.yq # command-line YAML processor
-
-  pkgs.unstable.lazyssh
 ]
