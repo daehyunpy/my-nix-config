@@ -64,7 +64,6 @@
                 "/System/Applications/iPhone Mirroring.app"
                 "/System/Applications/Utilities/Screen Sharing.app"
                 "/System/Applications/Utilities/Activity Monitor.app"
-                "/Applications/Warp.app"
                 "/Applications/WezTerm.app"
                 "/Applications/Zed.app"
                 "/Applications/Cursor.app"
