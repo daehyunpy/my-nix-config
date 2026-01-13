@@ -43,5 +43,6 @@ pkgs: [
   pkgs.tmux
   pkgs.uv
   pkgs.wget
-  pkgs.yq # command-line YAML processor
+  pkgs.yq
+  pkgs.zellij
 ]
