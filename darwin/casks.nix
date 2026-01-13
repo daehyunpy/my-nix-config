@@ -3,6 +3,7 @@
   "chatgpt"
   "chatgpt-atlas"
   "claude"
+  "comet"
   "container"
   "cursor"
   "dbeaver-community"
