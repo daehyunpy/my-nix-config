@@ -17,6 +17,7 @@ pkgs: [
   pkgs.helix
   pkgs.jq
   pkgs.k9s
+  pkgs.kubectl
   pkgs.kubectx
   pkgs.kubernetes-helm
   pkgs.kustomize
