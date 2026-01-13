@@ -29,7 +29,8 @@ pkgs: [
   pkgs.nixd
   pkgs.nixfmt-rfc-style
   pkgs.nodejs
-  pkgs.openblas # optimized BLAS library
+  pkgs.openblas
+  pkgs.opencode
   pkgs.podman
   pkgs.poetry
   pkgs.rclone

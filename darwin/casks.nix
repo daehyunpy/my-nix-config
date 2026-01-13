@@ -18,6 +18,7 @@
   "macos-fuse-t/cask/fuse-t-sshfs"
   "miniconda"
   "notion"
+  "opencode-desktop"
   "postman"
   "proton-drive"
   "proton-mail"
