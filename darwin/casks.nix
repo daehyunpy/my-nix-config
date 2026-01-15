@@ -1,5 +1,6 @@
 [
   "appcleaner"
+  "cap"
   "chatgpt"
   "chatgpt-atlas"
   "claude"
