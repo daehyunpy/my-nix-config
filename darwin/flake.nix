@@ -51,8 +51,8 @@
             dock = {
               persistent-apps = lib.mkDefault [
                 "/System/Cryptexes/App/System/Applications/Safari.app"
-                "/Applications/Comet.app"
-                "/Applications/Perplexity.app"
+                "/Applications/Dia.app"
+                "/Applications/Claude.app"
                 "/System/Applications/Messages.app"
                 "/Applications/Slack.app"
                 "/System/Applications/Mail.app"
