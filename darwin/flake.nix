@@ -59,6 +59,7 @@
                 "/System/Applications/Calendar.app"
                 "/System/Applications/Reminders.app"
                 "/System/Applications/Notes.app"
+                "/Applications/Obsidian.app"
                 "/System/Applications/Stickies.app"
                 "/System/Applications/iPhone Mirroring.app"
                 "/System/Applications/Utilities/Screen Sharing.app"

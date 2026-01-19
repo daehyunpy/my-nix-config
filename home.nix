@@ -35,18 +35,8 @@ in
     };
   };
 
-  programs.zsh = {
-    enable = true;
-    envExtra = ''
-      eval "$(direnv export zsh 2>/dev/null)"
-    '';
-  };
-  programs.fish = {
-    enable = true;
-    shellInit = ''
-      direnv export fish | source
-    '';
-  };
+  programs.zsh.enable = true;
+  programs.fish.enable = true;
   programs.git = {
     enable = true;
     lfs.enable = true;
