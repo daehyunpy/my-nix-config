@@ -41,7 +41,7 @@
             enable = true;
             brews = import ./brews.nix;
             casks = import ./casks.nix;
-            masApps = import ./mas-apps.nix;
+            masApps = import ./mas.nix;
           };
 
           programs.zsh.enable = true;

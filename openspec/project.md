@@ -52,7 +52,7 @@ Goals:
 - **Python**: Ruff for linting and formatting, auto-format on save
 - **JSON/YAML**: Prettier with default settings
 - **Terraform**: Built-in formatter
-- **Naming**: Lowercase with hyphens for Nix files (e.g., `brews.nix`, `mas-apps.nix`)
+- **Naming**: Lowercase with hyphens for Nix files (e.g., `brews.nix`, `mas.nix`)
 
 ### Architecture Patterns
 
