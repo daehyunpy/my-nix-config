@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "craft": {
+      "url": "https://mcp.craft.do/links/Apoq5TER6oD/mcp",
+      "headers": {}
+    },
+    "atlassian": {
+      "url": "https://mcp.atlassian.com/v1/mcp",
+      "headers": {}
+    }
+  }
+}
