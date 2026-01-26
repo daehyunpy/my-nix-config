@@ -56,5 +56,6 @@
   },
   "claudeCode.preferredLocation": "panel",
   "remote.autoForwardPortsSource": "hybrid",
-  "workbench.editor.enablePreview": false
+  "workbench.editor.enablePreview": false,
+  "window.commandCenter": true
 }

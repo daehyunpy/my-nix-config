@@ -1,22 +1,16 @@
 {
   "permissions": {
     "allow": [
-      "Shell(ls)"
+      "Shell(ls)",
+      "Shell(git status)",
+      "Shell(git diff)",
+      "Shell(git log)"
     ],
     "deny": []
   },
   "version": 1,
   "editor": {
     "vimMode": false
-  },
-  "hasChangedDefaultModel": false,
-  "privacyCache": {
-    "ghostMode": true,
-    "privacyMode": 2,
-    "updatedAt": 1768685830636
-  },
-  "network": {
-    "useHttp1ForAgent": false
   },
   "model": {
     "modelId": "claude-4.5-opus-high-thinking",
@@ -27,5 +21,14 @@
       "opus-4.5-thinking",
       "claude-4.5-opus-thinking"
     ]
+  },
+  "hasChangedDefaultModel": false,
+  "privacyCache": {
+    "ghostMode": true,
+    "privacyMode": 2,
+    "updatedAt": 1769452294357
+  },
+  "network": {
+    "useHttp1ForAgent": false
   }
 }
