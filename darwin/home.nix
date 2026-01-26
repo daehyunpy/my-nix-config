@@ -7,7 +7,7 @@ in
   home.packages = import ./packages.nix pkgs;
   home.file = {
     "Library/Application Support/Cursor/User".source =
-      makeOutOfStore "${homePathString}/.config/nix/home-files/cursor";
+      makeOutOfStore "${homePathString}/.config/nix/home-files/cursor-user";
   };
 
   programs.fish = {

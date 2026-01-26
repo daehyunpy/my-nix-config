@@ -41,7 +41,6 @@
   "git.blame.editorDecoration.enabled": true,
   "git.blame.statusBarItem.enabled": false,
   "notebook.formatOnSave.enabled": true,
-  "terminal.integrated.defaultProfile.linux": "fish",
   "terminal.integrated.defaultProfile.osx": "fish",
   "terminal.integrated.fontLigatures.enabled": false,
   "update.releaseTrack": "prerelease",
@@ -54,5 +53,8 @@
   "remote.SSH.remotePlatform": {
     "octo62": "linux",
     "octo61": "linux"
-  }
+  },
+  "claudeCode.preferredLocation": "panel",
+  "remote.autoForwardPortsSource": "hybrid",
+  "workbench.editor.enablePreview": false
 }
