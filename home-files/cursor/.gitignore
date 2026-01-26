@@ -1,6 +1,7 @@
 /ai-tracking
+/argv.json
 /extensions
+/ide_state.json
 /plans
 /projects
-/argv.json
-/ide_state.json
+/worktrees
