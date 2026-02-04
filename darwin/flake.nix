@@ -116,50 +116,6 @@
         };
     in
     {
-      darwinConfigurations.morpheus = nix-darwin.lib.darwinSystem {
-        system = "aarch64-darwin";
-        modules = [
-          configuration
-          nix-homebrew.darwinModules.nix-homebrew
-          {
-            nix-homebrew = {
-              enable = true;
-              enableRosetta = true;
-              user = "daehyun";
-            };
-          }
-          home-manager.darwinModules.home-manager
-          {
-            home-manager = {
-              useGlobalPkgs = true;
-              useUserPackages = true;
-            };
-          }
-          {
-            home-manager = {
-              users.daehyun = import ../home.nix;
-            };
-          }
-          {
-            home-manager = {
-              users.daehyun = import ./home.nix;
-            };
-          }
-          {
-            homebrew.brews = [
-              "gdal"
-            ];
-            homebrew.casks = [
-              "bitwarden"
-              "docker-desktop"
-              "latexit"
-              "mactex-no-gui"
-              "qgis"
-            ];
-          }
-        ];
-      };
-
       darwinConfigurations.apollo = nix-darwin.lib.darwinSystem {
         system = "aarch64-darwin";
         modules = [
@@ -222,7 +178,12 @@
             };
           }
           {
-            homebrew.casks = [ "plex-media-server" ];
+            homebrew.brews = [
+              "openclaw-cli"
+            ];
+            homebrew.casks = [
+              "plex-media-server"
+            ];
           }
         ];
       };

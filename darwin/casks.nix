@@ -7,6 +7,7 @@
   "container"
   "cursor"
   "dbeaver-community"
+  "discord"
   "figma"
   "font-zed-mono-nerd-font"
   "fork"
