@@ -1,4 +1,5 @@
 [
   "mas"
   "mosh"
+  "opencode"
 ]
