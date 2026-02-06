@@ -3,14 +3,11 @@ pkgs: [
   pkgs.bun # fast JavaScript runtime
   pkgs.bmon
   pkgs.caddy
-  pkgs.claude-code
-  pkgs.codex
   pkgs.direnv
   pkgs.docker-client
   pkgs.duckdb
   pkgs.fd # simple, fast and user-friendly alternative to find
   pkgs.fzf # command-line fuzzy finder
-  pkgs.gemini-cli
   pkgs.git-crypt
   pkgs.git-lfs
   pkgs.gnupg
@@ -24,20 +21,12 @@ pkgs: [
   pkgs.lazydocker
   pkgs.lazygit
   pkgs.mosh # mobile shell for remote connections
-  pkgs.mutt # text-based email client
   pkgs.neovim
-  pkgs.nil # yet another language server for Nix
-  pkgs.nixd
-  pkgs.nixfmt-rfc-style
   pkgs.nodejs
-  pkgs.openblas
-  pkgs.opencode
   pkgs.podman
   pkgs.poetry
   pkgs.rclone
   pkgs.restic # fast, efficient backup program
-  pkgs.ripgrep # fast search tool
-  pkgs.ripgrep-all # ripgrep extension supporting binary file searches
   pkgs.ruff
   pkgs.temurin-jre-bin
   pkgs.tenv
