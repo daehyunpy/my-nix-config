@@ -1,10 +1,11 @@
 /*history*
 /*state.json
 /*storage
-/ai-tracking
+/ai-tracking/
 /argv.json
-/chats
-/extensions
-/plans
-/projects
-/worktrees
+/chats/
+/extensions/
+/plans/
+/projects/
+/skills-cursor/
+/worktrees/
