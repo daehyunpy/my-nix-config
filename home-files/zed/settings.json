@@ -1,62 +1,38 @@
 {
-  "features": {
-    "edit_prediction_provider": "zed"
+  "git_panel": {
+    "tree_view": true,
   },
+  "edit_predictions": {
+    "provider": "zed",
+  },
+  "helix_mode": true,
   "agent": {
     "default_model": {
-      "provider": "anthropic",
-      "model": "claude-sonnet-4-5-thinking-latest"
+      "provider": "google",
+      "model": "gemini-3-pro-preview",
     },
-    "model_parameters": []
+    "model_parameters": [],
   },
   "wrap_guides": [72, 79],
-  "vim_mode": true,
   "relative_line_numbers": "enabled",
-  "ui_font_size": 15,
-  "buffer_font_size": 12,
   "theme": {
     "mode": "system",
     "light": "One Light",
-    "dark": "One Dark"
+    "dark": "One Dark",
   },
   "languages": {
     "Python": {
       "language_servers": ["ruff", "..."],
       "code_actions_on_format": {
         "source.fixAll.ruff": true,
-        "source.organizeImports.ruff": true
-      }
+        "source.organizeImports.ruff": true,
+      },
     },
     "SQL": {
-      "tab_size": 2
-    }
-  },
-  "lsp": {
-    "nil": {
-      "initialization_options": {
-        "formatting": {
-          "command": ["nixfmt"]
-        }
-      }
-    }
-  },
-  "ssh_connections": [
-    {
-      "host": "octo61",
-      "projects": []
+      "tab_size": 2,
     },
-    {
-      "host": "octo61",
-      "username": "trino",
-      "projects": [
-        {
-          "paths": ["/home/trino/deploy"]
-        }
-      ],
-      "nickname": "trino@octo61"
-    }
-  ],
+  },
   "telemetry": {
-    "metrics": false
-  }
+    "metrics": false,
+  },
 }
