@@ -1,10 +1,10 @@
 /*history*
+/*state.json
 /*storage
 /ai-tracking
 /argv.json
 /chats
 /extensions
-/ide_state.json
 /plans
 /projects
 /worktrees
