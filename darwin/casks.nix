@@ -28,7 +28,6 @@
   "proton-mail"
   "proton-pass"
   "protonvpn"
-  "thebrowsercompany-dia"
   "tor-browser"
   "transmission"
   "warp"

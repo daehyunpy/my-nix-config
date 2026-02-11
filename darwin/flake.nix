@@ -50,8 +50,7 @@
           system.defaults = {
             dock = {
               persistent-apps = lib.mkDefault [
-                "/System/Cryptexes/App/System/Applications/Safari.app"
-                "/Applications/Dia.app"
+                "/Applications/ChatGPT Atlas.app"
                 "/Applications/Claude.app"
                 "/System/Applications/Messages.app"
                 "/Applications/Slack.app"
