@@ -31,6 +31,7 @@ in
       ".config/tmux".source = ./home-files/tmux;
       ".config/wezterm".source = ./home-files/wezterm;
       ".config/zed".source = makeOutOfStore "${homePathString}/.config/nix/home-files/zed";
+      ".claude".source = makeOutOfStore "${homePathString}/.config/nix/home-files/claude";
       ".cursor".source = makeOutOfStore "${homePathString}/.config/nix/home-files/cursor";
       ".ssh/config".source = makeOutOfStore "${homePathString}/.config/nix/home-files/ssh/config";
     };
