@@ -62,6 +62,7 @@
                 "/System/Applications/Utilities/Screen Sharing.app"
                 "/System/Applications/Utilities/Activity Monitor.app"
                 "/Applications/WezTerm.app"
+                "/Applications/Zed.app"
                 "/Applications/Cursor.app"
                 "/Applications/Fork.app"
                 "/Applications/DBeaver.app"
