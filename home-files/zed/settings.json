@@ -1,4 +1,16 @@
 {
+  "buffer_font_size": 12.0,
+  "ssh_connections": [
+    {
+      "host": "octo61",
+      "args": [],
+      "projects": [
+        {
+          "paths": ["/home/dhyou/Workspaces/60hz-grid-cast/main/./"],
+        },
+      ],
+    },
+  ],
   "git_panel": {
     "tree_view": true,
   },

@@ -1,26 +1,26 @@
 {
   "[json]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.tabSize": 2
+    "editor.tabSize": 2,
   },
   "[jsonc]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.tabSize": 2
+    "editor.tabSize": 2,
   },
   "[python]": {
-    "editor.defaultFormatter": "charliermarsh.ruff"
+    "editor.defaultFormatter": "charliermarsh.ruff",
   },
   "[sql]": {
-    "editor.tabSize": 2
+    "editor.tabSize": 2,
   },
   "[terraform]": {
-    "editor.defaultFormatter": "hashicorp.terraform"
+    "editor.defaultFormatter": "hashicorp.terraform",
   },
   "[toml]": {
-    "editor.tabSize": 2
+    "editor.tabSize": 2,
   },
   "[yaml]": {
-    "editor.tabSize": 2
+    "editor.tabSize": 2,
   },
   "cursor.windowSwitcher.sidebarHoverCollapsed": true,
   "debug.console.fontFamily": "'ZedMono Nerd Font Mono', monospace",
@@ -33,7 +33,7 @@
   "editor.renderWhitespace": "all",
   "editor.rulers": [72, 79],
   "files.exclude": {
-    "**/.venv": true
+    "**/.venv": true,
   },
   "files.insertFinalNewline": true,
   "files.trimTrailingWhitespace": true,
@@ -52,10 +52,11 @@
   "geminicodeassist.displayInlineContextHint": false,
   "remote.SSH.remotePlatform": {
     "octo62": "linux",
-    "octo61": "linux"
+    "octo61": "linux",
   },
   "claudeCode.preferredLocation": "panel",
   "remote.autoForwardPortsSource": "hybrid",
   "workbench.editor.enablePreview": false,
-  "window.commandCenter": true
+  "window.commandCenter": true,
+  "claudeCode.selectedModel": "opus",
 }
