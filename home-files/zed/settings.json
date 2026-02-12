@@ -34,7 +34,6 @@
   },
   "languages": {
     "Python": {
-      "language_servers": ["ruff", "..."],
       "code_actions_on_format": {
         "source.fixAll.ruff": true,
         "source.organizeImports.ruff": true,
