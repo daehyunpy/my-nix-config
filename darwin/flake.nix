@@ -183,6 +183,7 @@
             ];
             homebrew.casks = [
               "plex-media-server"
+              "ultimate"
             ];
           }
         ];
