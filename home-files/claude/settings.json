@@ -11,9 +11,14 @@
     "superpowers@claude-plugins-official": true,
     "plugin-dev@claude-plugins-official": true,
     "claude-code-setup@claude-plugins-official": true,
-    "learning-output-style@claude-plugins-official": true
+    "learning-output-style@claude-plugins-official": true,
+    "cowork-plugin-management@knowledge-work-plugins": true,
+    "data@knowledge-work-plugins": true,
+    "enterprise-search@knowledge-work-plugins": true,
+    "product-management@knowledge-work-plugins": true,
+    "productivity@knowledge-work-plugins": true,
+    "explanatory-output-style@claude-plugins-official": true
   },
-  "alwaysThinkingEnabled": true,
   "extraKnownMarketplaces": {
     "claude-plugins-official": {
       "source": {
@@ -27,5 +32,6 @@
         "repo": "anthropics/skills"
       }
     }
-  }
+  },
+  "alwaysThinkingEnabled": true
 }
