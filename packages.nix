@@ -22,6 +22,9 @@ pkgs: [
   pkgs.lazygit
   pkgs.mosh # mobile shell for remote connections
   pkgs.neovim
+  pkgs.nil # Nix language server
+  pkgs.nixd # Nix language server daemon
+  pkgs.nixfmt # Nix language formatter
   pkgs.nodejs
   pkgs.podman
   pkgs.poetry
