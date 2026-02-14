@@ -183,8 +183,6 @@
             ];
             homebrew.casks = [
               "plex-media-server"
-              "ridibooks"
-              "ultimate"
             ];
           }
         ];
