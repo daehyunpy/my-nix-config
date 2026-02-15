@@ -1,37 +1,22 @@
 {
-  "vim_mode": true,
-  "buffer_font_size": 12.0,
-  "ssh_connections": [
-    {
-      "host": "octo61",
-      "args": [],
-      "projects": [
-        {
-          "paths": ["/home/dhyou/Workspaces/60hz-grid-cast/main/./"],
-        },
-      ],
+  "agent": {
+    "default_model": {
+      "model": "gemini-3-pro-preview",
+      "provider": "google",
     },
-  ],
-  "git_panel": {
-    "tree_view": true,
   },
+  "autosave": "on_focus_change",
+  "buffer_font_size": 12.0,
   "edit_predictions": {
     "provider": "zed",
   },
-  "helix_mode": true,
-  "agent": {
-    "default_model": {
-      "provider": "google",
-      "model": "gemini-3-pro-preview",
-    },
-    "model_parameters": [],
+  "format_on_save": "on",
+  "git_panel": {
+    "tree_view": true,
   },
-  "wrap_guides": [72, 79],
-  "relative_line_numbers": "enabled",
-  "theme": {
-    "mode": "system",
-    "light": "One Light",
-    "dark": "One Dark",
+  "helix_mode": true,
+  "inlay_hints": {
+    "enabled": true,
   },
   "languages": {
     "Python": {
@@ -44,7 +29,18 @@
       "tab_size": 2,
     },
   },
+  "relative_line_numbers": "enabled",
   "telemetry": {
+    "diagnostics": false,
     "metrics": false,
   },
+  "terminal": {
+    "line_height": "comfortable",
+  },
+  "theme": {
+    "dark": "One Dark",
+    "light": "One Light",
+    "mode": "system",
+  },
+  "wrap_guides": [72, 79],
 }
