@@ -10,6 +10,7 @@ pkgs: [
   pkgs.fzf # command-line fuzzy finder
   pkgs.git-crypt
   pkgs.git-lfs
+  pkgs.gh # GitHub CLI
   pkgs.gnupg
   pkgs.helix
   pkgs.jq
