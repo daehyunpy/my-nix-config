@@ -1,10 +1,9 @@
 pkgs: [
   pkgs.awscli2
   pkgs.bun # fast JavaScript runtime
-  pkgs.bmon
+  pkgs.btop # resource monitor
   pkgs.caddy
   pkgs.direnv
-  pkgs.docker-client
   pkgs.duckdb
   pkgs.fd # simple, fast and user-friendly alternative to find
   pkgs.fzf # command-line fuzzy finder
@@ -27,8 +26,6 @@ pkgs: [
   pkgs.nixd # Nix language server daemon
   pkgs.nixfmt # Nix language formatter
   pkgs.nodejs
-  pkgs.podman
-  pkgs.poetry
   pkgs.rclone
   pkgs.restic # fast, efficient backup program
   pkgs.ruff
