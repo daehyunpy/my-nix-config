@@ -20,7 +20,7 @@ pkgs: [
   pkgs.kustomize # Kubernetes YAML customization tool
   pkgs.lazydocker # terminal UI for Docker
   pkgs.lazygit # terminal UI for Git
-  pkgs.mise # polyglot runtime and tool version manager
+  pkgs.devbox # reproducible development environments
   pkgs.mosh # mobile shell for remote connections
   pkgs.neovim # extensible Vim-based text editor
   pkgs.nil # Nix language server
