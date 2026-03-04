@@ -1,12 +1,26 @@
 {
   "agent": {
+    "tool_permissions": {
+      "tools": {
+        "terminal": {
+          "always_allow": [
+            {
+              "pattern": "^git\\s+status(\\s|$)"
+            },
+            {
+              "pattern": "^git\\s+add(\\s|$)"
+            }
+          ]
+        }
+      }
+    },
     "default_model": {
-      "model": "gemini-3-pro-preview",
+      "enable_thinking": true,
+      "model": "gemini-3.1-pro-preview",
       "provider": "google",
     },
   },
   "autosave": "on_focus_change",
-  "buffer_font_size": 12.0,
   "edit_predictions": {
     "provider": "zed",
   },
@@ -33,9 +47,6 @@
   "telemetry": {
     "diagnostics": false,
     "metrics": false,
-  },
-  "terminal": {
-    "line_height": "comfortable",
   },
   "theme": {
     "dark": "One Dark",

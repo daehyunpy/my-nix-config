@@ -52,7 +52,7 @@
   "geminicodeassist.displayInlineContextHint": false,
   "remote.SSH.remotePlatform": {
     "octo62": "linux",
-    "octo61": "linux",
+    "octo61": "linux"
   },
   "claudeCode.preferredLocation": "panel",
   "remote.autoForwardPortsSource": "hybrid",
