@@ -59,4 +59,6 @@
   "workbench.editor.enablePreview": false,
   "window.commandCenter": true,
   "claudeCode.selectedModel": "opus",
+  "cursor.composer.shouldChimeAfterChatFinishes": true,
+  "editor.accessibilitySupport": "on",
 }
