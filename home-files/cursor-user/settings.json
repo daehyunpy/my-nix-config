@@ -61,4 +61,5 @@
   "claudeCode.selectedModel": "opus",
   "cursor.composer.shouldChimeAfterChatFinishes": true,
   "editor.accessibilitySupport": "on",
+  "cursor.cpp.enablePartialAccepts": true,
 }
