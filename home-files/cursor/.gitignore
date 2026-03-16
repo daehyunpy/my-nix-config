@@ -1,7 +1,14 @@
-# Ignore everything at top level
-/*
-# Tracked directories
+# Ignore everything in .cursor
+*
+# User's personal skills
 !skills/
+!skills/**
+# User's personal slash commands
 !commands/
+!commands/**
+# Subagent state/transcripts
 !subagents/
+!subagents/**
+# User-level cursor rules
 !rules/
+!rules/**
