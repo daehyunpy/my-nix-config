@@ -20,7 +20,7 @@ in
       "/etc/profiles/per-user/$USER/bin"
     ];
     sessionVariables = {
-      EDITOR = pkgs.helix;
+      EDITOR = "${pkgs.helix}/bin/hx";
     }
     // builtins.fromJSON (builtins.readFile ./secret-envs.json);
     file = {
