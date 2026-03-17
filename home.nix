@@ -16,13 +16,11 @@ in
     packages = import ./packages.nix pkgs;
     sessionPath = [
       "$HOME/.local/bin"
-      "$HOME/.local/share/npm/bin"
-      "$HOME/.local/share/pnpm"
+      "$HOME/.nix-profile/bin"
+      "/etc/profiles/per-user/$USER/bin"
     ];
     sessionVariables = {
-      EDITOR = "/usr/bin/vim";
-      NPM_CONFIG_PREFIX = "${homePathString}/.local/share/npm";
-      PNPM_HOME = "${homePathString}/.local/share/pnpm";
+      EDITOR = pkgs.helix;
     }
     // builtins.fromJSON (builtins.readFile ./secret-envs.json);
     file = {
