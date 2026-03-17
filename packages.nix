@@ -4,6 +4,7 @@ pkgs: [
   pkgs.btop # terminal resource monitor
   pkgs.caddy # web server and reverse proxy
   pkgs.direnv # directory-based environment loader
+  pkgs.docker-client # Docker command-line interface
   pkgs.duckdb # in-process analytical SQL database
   pkgs.fd # simple, fast and user-friendly alternative to find
   pkgs.fzf # command-line fuzzy finder
