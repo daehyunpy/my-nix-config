@@ -37,7 +37,7 @@
         };
     in
     {
-      homeConfigurations."dhyou@octo60" = home-manager.lib.homeManagerConfiguration {
+      homeConfigurations.charon = home-manager.lib.homeManagerConfiguration {
         pkgs = import nixpkgs { system = "x86_64-linux"; };
         modules = [
           configuration
@@ -46,46 +46,13 @@
           (
             { pkgs, ... }:
             {
-              home.username = "dhyou";
-              home.homeDirectory = "/home/dhyou";
-              programs.git.settings.user.email = "dhyou@60hz.io";
-            }
-          )
-        ];
-      };
-      homeConfigurations."dhyou@octo61" = home-manager.lib.homeManagerConfiguration {
-        pkgs = import nixpkgs { system = "x86_64-linux"; };
-        modules = [
-          configuration
-          (import ../home.nix)
-          (import ./home.nix)
-          (
-            { pkgs, ... }:
-            {
-              home.username = "dhyou";
-              home.homeDirectory = "/home/dhyou";
-              programs.git.settings.user.email = "dhyou@60hz.io";
+              home.homeDirectory = "/home/daehyun";
+              programs.git.settings.user.email = "dyou@goremutual.ca";
               programs.fish = {
                 interactiveShellInit = ''
                   eval /opt/anaconda3/bin/conda shell.fish hook | source
                 '';
               };
-            }
-          )
-        ];
-      };
-      homeConfigurations."dhyou@octo62" = home-manager.lib.homeManagerConfiguration {
-        pkgs = import nixpkgs { system = "x86_64-linux"; };
-        modules = [
-          configuration
-          (import ../home.nix)
-          (import ./home.nix)
-          (
-            { pkgs, ... }:
-            {
-              home.username = "dhyou";
-              home.homeDirectory = "/home/dhyou";
-              programs.git.settings.user.email = "dhyou@60hz.io";
             }
           )
         ];
