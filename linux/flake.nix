@@ -48,11 +48,6 @@
             {
               home.homeDirectory = "/home/daehyun";
               programs.git.settings.user.email = "dyou@goremutual.ca";
-              programs.fish = {
-                interactiveShellInit = ''
-                  eval /opt/anaconda3/bin/conda shell.fish hook | source
-                '';
-              };
             }
           )
         ];
