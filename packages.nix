@@ -1,5 +1,6 @@
 pkgs: [
   pkgs.awscli2 # AWS command-line interface v2
+  pkgs.azure-cli # Azure command-line interface
   pkgs.bun # fast JavaScript runtime
   pkgs.btop # terminal resource monitor
   pkgs.caddy # web server and reverse proxy
