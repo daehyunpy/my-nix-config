@@ -47,16 +47,16 @@
      | sudo tee -a /etc/nix/nix.conf
    ```
 
-1. Install `home-manager`:
+1. Install `home-manager` (replace `username@hostname` with a config defined in `linux/flake.nix`):
 
    ```sh
-   nix run home-manager -- switch --flake ~/.config/nix/linux
+   nix run home-manager -- switch --flake ~/.config/nix/linux#username@hostname
    ```
 
 1. As you need, you can rebuild the system to apply changes by:
 
    ```sh
-   home-manager switch --flake ~/.config/nix/linux
+   home-manager switch --flake ~/.config/nix/linux#username@hostname
    ```
 
 1. To upgrade the system, you can run:
