@@ -8,7 +8,6 @@ pkgs: [
   pkgs.duckdb # in-process analytical SQL database
   pkgs.fd # simple, fast and user-friendly alternative to find
   pkgs.fzf # command-line fuzzy finder
-  pkgs.git-crypt # transparent file encryption in Git
   pkgs.git-lfs # Git extension for large file storage
   pkgs.gh # GitHub CLI
   pkgs.gnupg # OpenPGP encryption and signing tools

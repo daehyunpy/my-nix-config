@@ -21,8 +21,7 @@ in
     ];
     sessionVariables = {
       EDITOR = "${pkgs.helix}/bin/hx";
-    }
-    // builtins.fromJSON (builtins.readFile ./secret-envs.json);
+    };
     file = {
       ".config/conda".source = ./home-files/conda;
       ".config/direnv".source = ./home-files/direnv;

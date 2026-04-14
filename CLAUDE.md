@@ -30,7 +30,6 @@ Declarative system and user environment configuration using Nix flakes.
 - Both flakes define a `pkgs.unstable` overlay (from `nixpkgs-unstable`) for accessing bleeding-edge packages. Use `pkgs.unstable.<pkg>` when the stable channel is too old.
 - Machine-specific overrides are inline in each flake's module list (e.g., `thales` adds `openclaw-cli` brew, `plex-media-server` and `orbstack` casks).
 - `home-files/` contents are symlinked via `mkOutOfStoreSymlink` (live link) or `.source` (copy). Prefer `mkOutOfStoreSymlink` for configs that change outside of nix (e.g., editor settings).
-- `secret-envs.json` contains API keys and is encrypted via `git-crypt`. Never log or expose its contents.
 - `.env` holds additional secrets (`MILVUS_ADDRESS`, `MILVUS_TOKEN`); see `.env.example` for the template. Both `.env` and `.envrc` are gitignored.
 
 ## Applying Changes
