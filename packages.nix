@@ -4,6 +4,7 @@ pkgs: [
   pkgs.bun # fast JavaScript runtime
   pkgs.btop # terminal resource monitor
   pkgs.caddy # web server and reverse proxy
+  pkgs.databricks-cli # Databricks CLI
   pkgs.direnv # directory-based environment loader
   pkgs.docker-client # Docker command-line interface
   pkgs.duckdb # in-process analytical SQL database
