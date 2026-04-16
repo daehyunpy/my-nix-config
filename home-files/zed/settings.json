@@ -8,9 +8,8 @@
   "project_panel": {
     "dock": "left"
   },
-  "vim_mode": true,
   "agent_servers": {
-    "cursor": {
+    "opencode": {
       "type": "registry"
     },
     "github-copilot-cli": {
@@ -29,59 +28,50 @@
   "agent": {
     "dock": "right",
     "sidebar_side": "right",
-    "tool_permissions": {
-      "tools": {
-        "terminal": {
-          "always_allow": [
-            {
-              "pattern": "^git\\s+status(\\s|$)"
-            },
-            {
-              "pattern": "^git\\s+add(\\s|$)"
-            }
-          ]
-        }
-      }
-    },
     "default_model": {
       "enable_thinking": true,
       "model": "gemini-3.1-pro-preview",
-      "provider": "google",
-    },
+      "provider": "google"
+    }
   },
   "autosave": "on_focus_change",
   "edit_predictions": {
-    "provider": "zed",
+    "provider": "zed"
   },
   "format_on_save": "on",
   "git_panel": {
     "dock": "left",
-    "tree_view": true,
+    "tree_view": true
   },
   "helix_mode": true,
   "inlay_hints": {
-    "enabled": true,
+    "enabled": true
   },
   "languages": {
     "Python": {
       "code_actions_on_format": {
         "source.fixAll.ruff": true,
-        "source.organizeImports.ruff": true,
-      },
+        "source.organizeImports.ruff": true
+      }
     },
     "SQL": {
-      "tab_size": 2,
+      "tab_size": 2
     },
+    "JSON": {
+      "tab_size": 2
+    }
   },
   "relative_line_numbers": "enabled",
   "telemetry": {
     "diagnostics": false,
-    "metrics": false,
+    "metrics": false
   },
   "theme": {
     "dark": "One Dark",
     "light": "One Light",
-    "mode": "system",
+    "mode": "system"
   },
   "wrap_guides": [72, 79],
+  "ui_font_size": 12,
+  "buffer_font_size": 10
 }
