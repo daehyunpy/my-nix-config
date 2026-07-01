@@ -50,14 +50,14 @@
           system.defaults = {
             dock = {
               persistent-apps = lib.mkDefault [
-                "/Applications/ChatGPT Atlas.app"
-                "/Applications/Claude.app"
+                "/System/Applications/Siri.app"
+                "/System/Cryptexes/App/System/Applications/Safari.app"
                 "/System/Applications/Messages.app"
                 "/Applications/Slack.app"
                 "/System/Applications/Mail.app"
                 "/System/Applications/Calendar.app"
                 "/System/Applications/Stickies.app"
-                "/Applications/Craft.app"
+                "/System/Applications/Notes.app"
                 "/System/Applications/iPhone Mirroring.app"
                 "/System/Applications/Utilities/Screen Sharing.app"
                 "/System/Applications/Utilities/Activity Monitor.app"
