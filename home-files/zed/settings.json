@@ -1,29 +1,32 @@
 {
   "outline_panel": {
-    "dock": "left"
+    "dock": "left",
   },
   "collaboration_panel": {
-    "dock": "left"
+    "dock": "left",
   },
   "project_panel": {
-    "dock": "left"
+    "dock": "left",
   },
   "agent_servers": {
     "opencode": {
-      "type": "registry"
+      "type": "registry",
     },
     "github-copilot-cli": {
-      "type": "registry"
+      "type": "registry",
     },
     "gemini": {
-      "type": "registry"
+      "type": "registry",
     },
     "codex-acp": {
-      "type": "registry"
+      "type": "registry",
     },
     "claude-acp": {
-      "type": "registry"
-    }
+      "favorite_config_option_values": {
+        "mode": ["bypassPermissions"],
+      },
+      "type": "registry",
+    },
   },
   "agent": {
     "dock": "right",
@@ -31,47 +34,49 @@
     "default_model": {
       "enable_thinking": true,
       "model": "gemini-3.1-pro-preview",
-      "provider": "google"
-    }
+      "provider": "google",
+    },
   },
   "autosave": "on_focus_change",
   "edit_predictions": {
-    "provider": "zed"
+    "provider": "zed",
   },
   "format_on_save": "on",
   "git_panel": {
     "dock": "left",
-    "tree_view": true
+    "tree_view": true,
   },
   "helix_mode": true,
   "inlay_hints": {
-    "enabled": true
+    "enabled": true,
   },
   "languages": {
     "Python": {
       "code_actions_on_format": {
         "source.fixAll.ruff": true,
-        "source.organizeImports.ruff": true
-      }
+        "source.organizeImports.ruff": true,
+      },
     },
     "SQL": {
-      "tab_size": 2
+      "tab_size": 2,
     },
     "JSON": {
-      "tab_size": 2
-    }
+      "tab_size": 2,
+    },
   },
   "relative_line_numbers": "enabled",
   "telemetry": {
     "diagnostics": false,
-    "metrics": false
+    "metrics": false,
   },
   "theme": {
     "dark": "One Dark",
     "light": "One Light",
-    "mode": "system"
+    "mode": "system",
   },
   "wrap_guides": [72, 79],
   "ui_font_size": 12,
-  "buffer_font_size": 10
+  "buffer_font_size": 10,
+  "agent_ui_font_size": 12,
+  "agent_buffer_font_size": 10,
 }
