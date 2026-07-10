@@ -26,6 +26,7 @@ pkgs: [
   pkgs.mosh # mobile shell for remote connections
   pkgs.neovim # extensible Vim-based text editor
   pkgs.nil # Nix language server
+  pkgs.opencode # AI coding agent built for the terminal
   pkgs.nixd # Nix language server daemon
   pkgs.nixfmt # Nix language formatter
   pkgs.nodejs # JavaScript runtime

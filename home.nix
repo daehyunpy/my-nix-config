@@ -10,7 +10,7 @@ let
 in
 {
   home = {
-    stateVersion = "25.11";
+    stateVersion = "26.05";
     username = lib.mkDefault "daehyun";
     homeDirectory = lib.mkDefault "/Users/daehyun";
     packages = import ./packages.nix pkgs;
