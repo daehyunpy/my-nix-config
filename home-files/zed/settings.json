@@ -1,82 +1,76 @@
 {
-  "outline_panel": {
-    "dock": "left",
-  },
-  "collaboration_panel": {
-    "dock": "left",
-  },
-  "project_panel": {
-    "dock": "left",
-  },
-  "agent_servers": {
-    "opencode": {
-      "type": "registry",
+    "outline_panel": {
+        "dock": "left"
     },
-    "github-copilot-cli": {
-      "type": "registry",
+    "collaboration_panel": {
+        "dock": "left"
     },
-    "gemini": {
-      "type": "registry",
+    "project_panel": {
+        "dock": "left"
     },
-    "codex-acp": {
-      "type": "registry",
+    "agent_servers": {
+        "opencode": {
+            "type": "registry"
+        },
+        "gemini": {
+            "type": "registry"
+        },
+        "codex-acp": {
+            "type": "registry"
+        },
+        "claude-acp": {
+            "type": "registry"
+        }
     },
-    "claude-acp": {
-      "favorite_config_option_values": {
-        "mode": ["bypassPermissions"],
-      },
-      "type": "registry",
+    "agent": {
+        "dock": "right",
+        "sidebar_side": "right",
+        "default_model": {
+            "enable_thinking": true,
+            "model": "gemini-3.1-pro-preview",
+            "provider": "google"
+        }
     },
-  },
-  "agent": {
-    "dock": "right",
-    "sidebar_side": "right",
-    "default_model": {
-      "enable_thinking": true,
-      "model": "gemini-3.1-pro-preview",
-      "provider": "google",
+    "autosave": "on_focus_change",
+    "edit_predictions": {
+        "provider": "zed"
     },
-  },
-  "autosave": "on_focus_change",
-  "edit_predictions": {
-    "provider": "zed",
-  },
-  "format_on_save": "on",
-  "git_panel": {
-    "dock": "left",
-    "tree_view": true,
-  },
-  "helix_mode": true,
-  "inlay_hints": {
-    "enabled": true,
-  },
-  "languages": {
-    "Python": {
-      "code_actions_on_format": {
-        "source.fixAll.ruff": true,
-        "source.organizeImports.ruff": true,
-      },
+    "format_on_save": "on",
+    "git_panel": {
+        "dock": "left",
+        "tree_view": true
     },
-    "SQL": {
-      "tab_size": 2,
+    "helix_mode": true,
+    "inlay_hints": {
+        "enabled": true
     },
-    "JSON": {
-      "tab_size": 2,
+    "languages": {
+        "Python": {
+            "code_actions_on_format": {
+                "source.fixAll.ruff": true,
+                "source.organizeImports.ruff": true
+            }
+        },
+        "SQL": {
+            "tab_size": 2
+        },
+        "JSON": {
+            "tab_size": 2
+        }
     },
-  },
-  "relative_line_numbers": "enabled",
-  "telemetry": {
-    "diagnostics": false,
-    "metrics": false,
-  },
-  "theme": {
-    "dark": "One Dark",
-    "light": "One Light",
-    "mode": "system",
-  },
-  "wrap_guides": [72, 79],
-  "ui_font_size": 12,
-  "buffer_font_size": 10,
-  "agent_ui_font_size": 12,
-  "agent_buffer_font_size": 10,
+    "relative_line_numbers": "enabled",
+    "telemetry": {
+        "diagnostics": false,
+        "metrics": false
+    },
+    "theme": {
+        "dark": "One Dark",
+        "light": "One Light",
+        "mode": "system"
+    },
+    "wrap_guides": [72, 79],
+    "ui_font_size": 12,
+    "buffer_font_size": 10,
+    "agent_ui_font_size": 12,
+    "agent_buffer_font_size": 10
 }
