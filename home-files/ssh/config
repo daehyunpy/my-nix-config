@@ -5,9 +5,6 @@ Include ~/.orbstack/ssh/config
 
 Include ~/.ssh/config.d/*.conf
 
-Host octo60 octo60.* octo61 octo61.* octo62 octo62.* mobilint mobilint.*
-  User dhyou
-
 Host thales
 
 Host morphes
