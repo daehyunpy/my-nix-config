@@ -16,6 +16,7 @@ in
     packages = import ./packages.nix pkgs;
     sessionPath = [
       "$HOME/.local/bin"
+      "$HOME/.opencode/bin"
       "$HOME/.nix-profile/bin"
       "/etc/profiles/per-user/$USER/bin"
     ];

@@ -1,5 +1,4 @@
 [
   "gemini-cli"
   "mas"
-  "opencode"
 ]

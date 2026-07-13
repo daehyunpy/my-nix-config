@@ -4,7 +4,6 @@ pkgs: [
   pkgs.bun # fast JavaScript runtime
   pkgs.btop # terminal resource monitor
   pkgs.caddy # web server and reverse proxy
-  pkgs.databricks-cli # Databricks CLI
   pkgs.direnv # directory-based environment loader
   pkgs.docker-client # Docker command-line interface
   pkgs.duckdb # in-process analytical SQL database
@@ -26,7 +25,6 @@ pkgs: [
   pkgs.mosh # mobile shell for remote connections
   pkgs.neovim # extensible Vim-based text editor
   pkgs.nil # Nix language server
-  pkgs.opencode # AI coding agent built for the terminal
   pkgs.nixd # Nix language server daemon
   pkgs.nixfmt # Nix language formatter
   pkgs.nodejs # JavaScript runtime
