@@ -28,7 +28,7 @@ Declarative system and user environment configuration using Nix flakes.
 - `brews.nix`, `casks.nix`, `packages.nix` are Nix lists. `mas.nix` is an attrset (`{ name = app-store-id; }`). Keep entries sorted alphabetically.
 - Shared config goes in root `home.nix`/`packages.nix`. Platform-specific config goes in `darwin/` or `linux/`.
 - Both flakes define a `pkgs.unstable` overlay (from `nixpkgs-unstable`) for accessing bleeding-edge packages. Use `pkgs.unstable.<pkg>` when the stable channel is too old.
-- Machine-specific overrides are inline in each flake's module list (e.g., `thales` adds `openclaw-cli` brew, `plex-media-server` and `orbstack` casks).
+- Machine-specific overrides are inline in each flake's module list (e.g., `thales` adds `plex-media-server` and `orbstack` casks).
 - `home-files/` contents are symlinked via `mkOutOfStoreSymlink` (live link) or `.source` (copy). Prefer `mkOutOfStoreSymlink` for configs that change outside of nix (e.g., editor settings).
 - `.env` holds additional secrets (`MILVUS_ADDRESS`, `MILVUS_TOKEN`); see `.env.example` for the template. Both `.env` and `.envrc` are gitignored.
 

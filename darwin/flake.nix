@@ -178,9 +178,6 @@
             };
           }
           {
-            homebrew.brews = [
-              "openclaw-cli"
-            ];
             homebrew.casks = [
               "plex-media-server"
               "orbstack"
