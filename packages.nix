@@ -8,6 +8,7 @@ pkgs: [
   pkgs.docker-client # Docker command-line interface
   pkgs.duckdb # in-process analytical SQL database
   pkgs.fd # simple, fast and user-friendly alternative to find
+  pkgs.fnm # fast Node.js version manager
   pkgs.fzf # command-line fuzzy finder
   pkgs.git-lfs # Git extension for large file storage
   pkgs.gh # GitHub CLI

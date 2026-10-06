@@ -34,7 +34,12 @@ in
   };
 
   programs.zsh.enable = true;
-  programs.fish.enable = true;
+  programs.fish = {
+    enable = true;
+    interactiveShellInit = ''
+      fnm env --use-on-cd --shell fish | source
+    '';
+  };
   programs.git = {
     enable = true;
     lfs.enable = true;
