@@ -3,7 +3,6 @@ pkgs: [
   pkgs.azure-cli # Azure command-line interface
   pkgs.bun # fast JavaScript runtime
   pkgs.btop # terminal resource monitor
-  pkgs.caddy # web server and reverse proxy
   pkgs.direnv # directory-based environment loader
   pkgs.docker-client # Docker command-line interface
   pkgs.duckdb # in-process analytical SQL database
