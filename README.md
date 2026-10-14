@@ -34,8 +34,6 @@
 
 ## Linux
 
-1. Install `fish` and add it to `/etc/shells`
-
 1. Install `nix`
 
 1. Leave the copy of this code at `~/.config/nix`
@@ -52,6 +50,18 @@
    ```sh
    nix run home-manager -- switch --flake ~/.config/nix/linux#username@hostname
    ```
+
+1. Select the Nix-managed Fish as the login shell:
+
+   ```sh
+   fish_path="$HOME/.nix-profile/bin/fish"
+   if ! grep -Fxq "$fish_path" /etc/shells; then
+     printf '%s\n' "$fish_path" | sudo tee -a /etc/shells
+   fi
+   sudo chsh -s "$fish_path" "$USER"
+   ```
+
+   Start a new login session. Reconnect Zed to WSL so it reloads the shell.
 
 1. As you need, you can rebuild the system to apply changes by:
 

@@ -1,14 +1,13 @@
-{ pkgs, config, ... }:
-let
-  homePathString = config.home.homeDirectory;
-  makeOutOfStore = config.lib.file.mkOutOfStoreSymlink;
-in
+{ pkgs, ... }:
 {
   home.packages = import ./packages.nix pkgs;
-  home.file = {
-    "Library/Application Support/Cursor/User".source =
-      makeOutOfStore "${homePathString}/.config/nix/home-files/cursor-user";
-  };
+
+  # Preserve the current app handling independently of home.stateVersion.
+  targets.darwin.copyApps.enable = true;
+  targets.darwin.linkApps.enable = false;
+
+  # Use the system man command instead of installing another implementation.
+  programs.man.package = null;
 
   programs.fish = {
     interactiveShellInit = ''

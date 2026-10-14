@@ -10,7 +10,8 @@ let
 in
 {
   home = {
-    stateVersion = "26.05";
+    # Keep the original compatibility baseline when updating flake inputs.
+    stateVersion = "24.11";
     username = lib.mkDefault "daehyun";
     homeDirectory = lib.mkDefault "/Users/daehyun";
     packages = import ./packages.nix pkgs;
