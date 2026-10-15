@@ -30,6 +30,8 @@ in
       ".config/tmux".source = ./home-files/tmux;
       ".config/wezterm".source = ./home-files/wezterm;
       ".config/zed".source = makeOutOfStore "${homePathString}/.config/nix/home-files/zed";
+      ".omp/agent/models.yml".source =
+        makeOutOfStore "${homePathString}/.config/nix/home-files/omp/models.yml";
       ".ssh/config".source = makeOutOfStore "${homePathString}/.config/nix/home-files/ssh/config";
     };
   };

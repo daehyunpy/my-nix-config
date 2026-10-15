@@ -74,6 +74,41 @@
    nix flake update --flake ~/.config/nix/linux
    ```
 
+## OMP
+
+### Unity Gateway providers
+
+`home-files/omp/models.yml` defines four providers: `unity-anthropic` (Claude), `unity-openai` (GPT), `unity-google` (Gemini), and `unity-oss` (DeepSeek, GLM, Kimi). Home Manager links it to `~/.omp/agent/models.yml` using the same live-link convention as Zed. It does not manage the rest of `~/.omp`.
+
+Install OMP, [Unity Gateway](https://github.com/databricks/unity-gateway), and the Databricks CLI separately. `databricks` and `jq` must be on OMP's `PATH`; `jq` is included in the shared Nix packages. Authenticate the configured workspace/profile:
+
+```sh
+databricks auth login \
+  --host https://adb-425124470313726.6.azuredatabricks.net \
+  --profile adb-425124470313726
+```
+
+Deploy on this Linux machine:
+
+```sh
+home-manager switch --flake ~/.config/nix/linux#daehyun@charon
+```
+
+Select a model explicitly, or use `/model` inside OMP:
+
+```sh
+omp --model unity-anthropic/system.ai.claude-opus-5-5
+omp --model unity-openai/system.ai.gpt-6-1-sol
+omp --model unity-google/system.ai.gemini-4-argon
+omp --model unity-oss/system.ai.kimi-k3
+```
+
+The existing default model is unchanged. The 41-model registry is an explicit snapshot; update it from `ug status` when gateway availability changes. Existing `~/.ucode` paths and `ucode/...` client metadata are compatibility names retained by Unity Gateway.
+
+Tokens are resolved with `databricks auth token` against the same profile used by Unity Gateway, then extracted with `jq`; no token is stored in this repository or Nix configuration. Calling the Databricks CLI directly avoids `ug auth-token` startup exceeding OMP's 10-second command timeout. OMP caches successful command credentials for the process lifetime; explicit credential refresh and 401 recovery invalidate that cache. Unity Gateway's Pi refresh loop and Claude's helper TTL are not configured here.
+
+Deployment verification: real OMP completions returned `UNITY_OK` through Claude Haiku 5.5, GPT-5.4 Mini, Gemini 3.5 Flash Lite, and DeepSeek V4.1 Flash. This covers all four API routes, not every advertised model, tool calling, image generation, long context, token-expiry recovery, or Zed's GUI. OMP's displayed fallback limits and capabilities for these custom IDs are not verified gateway capacity.
+
 ## Zed
 
 - Shared settings live in `home-files/zed`, linked to `~/.config/zed` by Home Manager.
