@@ -1,0 +1,16 @@
+# Keep provider credentials and model selection in the user's OMP profile.
+tools:
+  approvalMode: write
+  approval:
+    bash: prompt
+    eval: prompt
+
+lsp:
+  enabled: true
+  diagnosticsOnWrite: true
+  diagnosticsOnEdit: true
+  formatOnWrite: false
+
+# Installed at project scope; load the upstream Pi bootstrap explicitly.
+extensions:
+  - ./.omp/plugins/node_modules/superpowers/.pi/extensions/superpowers.ts

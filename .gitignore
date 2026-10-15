@@ -6,3 +6,6 @@
 .env
 
 node_modules/
+
+# OMP plugin registries and runtime links contain machine-local cache paths.
+/.omp/plugins/

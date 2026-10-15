@@ -1,0 +1,19 @@
+{
+  "servers": {
+    "nil": {
+      "command": "nil",
+      "fileTypes": [".nix"],
+      "rootMarkers": ["home.nix", "flake.nix"],
+      "settings": {
+        "nil": {
+          "formatting": {
+            "command": ["nixfmt"]
+          }
+        }
+      }
+    },
+    "nixd": {
+      "disabled": true
+    }
+  }
+}
