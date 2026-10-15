@@ -31,7 +31,6 @@
    nix flake update --flake ~/.config/nix/darwin
    ```
 
-
 ## Linux
 
 1. Install `nix`
@@ -75,5 +74,14 @@
    nix flake update --flake ~/.config/nix/linux
    ```
 
+## Zed
+
+- Shared settings live in `home-files/zed`, linked to `~/.config/zed` by Home Manager.
+- Install OMP separately and make `omp` available on Zed's `PATH`; the custom agent runs `omp acp`.
+- Focus changes save files without automatic formatting or Ruff format actions. Manual formatting remains available, including Ruff import organization for Python.
+- Edit predictions are disabled. Native and external agent requests still use their configured providers.
+- Native agent model settings do not configure ACP agents, which manage their own model selection and authentication.
+- Windows host settings at `%APPDATA%\Zed\settings.json` were merged manually, not automatically synchronized. SSH/WSL connections, MCP configuration, SQL formatter, and tool permissions remain host-only.
+- The custom OMP entry remains in the shared Linux/macOS settings, not the Windows host configuration.
 
 ## NixOS
