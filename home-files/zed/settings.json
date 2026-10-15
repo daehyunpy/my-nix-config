@@ -9,6 +9,12 @@
         "dock": "left"
     },
     "agent_servers": {
+        "OMP": {
+            "type": "custom",
+            "command": "/home/daehyun/.local/bin/omp",
+            "args": ["acp"],
+            "env": {}
+        },
         "opencode": {
             "type": "registry"
         },
