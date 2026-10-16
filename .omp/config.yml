@@ -10,7 +10,3 @@ lsp:
   diagnosticsOnWrite: true
   diagnosticsOnEdit: true
   formatOnWrite: false
-
-# Installed at project scope; load the upstream Pi bootstrap explicitly.
-extensions:
-  - ./.omp/plugins/node_modules/superpowers/.pi/extensions/superpowers.ts
