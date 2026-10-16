@@ -86,7 +86,7 @@ omp --cwd ~/.config/nix
 - `.omp/lsp.json` selects `nil` for Nix intelligence, including root-level `home.nix`, and disables the duplicate `nixd` server. Diagnostics run after edits/writes; automatic formatting is off. Explicit LSP formatting uses `nixfmt`.
 - `omp`, `nil`, `nixfmt`, and Nix must be on `PATH`. The shared Nix packages already include `nil` and `nixfmt`; install OMP separately.
 - Existing `CLAUDE.md` instructions are discovered automatically; there is no second copy to maintain. Non-secret Unity Gateway providers are managed in `home-files/omp/models.yml`; preferences, sessions, and credentials remain in your user OMP profile.
-- Run `/nix-check` to check task-changed Nix files, or all non-empty Nix files when there are no task changes. Pass a scope, for example `/nix-check home.nix linux/home.nix`.
+- `/nix-check` is shared by Claude Code and OMP from `.claude/commands/nix-check.md`. It checks task-changed Nix files, or all non-empty Nix files when there are no task changes. Pass a scope, for example `/nix-check home.nix linux/home.nix`.
 - `/nix-check` is an agent prompt for read-only formatting and syntax checks, not a shell script or automatic startup check. Semantic evaluation is opt-in; it must not activate configurations or update lock files.
 - Launch from the root rather than `linux/` or `darwin/`: project settings, LSP overrides, and commands are cwd-scoped.
 
@@ -132,8 +132,9 @@ From the repository root, restore the installation on another machine:
 ```sh
 omp plugin marketplace add obra/superpowers-marketplace
 omp plugin install --scope project superpowers@superpowers-marketplace
-omp plugin marketplace add anthropics/claude-plugins-official
-omp plugin install --scope project pr-review-toolkit@claude-plugins-official
+claude plugin marketplace add anthropics/claude-plugins-official
+claude plugin install pr-review-toolkit@claude-plugins-official --scope project
+claude plugin install context7@claude-plugins-official --scope project
 
 # OMP 18.10.4 omits the runtime link for this Pi-only package manifest.
 plugin_dir="$(omp plugin list --json | jq -er '.marketplace[] | select(.id == "superpowers@superpowers-marketplace") | .entries[] | select(.scope == "project") | .installPath')"
@@ -141,7 +142,9 @@ mkdir -p .omp/plugins/node_modules
 ln -sfn "$plugin_dir" .omp/plugins/node_modules/superpowers
 ```
 
-Marketplace registration is user-level, but plugin enablement is project-scoped. `.omp/plugins/` is ignored because it holds machine-local registries, timestamps, and cache links. `.omp/config.yml` explicitly loads the upstream Superpowers Pi bootstrap through that link. Install before starting OMP; restart an existing session to load the extension.
+`.claude/settings.json` is the shared declaration for PR Review Toolkit and Context7. Install them with the Claude CLI once per machine; OMP reuses their compatible components without a second OMP installation. The declarations do not download plugins or pin exact source revisions.
+
+Superpowers remains an OMP installation because `.omp/config.yml` explicitly loads its Pi bootstrap through the runtime link above. `.omp/plugins/` is ignored because it holds machine-local registries, timestamps, and cache links. Keep Claude's registry/cache machine-local too. Restart both tools after installation; OMP-specific permissions, LSP settings, and the Superpowers bootstrap remain in `.omp/`.
 
 Useful entry points:
 
@@ -161,19 +164,21 @@ To upgrade, run `omp plugin upgrade --scope project superpowers@superpowers-mark
 
 The [official marketplace plugin](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/pr-review-toolkit) adds six agents: `code-reviewer`, `comment-analyzer`, `pr-test-analyzer`, `silent-failure-hunter`, `type-design-analyzer`, and `code-simplifier`. Use only review aspects relevant to the change; type and application-test reviews usually add little to a package-list edit. The `simplify` aspect can modify files, so use `code comments` for a review without requesting simplification.
 
-Run `/reload-plugins` after installation, or restart OMP. To upgrade, run `omp plugin marketplace update claude-plugins-official` followed by `omp plugin upgrade --scope project pr-review-toolkit@claude-plugins-official`. The current catalog has no version for this plugin; OMP records `0.0.0` as fallback metadata, not a meaningful release pin.
+Verified in both Claude Code initialization and OMP discovery: `/pr-review-toolkit:review-pr` and all six review agents are available. The duplicate OMP project installation has been removed. To upgrade, run `claude plugin marketplace update claude-plugins-official` followed by `claude plugin update pr-review-toolkit@claude-plugins-official --scope project`, then restart the tools. Existing Claude cache entries can affect which version OMP selects; project enablement is not an exact version pin.
 
 #### Context7 documentation tools
 
-`.omp/mcp.json` connects directly to [Context7's hosted MCP service](https://context7.com). This OMP build did not discover the official plugin's MCP definition, so the project uses the native server configuration instead of retaining a redundant Context7 plugin installation. No local Node process or API key is required for anonymous access; shared rate limits apply.
+Context7 is declared in `.claude/settings.json` and installed through Claude Code at project scope using the shared installation commands above. OMP imports the plugin's MCP server definition; there is no separate `.omp/mcp.json` to maintain. Claude Code must be installed separately; keep its machine-local registry and cache outside this repository.
 
-- `/mcp test context7` — check connectivity and tool discovery.
-- `/mcp reload` — reconnect after configuration changes.
+- Restart OMP after installation so it discovers the plugin-provided server as `context7:context7`.
+- In OMP 18.10.4 RPC/ACP mode, `/mcp list` and `/mcp test` inspect native MCP files only; their output does not establish whether a plugin-provided server is available.
 - Ask OMP to use Context7 to resolve a library, then query its docs. For example: “Use Context7 to look up standalone Home Manager flake configuration.”
 
-The server provides `resolve-library-id` and `query-docs`; a live lookup found `/nix-community/home-manager` and retrieved its standalone-flake documentation. Documentation may target a different branch or version: match the repository's locked inputs rather than blindly copying examples.
+Verified through OMP's actual MCP runtime: the Claude plugin connected and both `resolve-library-id` and `query-docs` successfully looked up `/nix-community/home-manager` and retrieved documentation. Documentation may target a different branch or version: match the repository's locked inputs rather than blindly copying examples.
 
-Queries leave the machine. Do not send `.env` contents, credentials, private SSH material, or proprietary source. API-key authentication is not configured. The native MCP file lives in the repository, so Context7 needs no marketplace reinstall on another machine and is loaded only when OMP starts from this repository root.
+OMP can reuse an older Claude cache entry when the same plugin has multiple installations. On this machine it currently selects the older `unknown` cache entry, which starts `npx -y @upstash/context7-mcp`; Node.js and `npx` are therefore required here. The newly installed plugin uses hosted HTTP, but OMP's selected cache entry is not an exact version pin.
+
+Queries leave the machine. Do not send `.env` contents, credentials, private SSH material, or proprietary source. No credentials were added to this repository. Shared anonymous rate limits can apply; project settings and per-machine installation are both required.
 
 ## Zed
 
