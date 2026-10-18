@@ -24,6 +24,18 @@
         {
           nix.settings.experimental-features = "nix-command flakes";
 
+          nix.gc = {
+            automatic = true;
+            interval = [
+              {
+                Weekday = 7;
+                Hour = 3;
+                Minute = 15;
+              }
+            ];
+            options = "--delete-older-than 30d";
+          };
+
           nixpkgs.config.allowUnfree = true;
           nixpkgs.overlays = [
             (final: prev: {

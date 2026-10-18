@@ -74,6 +74,29 @@
    nix flake update --flake ~/.config/nix/linux
    ```
 
+## Shell tools and maintenance
+
+- Home Manager enables Fish integration for direnv, fzf, and zoxide. Use `z` to jump to a frequently visited directory and `zi` to select one interactively; fzf supplies Ctrl-R history search, Ctrl-T file selection, and Alt-C directory selection.
+- `ripgrep` (`rg`) is installed for content search. `nil` is the shared Nix language server; the unused `nixd` package is no longer installed.
+- Direnv's `load_dotenv = true` setting is managed in `home.nix`. nix-direnv caches Nix development environments for `.envrc` files using `use nix` or `use flake`; approve trusted project configurations with `direnv allow`. The old `home-files/direnv` copy is no longer used.
+- Nix garbage collection runs weekly: Sunday at 03:15 local time on macOS, and the systemd `weekly` schedule on Linux. The Linux user timer is persistent and catches up after missed runs when the user manager starts. Both use `--delete-older-than 30d`; collected old generations are no longer rollback targets. Referenced store paths remain protected.
+- Unrestricted passwordless sudo for the macOS admin group is intentional and remains enabled.
+- `restic` remains installed, but no backup job is declared. Scheduling requires the source paths, repository destination, and runtime credential-file location; never put backup passwords in Nix expressions.
+
+### Validation
+
+`.github/workflows/validate.yml` checks all non-empty tracked Nix files with the locked Linux nixpkgs formatter, evaluates the Linux activation package on Ubuntu, and evaluates both Darwin systems on macOS ARM. It runs on pushes, pull requests, and manual dispatch without activation or lock updates.
+
+Run the host evaluations locally without switching:
+
+```sh
+nix eval --no-update-lock-file --raw ./darwin#darwinConfigurations.apollo.system.drvPath
+nix eval --no-update-lock-file --raw ./darwin#darwinConfigurations.thales.system.drvPath
+nix eval --no-update-lock-file --raw './linux#homeConfigurations."daehyun@charon".activationPackage.drvPath'
+```
+
+Evaluation does not prove that every package builds on its target platform. Apply with the platform-specific switch command above, then start a new Fish session. The GC schedules take effect only after activation; no collection is run by validation.
+
 ## OMP
 
 Start OMP from the repository root so it loads the project-local harness:

@@ -1,15 +1,13 @@
 pkgs: [
   pkgs.awscli2 # AWS command-line interface v2
   pkgs.azure-cli # Azure command-line interface
-  pkgs.bun # fast JavaScript runtime
   pkgs.btop # terminal resource monitor
-  pkgs.direnv # directory-based environment loader
+  pkgs.bun # fast JavaScript runtime
+  pkgs.devbox # reproducible development environments
   pkgs.docker-client # Docker command-line interface
   pkgs.duckdb # in-process analytical SQL database
   pkgs.fd # simple, fast and user-friendly alternative to find
   pkgs.fnm # fast Node.js version manager
-  pkgs.fzf # command-line fuzzy finder
-  pkgs.git-lfs # Git extension for large file storage
   pkgs.gh # GitHub CLI
   pkgs.gnupg # OpenPGP encryption and signing tools
   pkgs.helix # modal text editor
@@ -21,15 +19,14 @@ pkgs: [
   pkgs.kustomize # Kubernetes YAML customization tool
   pkgs.lazydocker # terminal UI for Docker
   pkgs.lazygit # terminal UI for Git
-  pkgs.devbox # reproducible development environments
   pkgs.mosh # mobile shell for remote connections
   pkgs.neovim # extensible Vim-based text editor
   pkgs.nil # Nix language server
-  pkgs.nixd # Nix language server daemon
   pkgs.nixfmt # Nix language formatter
   pkgs.nodejs # JavaScript runtime
   pkgs.rclone # sync tool for cloud storage
   pkgs.restic # fast, efficient backup program
+  pkgs.ripgrep # fast recursive content search
   pkgs.ruff # Python linter and formatter
   pkgs.temurin-jre-bin # Eclipse Temurin Java Runtime Environment
   pkgs.tenv # version manager for Terraform and OpenTofu

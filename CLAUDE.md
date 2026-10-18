@@ -20,7 +20,7 @@ Declarative system and user environment configuration using Nix flakes.
 - `packages.nix` — Shared nix packages (cross-platform)
 - `home-files/` — Dotfiles symlinked into `$HOME` via `home.file`
   - `claude`, `cursor`, `cursor-user`, `zed` — Editor/tool configs (symlinked live via `mkOutOfStoreSymlink`)
-  - `conda`, `direnv`, `tmux`, `wezterm` — Shell/terminal configs (copied via `.source`)
+  - `conda`, `tmux`, `wezterm` — Shell/terminal configs (copied via `.source`)
   - `ssh` — SSH config (symlinked live via `mkOutOfStoreSymlink`)
 
 ## Conventions
@@ -31,6 +31,10 @@ Declarative system and user environment configuration using Nix flakes.
 - Machine-specific overrides are inline in each flake's module list (e.g., `thales` adds `plex-media-server` and `orbstack` casks).
 - `home-files/` contents are symlinked via `mkOutOfStoreSymlink` (live link) or `.source` (copy). Prefer `mkOutOfStoreSymlink` for configs that change outside of nix (e.g., editor settings).
 - `.env` holds additional secrets (`MILVUS_ADDRESS`, `MILVUS_TOKEN`); see `.env.example` for the template. Both `.env` and `.envrc` are gitignored.
+
+## Preferences
+
+- Preserve unrestricted passwordless sudo (`%admin ALL=(ALL) NOPASSWD: ALL`) on macOS. This is intentional; do not replace it with password or Touch ID authentication unless explicitly requested.
 
 ## Applying Changes
 

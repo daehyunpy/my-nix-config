@@ -1,0 +1,51 @@
+name: Validate Nix
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  linux:
+    name: Formatting and Linux evaluation
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - uses: cachix/install-nix-action@v31.11.2
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check formatting of non-empty tracked Nix files
+        run: |
+          nix shell --no-update-lock-file --inputs-from ./linux nixpkgs#nixfmt --command bash -euo pipefail <<'SCRIPT'
+          while IFS= read -r -d "" file; do
+            if [[ -s "$file" ]]; then
+              nixfmt --check "$file"
+            fi
+          done < <(git ls-files -z -- "*.nix")
+          SCRIPT
+      - name: Evaluate charon activation package
+        run: nix eval --no-update-lock-file --raw './linux#homeConfigurations."daehyun@charon".activationPackage.drvPath'
+
+  darwin:
+    name: Darwin evaluations
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - uses: cachix/install-nix-action@v31.11.2
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Evaluate apollo system
+        run: nix eval --no-update-lock-file --raw ./darwin#darwinConfigurations.apollo.system.drvPath
+      - name: Evaluate thales system
+        run: nix eval --no-update-lock-file --raw ./darwin#darwinConfigurations.thales.system.drvPath

@@ -26,7 +26,6 @@ in
     };
     file = {
       ".config/conda".source = ./home-files/conda;
-      ".config/direnv".source = ./home-files/direnv;
       ".config/tmux".source = ./home-files/tmux;
       ".config/wezterm".source = ./home-files/wezterm;
       ".config/zed".source = makeOutOfStore "${homePathString}/.config/nix/home-files/zed";
@@ -42,6 +41,14 @@ in
     interactiveShellInit = ''
       fnm env --use-on-cd --shell fish | source
     '';
+  };
+  programs.fzf = {
+    enable = true;
+    enableFishIntegration = true;
+  };
+  programs.zoxide = {
+    enable = true;
+    enableFishIntegration = true;
   };
   programs.git = {
     enable = true;
@@ -78,6 +85,11 @@ in
       tag.sort = "version:refname";
     };
   };
-  programs.direnv.enable = true;
+  programs.direnv = {
+    enable = true;
+    enableFishIntegration = true;
+    nix-direnv.enable = true;
+    config.global.load_dotenv = true;
+  };
   programs.home-manager.enable = true;
 }
