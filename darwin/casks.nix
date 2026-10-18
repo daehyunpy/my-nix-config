@@ -22,7 +22,6 @@
   "protonvpn"
   "tor-browser"
   "transmission"
-  "warp"
   "wezterm"
   "zed"
   "zotero"
