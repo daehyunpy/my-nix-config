@@ -53,7 +53,6 @@
                 "/System/Applications/Siri.app"
                 "/System/Cryptexes/App/System/Applications/Safari.app"
                 "/System/Applications/Messages.app"
-                "/Applications/Slack.app"
                 "/System/Applications/Mail.app"
                 "/System/Applications/Calendar.app"
                 "/System/Applications/Stickies.app"
@@ -63,9 +62,7 @@
                 "/System/Applications/Utilities/Activity Monitor.app"
                 "/Applications/WezTerm.app"
                 "/Applications/Zed.app"
-                "/Applications/Cursor.app"
                 "/Applications/Fork.app"
-                "/Applications/DBeaver.app"
               ];
               appswitcher-all-displays = true;
               largesize = 128;
