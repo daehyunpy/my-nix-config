@@ -50,7 +50,8 @@
           system.defaults = {
             dock = {
               persistent-apps = lib.mkDefault [
-                "/System/Applications/Siri.app"
+                # Pin Siri itself rather than the system-hidden Applications launcher.
+                "/System/Library/CoreServices/Siri.app"
                 "/System/Cryptexes/App/System/Applications/Safari.app"
                 "/System/Applications/Messages.app"
                 "/System/Applications/Mail.app"
