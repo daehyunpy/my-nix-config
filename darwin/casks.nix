@@ -1,6 +1,7 @@
 [
   "appcleaner"
   "container"
+  "cuadriver"
   "cursor"
   "dbeaver-community"
   "discord"

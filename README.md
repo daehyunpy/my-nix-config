@@ -1,93 +1,64 @@
 # my-nix-config
 
-## macOS
+Cross-platform Nix configuration. Keep the checkout at `~/.config/nix`.
 
-1. Install `nix`
+- `home.nix`, `packages.nix`: shared Home Manager configuration and packages.
+- `darwin/`, `linux/`: platform and machine configuration.
+- `home-files/`: managed dotfiles.
 
-1. Leave the copy of this code at `~/.config/nix`
+## Setup
 
-1. Enable experimental features
+Install [Nix](https://nixos.org/download/), then enable flakes:
 
-   ```sh
-   echo "experimental-features = nix-command flakes" \
-     | sudo tee -a /etc/nix/nix.conf
-   ```
+```sh
+mkdir -p ~/.config/nix
+printf '%s\n' 'experimental-features = nix-command flakes' >> ~/.config/nix/nix.conf
+```
 
-1. Install `nix-darwin`:
+### macOS
 
-   ```sh
-   nix run nix-darwin -- switch --flake ~/.config/nix/darwin
-   ```
+```sh
+# Bootstrap nix-darwin
+nix run nix-darwin -- switch --flake ~/.config/nix/darwin
 
-1. As you need, you can rebuild the system to apply changes by:
+# Apply changes
+darwin-rebuild switch --flake ~/.config/nix/darwin
+```
 
-   ```sh
-   darwin-rebuild switch --flake ~/.config/nix/darwin
-   ```
+Homebrew formulae, casks, and App Store apps are declared in `darwin/`. Unrestricted passwordless sudo for the admin group is intentional.
 
-1. To upgrade the system, you can run:
+### Linux
 
-   ```sh
-   nix flake update --flake ~/.config/nix/darwin
-   ```
+Replace `username@hostname` with a configuration from `linux/flake.nix`:
 
-## Linux
+```sh
+# Bootstrap Home Manager
+nix run home-manager -- switch --flake ~/.config/nix/linux#username@hostname
 
-1. Install `nix`
+# Apply changes
+home-manager switch --flake ~/.config/nix/linux#username@hostname
+```
 
-1. Leave the copy of this code at `~/.config/nix`
+To use the Nix-managed Fish as your login shell:
 
-1. Enable experimental features
+```sh
+fish_path="$HOME/.nix-profile/bin/fish"
+if ! grep -Fxq "$fish_path" /etc/shells; then
+  printf '%s\n' "$fish_path" | sudo tee -a /etc/shells
+fi
+sudo chsh -s "$fish_path" "$USER"
+```
 
-   ```sh
-   echo "experimental-features = nix-command flakes" \
-     | sudo tee -a /etc/nix/nix.conf
-   ```
+Start a new login session after activation; reconnect remote editors to reload the shell.
 
-1. Install `home-manager` (replace `username@hostname` with a config defined in `linux/flake.nix`):
+## Maintenance
 
-   ```sh
-   nix run home-manager -- switch --flake ~/.config/nix/linux#username@hostname
-   ```
+- Update inputs: `nix flake update --flake darwin` or `nix flake update --flake linux`, then apply.
+- Format Nix files: `nixfmt **/*.nix`.
+- Garbage collection runs weekly and removes unreferenced generations older than 30 days, making them unavailable for rollback.
+- Approve trusted direnv configurations with `direnv allow`. `.env` is gitignored; see `.env.example`.
 
-1. Select the Nix-managed Fish as the login shell:
-
-   ```sh
-   fish_path="$HOME/.nix-profile/bin/fish"
-   if ! grep -Fxq "$fish_path" /etc/shells; then
-     printf '%s\n' "$fish_path" | sudo tee -a /etc/shells
-   fi
-   sudo chsh -s "$fish_path" "$USER"
-   ```
-
-   Start a new login session. Reconnect Zed to WSL so it reloads the shell.
-
-1. As you need, you can rebuild the system to apply changes by:
-
-   ```sh
-   home-manager switch --flake ~/.config/nix/linux#username@hostname
-   ```
-
-1. To upgrade the system, you can run:
-
-   ```sh
-   nix flake update --flake ~/.config/nix/linux
-   ```
-
-## Shell tools and maintenance
-
-- Home Manager enables Fish integration for direnv, fzf, and zoxide. Use `z` to jump to a frequently visited directory and `zi` to select one interactively; fzf supplies Ctrl-R history search, Ctrl-T file selection, and Alt-C directory selection.
-- `ripgrep` (`rg`) is installed for content search. `nil` is the shared Nix language server; the unused `nixd` package is no longer installed.
-- Direnv's `load_dotenv = true` setting is managed in `home.nix`. nix-direnv caches Nix development environments for `.envrc` files using `use nix` or `use flake`; approve trusted project configurations with `direnv allow`. The old `home-files/direnv` copy is no longer used.
-- Nix garbage collection runs weekly: Sunday at 03:15 local time on macOS, and the systemd `weekly` schedule on Linux. The Linux user timer is persistent and catches up after missed runs when the user manager starts. Both use `--delete-older-than 30d`; collected old generations are no longer rollback targets. Referenced store paths remain protected.
-- Unrestricted passwordless sudo for the macOS admin group is intentional and remains enabled.
-- `restic` remains installed, but no backup job is declared. Scheduling requires the source paths, repository destination, and runtime credential-file location; never put backup passwords in Nix expressions.
-
-### Validation
-
-`.github/workflows/validate.yml` checks all non-empty tracked Nix files with the locked Linux nixpkgs formatter, evaluates the Linux activation package on Ubuntu, and evaluates both Darwin systems on macOS ARM. It runs on pushes, pull requests, and manual dispatch without activation or lock updates.
-
-Run the host evaluations locally without switching:
+CI checks formatting and evaluates Linux and both Darwin configurations without activation. Evaluate locally:
 
 ```sh
 nix eval --no-update-lock-file --raw ./darwin#darwinConfigurations.apollo.system.drvPath
@@ -95,65 +66,42 @@ nix eval --no-update-lock-file --raw ./darwin#darwinConfigurations.thales.system
 nix eval --no-update-lock-file --raw './linux#homeConfigurations."daehyun@charon".activationPackage.drvPath'
 ```
 
-Evaluation does not prove that every package builds on its target platform. Apply with the platform-specific switch command above, then start a new Fish session. The GC schedules take effect only after activation; no collection is run by validation.
-
 ## OMP
 
-Start OMP from the repository root so it loads the project-local harness:
+Install OMP separately and launch from the repository root:
 
 ```sh
 omp --cwd ~/.config/nix
 ```
 
-- `.omp/config.yml` permits reads and workspace edits, but prompts for Bash and Eval execution, including under `--auto-approve`. Headless calls that require approval are rejected. Approval policies are not a sandbox.
-- `.omp/lsp.json` selects `nil` for Nix intelligence, including root-level `home.nix`, and disables the duplicate `nixd` server. Diagnostics run after edits/writes; automatic formatting is off. Explicit LSP formatting uses `nixfmt`.
-- `omp`, `nil`, `nixfmt`, and Nix must be on `PATH`. The shared Nix packages already include `nil` and `nixfmt`; install OMP separately.
-- Existing `CLAUDE.md` instructions are discovered automatically; there is no second copy to maintain. Non-secret Unity Gateway providers are managed in `home-files/omp/models.yml`; preferences, sessions, and credentials remain in your user OMP profile.
-- `/nix-check` is shared by Claude Code and OMP from `.claude/commands/nix-check.md`. It checks task-changed Nix files, or all non-empty Nix files when there are no task changes. Pass a scope, for example `/nix-check home.nix linux/home.nix`.
-- `/nix-check` is an agent prompt for read-only formatting and syntax checks, not a shell script or automatic startup check. Semantic evaluation is opt-in; it must not activate configurations or update lock files.
-- Launch from the root rather than `linux/` or `darwin/`: project settings, LSP overrides, and commands are cwd-scoped.
+- `.omp/config.yml` prompts for Bash and Eval execution, including under `--auto-approve`; approval policies are not a sandbox.
+- `.omp/lsp.json` uses `nil` and `nixfmt` without automatic formatting.
+- `/nix-check [files...]` runs read-only formatting and syntax checks; semantic evaluation is opt-in.
 
-### Unity Gateway providers
+### Cua Driver MCP
 
-`home-files/omp/models.yml` defines four providers: `unity-anthropic` (Claude), `unity-openai` (GPT), `unity-google` (Gemini), and `unity-oss` (DeepSeek, GLM, Kimi). Home Manager links it to `~/.omp/agent/models.yml` using the same live-link convention as Zed. It does not manage the rest of `~/.omp`.
+`.mcp.json` registers `cua-driver mcp` for OMP and Claude Code; the driver must be on the agent's `PATH`. macOS installation is managed by Homebrew through `darwin/casks.nix`; install the driver separately on Linux or Windows. On macOS, after activation:
 
-Install OMP, [Unity Gateway](https://github.com/databricks/unity-gateway), and the Databricks CLI separately. `databricks` and `jq` must be on OMP's `PATH`; `jq` is included in the shared Nix packages. Authenticate the configured workspace/profile:
+```sh
+open -n -g -a CuaDriver --args serve
+cua-driver permissions grant
+```
+
+On macOS, grant Accessibility, Screen Recording, and direct capture consent, then restart the agent. Check the connection with `/mcp test cua-driver` in OMP or `claude mcp get cua-driver`. The default mode allows input to every app, not just this project.
+
+### Unity Gateway
+
+Home Manager links `home-files/omp/models.yml` into OMP. Install [Unity Gateway](https://github.com/databricks/unity-gateway) and the Databricks CLI separately; `databricks` and `jq` must be on `PATH`.
 
 ```sh
 databricks auth login \
   --host https://adb-425124470313726.6.azuredatabricks.net \
   --profile adb-425124470313726
-```
-
-Deploy on this Linux machine:
-
-```sh
-home-manager switch --flake ~/.config/nix/linux#daehyun@charon
-```
-
-Select a model explicitly, or use `/model` inside OMP:
-
-```sh
-omp --model unity-anthropic/system.ai.claude-opus-5-5
 omp --model unity-openai/system.ai.gpt-6-1-sol
-omp --model unity-google/system.ai.gemini-4-argon
-omp --model unity-oss/system.ai.kimi-k3
 ```
 
-The existing default model is unchanged. The 41-model registry is an explicit snapshot; update it from `ug status` when gateway availability changes. Existing `~/.ucode` paths and `ucode/...` client metadata are compatibility names retained by Unity Gateway.
-
-Tokens are resolved with `databricks auth token` against the same profile used by Unity Gateway, then extracted with `jq`; no token is stored in this repository or Nix configuration. Calling the Databricks CLI directly avoids `ug auth-token` startup exceeding OMP's 10-second command timeout. OMP caches successful command credentials for the process lifetime; explicit credential refresh and 401 recovery invalidate that cache. Unity Gateway's Pi refresh loop and Claude's helper TTL are not configured here.
-
-Deployment verification: real OMP completions returned `UNITY_OK` through Claude Haiku 5.5, GPT-5.4 Mini, Gemini 3.5 Flash Lite, and DeepSeek V4.1 Flash. This covers all four API routes, not every advertised model, tool calling, image generation, long context, token-expiry recovery, or Zed's GUI. OMP's displayed fallback limits and capabilities for these custom IDs are not verified gateway capacity.
+Use `/model` to select from `unity-anthropic`, `unity-openai`, `unity-google`, or `unity-oss`. Refresh the model registry from `ug status` when availability changes. Tokens are resolved at runtime, never stored in this repository.
 
 ## Zed
 
-- Shared settings live in `home-files/zed`, linked to `~/.config/zed` by Home Manager.
-- Install OMP separately and make `omp` available on Zed's `PATH`; the custom agent runs `omp acp`.
-- Focus changes save files without automatic formatting or Ruff format actions. Manual formatting remains available, including Ruff import organization for Python.
-- Edit predictions are disabled. Native and external agent requests still use their configured providers.
-- Native agent model settings do not configure ACP agents, which manage their own model selection and authentication.
-- Windows host settings at `%APPDATA%\Zed\settings.json` were merged manually, not automatically synchronized. SSH/WSL connections, MCP configuration, SQL formatter, and tool permissions remain host-only.
-- The custom OMP entry remains in the shared Linux/macOS settings, not the Windows host configuration.
-
-## NixOS
+`home-files/zed` is linked to `~/.config/zed`. The external agent runs `omp acp`, so OMP must be on Zed's `PATH`; its model configuration is separate from Zed's native agent. Windows host settings are not managed here.
