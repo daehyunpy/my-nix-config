@@ -37,7 +37,9 @@
         };
     in
     {
-      homeConfigurations."daehyun@charon" = home-manager.lib.homeManagerConfiguration {
+      nixosModules.tailscale = ../modules/tailscale.nix;
+
+      homeConfigurations."daehyun@poseidon" = home-manager.lib.homeManagerConfiguration {
         pkgs = import nixpkgs { system = "x86_64-linux"; };
         modules = [
           configuration

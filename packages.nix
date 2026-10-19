@@ -28,6 +28,7 @@ pkgs: [
   pkgs.restic # fast, efficient backup program
   pkgs.ripgrep # fast recursive content search
   pkgs.ruff # Python linter and formatter
+  pkgs.tailscale # Tailscale CLI; the daemon is a native system service
   pkgs.temurin-jre-bin # Eclipse Temurin Java Runtime Environment
   pkgs.tenv # version manager for Terraform and OpenTofu
   pkgs.tmux # terminal multiplexer

@@ -32,8 +32,33 @@ jobs:
             fi
           done < <(git ls-files -z -- "*.nix")
           SCRIPT
-      - name: Evaluate charon activation package
-        run: nix eval --no-update-lock-file --raw './linux#homeConfigurations."daehyun@charon".activationPackage.drvPath'
+      - name: Evaluate poseidon activation package
+        run: nix eval --no-update-lock-file --raw './linux#homeConfigurations."daehyun@poseidon".activationPackage.drvPath'
+      - name: Evaluate generic NixOS Tailscale module
+        run: |
+          nix eval --no-update-lock-file --impure --expr '
+            let
+              flake = builtins.getFlake "git+file://${toString ./.}?dir=linux";
+              nixos = import (flake.inputs.nixpkgs + "/nixos/lib/eval-config.nix") {
+                system = "x86_64-linux";
+                modules = [
+                  flake.nixosModules.tailscale
+                  {
+                    boot.loader.grub.enable = false;
+                    fileSystems."/" = {
+                      device = "discard";
+                      fsType = "tmpfs";
+                    };
+                    system.stateVersion = "24.11";
+                  }
+                ];
+              };
+            in
+            builtins.toJSON {
+              enable = nixos.config.services.tailscale.enable;
+              wantedBy = nixos.config.systemd.services.tailscaled.wantedBy;
+            }
+          '
 
   darwin:
     name: Darwin evaluations

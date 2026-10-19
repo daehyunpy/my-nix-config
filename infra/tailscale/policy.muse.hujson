@@ -1,0 +1,54 @@
+{
+  "tagOwners": {
+    "tag:muse": ["r74pxy8dnm@privaterelay.appleid.com"],
+    "tag:muse-ssh-target": ["r74pxy8dnm@privaterelay.appleid.com"]
+  },
+  "ssh": [
+    {
+      "action": "check",
+      "src": ["autogroup:member"],
+      "dst": ["autogroup:self"],
+      "users": ["autogroup:nonroot", "root"]
+    },
+    {
+      "action": "check",
+      "src": ["r74pxy8dnm@privaterelay.appleid.com"],
+      "dst": ["tag:muse", "tag:muse-ssh-target"],
+      "users": ["autogroup:nonroot", "root"]
+    },
+    {
+      "action": "accept",
+      "src": ["tag:muse"],
+      "dst": ["tag:muse-ssh-target"],
+      "users": ["daehyun"]
+    }
+  ],
+  "nodeAttrs": [
+    {
+      "target": ["autogroup:member"],
+      "attr": ["funnel"]
+    },
+    {
+      "target": ["tag:muse", "tag:muse-ssh-target"],
+      "attr": ["funnel"]
+    }
+  ],
+  "sshTests": [
+    {
+      "src": "tag:muse",
+      "dst": ["tag:muse-ssh-target"],
+      "accept": ["daehyun"],
+      "deny": ["root", "nobody"]
+    },
+    {
+      "src": "r74pxy8dnm@privaterelay.appleid.com",
+      "dst": ["tag:muse", "tag:muse-ssh-target"],
+      "check": ["daehyun", "root"]
+    },
+    {
+      "src": "tag:muse",
+      "dst": ["100.73.130.74"],
+      "deny": ["daehyun", "root"]
+    }
+  ]
+}

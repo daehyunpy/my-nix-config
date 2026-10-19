@@ -9,3 +9,11 @@ node_modules/
 
 # OMP plugin registries and runtime links contain machine-local cache paths.
 /.omp/plugins/
+
+# OpenTofu local state, plans, and credential files. Commit .terraform.lock.hcl.
+**/.terraform/
+**/*.tfstate
+**/*.tfstate.*
+**/*.tfplan
+**/*.auto.tfvars
+**/secrets.tfvars
