@@ -22,6 +22,7 @@ This is the first infrastructure-management use case in the repository, not a ma
 - Rename the Home Manager configuration to `daehyun@poseidon`, without keeping a `charon` alias.
 - Preserve current policy, DNS, routing, authentication ownership, key-expiry settings, security properties, node identities, and addresses during adoption. Do not automatically reenroll or replace device identities; surface any unavoidable identity change for an explicit migration decision.
 - Keep user activation, native system-service activation, and OpenTofu application explicit. A normal Home Manager switch does not install or replace the privileged daemon.
+- The user separately selected unattended Tailscale SSH from Muse to `daehyun` on Thales and Poseidon using tag-based identities. Treat this as an explicit policy/ownership extension, not a side effect of adoption; apply no unrelated access changes.
 
 ## PEP20 design principles
 
@@ -73,7 +74,7 @@ The user requested inspection through `cua-driver` and preservation of the curre
 | Release track | `stable` | `stable` | `stable` |
 | Encrypted client state reported | `true` | `false` | `false` |
 
-All three devices are user-owned under the same account; no device tags were displayed for them. Preserve user ownership rather than tagging them as a cleanup step: the existing SSH policy depends on `autogroup:self`. The console showed ten machines in total; preserve the seven other device records and their access without enrolling them into machine management.
+At inspection, all three managed machines were user-owned under the same account and had no displayed tags. The later Muse SSH extension explicitly changes ownership of Muse, Thales, and Poseidon; do not introduce tags on any other device as cleanup. The console showed ten machines total. Muse receives only the control-plane changes described in the extension, not a new machine configuration.
 
 The console confirms `poseidon` already has both OS hostname and Tailscale name `poseidon`. Only the repository's `charon` configuration key needs renaming. The console's WSL kernel string supports the WSL observation but does not independently prove the distribution is NixOS; that remains user-confirmed until the system declaration is retrieved.
 
@@ -135,13 +136,119 @@ The JSON editor displayed the complete document through its closing brace. Its s
 }
 ```
 
-The displayed document also contains explanatory SSH and Funnel comments. No `acls`, `grants`, `groups`, `tagOwners`, `autoApprovers`, or `tests` fields were present. Preserve that omission, the SSH check-mode rule, root/nonroot access to owned devices, and the Funnel capability. Do not convert to grants or generate empty policy fields. Tailscale documents that omitting `acls` applies default allow-all behavior, whereas `"acls": []` denies all connections; inserting an empty list would break preservation.
+The displayed document also contains explanatory SSH and Funnel comments. No `acls`, `grants`, `groups`, `tagOwners`, `autoApprovers`, or `tests` fields were present. Preserve the baseline during adoption; only the separately requested Muse SSH extension adds tag definitions, SSH rules, and SSH tests. Do not convert to grants or generate empty network-policy fields. Tailscale documents that omitting `acls` applies default allow-all behavior, whereas `"acls": []` denies all connections; inserting an empty list would break preservation.
 
 The Funnel capability is permission, not proof that a device currently publishes a Funnel service. Do not create, delete, or infer a published service from this policy alone. Export the authoritative policy before implementation to retain its exact source, comments, and any concurrent changes.
 
 #### Preservation priority
 
-No live setup changes are authorized by this inspection. The generic Nix-managed service target does not permit changes to existing network roles, ownership, expiry settings, key protection, or external-device access. Inventory and review platform differences before service activation; stop on an unsupported required property rather than claiming feature parity. Revalidate the baseline before any future apply because the live tailnet can change independently of this spec.
+No live setup changes were authorized by the inspection. The generic Nix-managed service target does not permit changes to existing network roles, ownership, expiry settings, key protection, or external-device access. The separately requested Muse SSH extension is the explicit ownership/access exception described below. Revalidate the baseline before any future apply because the live tailnet can change independently of this spec.
+
+## Requested extension: unattended Muse SSH
+
+### Authorized behavior and selectors
+
+The user requested Muse access to `daehyun@thales` and `daehyun@poseidon`, confirmed that it must work without periodic browser reauthentication, and selected tagged Tailscale SSH after reviewing the ownership tradeoff.
+
+- Source: only `muse`, currently device ID `n3u5ATYqT411CNTRL`, Tailscale IPv4 `100.115.105.38`, authenticated under the same account as the servers.
+- Destinations: only the existing Thales and Poseidon device records from the baseline.
+- Local SSH username: `daehyun`. Do not grant unattended root or other-user access.
+- Apply `tag:muse` only to Muse and `tag:muse-ssh-target` only to Thales and Poseidon. These are purpose-based identities, not labels on top of user ownership.
+- Define the two tag owners as the existing tailnet account. Assigning either tag to another device would extend its permissions and requires a separate reviewed change.
+
+The network already permits these connections because `acls` is omitted. Add SSH authorization, not a new narrow network ACL that would replace the default network access.
+
+SSH `check` rules take precedence over matching `accept` rules, regardless of their position. Do not append an accept rule that still overlaps the existing user-based check rule and claim unattended access. With tagged identities, Muse no longer matches the user-based source selector; the new accept rule must match only Muse and the target tag.
+
+### Proposed merged policy
+
+The following is the structural target, not a claim that the live policy has been changed. Preserve the explanatory comments and any concurrent edits when merging with the authoritative export.
+
+```json
+{
+  "tagOwners": {
+    "tag:muse": ["r74pxy8dnm@privaterelay.appleid.com"],
+    "tag:muse-ssh-target": ["r74pxy8dnm@privaterelay.appleid.com"]
+  },
+  "ssh": [
+    {
+      "action": "check",
+      "src": ["autogroup:member"],
+      "dst": ["autogroup:self"],
+      "users": ["autogroup:nonroot", "root"]
+    },
+    {
+      "action": "check",
+      "src": ["r74pxy8dnm@privaterelay.appleid.com"],
+      "dst": ["tag:muse", "tag:muse-ssh-target"],
+      "users": ["autogroup:nonroot", "root"]
+    },
+    {
+      "action": "accept",
+      "src": ["tag:muse"],
+      "dst": ["tag:muse-ssh-target"],
+      "users": ["daehyun"]
+    }
+  ],
+  "nodeAttrs": [
+    {
+      "target": ["autogroup:member"],
+      "attr": ["funnel"]
+    },
+    {
+      "target": ["tag:muse", "tag:muse-ssh-target"],
+      "attr": ["funnel"]
+    }
+  ],
+  "sshTests": [
+    {
+      "src": "tag:muse",
+      "dst": ["tag:muse-ssh-target"],
+      "accept": ["daehyun"],
+      "deny": ["root", "nobody"]
+    },
+    {
+      "src": "r74pxy8dnm@privaterelay.appleid.com",
+      "dst": ["tag:muse", "tag:muse-ssh-target"],
+      "check": ["daehyun", "root"]
+    },
+    {
+      "src": "tag:muse",
+      "dst": ["100.73.130.74"],
+      "deny": ["daehyun", "root"]
+    }
+  ]
+}
+```
+
+Keep the original own-device check rule for user-owned devices. The second rule retains check-mode access from the existing account's personal devices to the newly tagged devices. The added node attribute retains their previously inherited Funnel capability; it does not publish any Funnel service.
+
+The negative SSH tests express the new automation rule's intended boundaries. They do not assert that Muse previously lacked check-mode access as root or to other owned devices.
+
+### Explicit ownership consequences
+
+Tagging replaces user authentication with a service identity. The three devices no longer participate as user-owned nodes in `autogroup:self`. Tagged sources can use Tailscale SSH only to tagged destinations, and cannot use SSH check mode. Therefore:
+
+- Muse's new unattended access is limited to `daehyun` on the two targets; its previous user-based SSH paths do not remain automatically available.
+- Thales/Poseidon-originated SSH to user-owned devices cannot be preserved by simply retaining the old rule. Inventory required outbound SSH before tagging; stop if a required path has no separately reviewed solution.
+- User-identity-dependent features, including Taildrop, are not presumed equivalent after tagging. Review actual use before applying.
+- Preserve device IDs, IPs, route approvals, DNS, and current expiry settings. Muse currently has key expiry enabled; Thales and Poseidon have it disabled. Do not reauthenticate merely to assign tags, because that can regenerate keys and disable expiry.
+- Removing all tags is not a simple console rollback: restoring user ownership requires user authentication on the device. Confirm an independent recovery path for each device before changing it, including the currently offline Poseidon.
+
+The selected tagged design authorizes the stated ownership transition, not arbitrary permission widening or unsupported claims of unchanged user-based behavior. If required existing behavior conflicts with tagged identities, surface that exact conflict before applying.
+
+### Application order and proof
+
+Keep this policy change separate from initial no-drift imports and daemon/package migration.
+
+1. Export the current policy and device configuration. Inventory affected user-based access, key expiry, route approvals, and recovery methods.
+2. Validate the merged policy with Tailscale's policy validator and SSH tests. Tag selectors in policy tests are not proof of actual device membership or working SSH sessions.
+3. Apply the reviewed policy with both original check behavior and the tagged replacements present, then assign the target tag to the two existing server records through the control plane without reenrollment. Verify personal-account check-mode access after each available server transition.
+4. Assign the source tag only to Muse, retaining its existing enabled key expiry. Confirm exact tag membership and the preserved device IDs, addresses, and expiry settings.
+5. From Muse, exercise `ssh -o BatchMode=yes daehyun@thales` and `ssh -o BatchMode=yes daehyun@poseidon` with a harmless remote command and verify the remote username and hostname. Observe absence of a Tailscale check challenge; SSH batch mode alone does not establish that.
+6. Verify the policy's root/other-user and unrelated-destination boundaries, personal check-mode access, preserved Funnel capability, and unchanged networking. Use policy tests for authorization denials rather than interpreting a timeout or offline server as a denial.
+
+Do not mark the extension complete while Poseidon is offline, policy validation is unavailable, or only the document/JSON syntax has been checked. No live tags, policy changes, or successful Muse SSH sessions have been established by writing this spec.
 
 ## Scope and non-goals
 
@@ -153,16 +260,17 @@ No live setup changes are authorized by this inspection. The generic Nix-managed
 - Recording and preserving the observed host preferences, subnet routing, exit-node advertisement, and Tailscale SSH without applying one set of flags to every host.
 - Adoption of existing tailnet policy, DNS settings, device tags, subnet/exit-route approvals, and preservation of existing per-device key-expiry settings where supported by the provider.
 - Credential handling, OpenTofu state handling, adoption instructions, verification, and recovery instructions.
+- The separately requested tag-based Muse SSH exception and its narrowly scoped ownership transition, with policy tests and preservation checks.
 
 ### Out of scope
 
 - Replacing Tailscale with Headscale.
-- Installing or changing clients on Windows, mobile, TV, or other machines outside the three named hosts.
+- Installing or changing client software on Windows, mobile, TV, Muse, or other machines outside the three managed hosts. Muse's specified control-plane tag and SSH policy changes are the sole exception.
 - Migrating `poseidon` to another distribution or reinstalling WSL.
 - Adopting the full NixOS-WSL system declaration, creating a Poseidon-specific system file or `nixosConfigurations` output, or changing users, boot settings, OS hostname, or WSL registration.
 - Adding a second daemon through a Home Manager user service, silently changing private-state storage, or migrating device identities without an explicit decision.
 - Installing root services through Home Manager activation scripts, automatically running sudo, or switching to userspace networking as a substitute for the current VPN.
-- Redesigning access rules, enabling additional routes, creating new device roles, changing key-expiry policy, or enabling new SSH access during adoption.
+- Redesigning access rules, enabling additional routes, changing key-expiry policy, or enabling SSH access beyond the explicitly requested Muse-to-two-targets exception.
 - Combining Home Manager activation with NixOS activation as an unrelated migration.
 - Automatically enrolling machines with repository-managed auth keys.
 - Managing private node keys, login sessions, or macOS approval state as source-controlled configuration.
@@ -245,7 +353,7 @@ The initial inventory covers:
 - MagicDNS, global and restricted nameservers, search paths, and other DNS settings supported by the selected provider that affect the existing configuration.
 - Existing tags, ownership, per-device key-expiry settings, and subnet/exit-route approvals for the managed hosts.
 
-Retain the policy in a readable provider-supported source file. Adopt its existing semantics; do not convert ACL style, invent tags, or create a policy from visible peer information.
+Retain the policy in readable provider-supported source. First adopt the baseline unchanged; apply the separately reviewed Muse exception as a distinct policy/ownership change. Do not convert ACL style, introduce unrelated tags, or generate policy from peer visibility alone.
 
 Device identity and mutable preferences belong to different layers. Nix owns what a host advertises; OpenTofu owns the corresponding control-plane approvals. Do not make OpenTofu re-enroll or destroy devices merely because a local installation changes.
 
@@ -279,6 +387,8 @@ Home Manager rollback covers user tooling; native system generations cover decla
 
 For NixOS-WSL, daemon startup means startup when the distribution runs; it does not promise availability while WSL is shut down or introduce Windows startup tasks.
 
+Apply the Muse ownership/SSH extension only through its separate application sequence above. Do not combine tagging with OS client replacement or conceal its expected policy diff inside a no-drift adoption plan.
+
 ## Verification and acceptance criteria
 
 ### Static and evaluation checks
@@ -295,17 +405,17 @@ For NixOS-WSL, daemon startup means startup when the distribution runs; it does 
 ### Runtime proof
 
 - Each migrated host runs exactly one intended Nix-managed daemon through its native service manager, and the Home Manager CLI reports that daemon's real authenticated status.
-- Preserve device identity, local role preferences, authentication ownership, and key protection through the reviewed migration. Verify startup after a service restart and planned reboot or WSL distribution restart.
+- Preserve device identity, local role preferences, and key protection through the reviewed daemon migration. Change authentication ownership only through the separately specified Muse tag transition. Verify startup after a service restart and planned reboot or WSL distribution restart.
 - MagicDNS resolves real peer names and normal public DNS continues to work after user and system activation.
 - Required peer connectivity is exercised with actual traffic, not inferred from successful evaluation or a daemon process listing.
 - `thales` retains its required `192.168.68.0/24` subnet-routing behavior and exit-node advertisement. Verify subnet traffic from an authorized client that is not already on that subnet.
 - `poseidon` retains its inventoried exit-node behavior while WSL is running. If Windows also runs Tailscale, resolve and verify the documented nested-tunnel risk before accepting the configuration.
 - Verify exit-node traffic with a client that supports consuming exit nodes; do not select an exit node on `apollo` or assume a headless macOS client can consume one to perform the check.
-- Existing enabled Tailscale SSH paths remain usable after native service migration and Home Manager activation.
+- Existing enabled Tailscale SSH paths remain usable after native service migration and Home Manager activation. For the separate tag transition, verify the explicitly retained paths and review the documented user-identity limitations rather than claiming every former path is unchanged.
 - The final OpenTofu plan has no unexplained changes. Reapplying machine configuration does not duplicate installations, re-enroll devices, or reset unrelated preferences.
 - Credentials and private node state remain outside source-controlled and Nix-store content.
 - Preserve the Cua Driver baseline: `apollo` accepts incoming connections, Tailscale DNS, and subnet routes without selecting or advertising an exit node; the tailnet DNS override stays off and HTTPS stays enabled.
-- Preserve disabled key expiry on `thales` and `poseidon`, enabled expiry on `apollo`, existing user ownership, and SSH check-mode semantics. Do not introduce device tags or empty ACL/grant lists.
+- Preserve disabled key expiry on Thales and Poseidon, enabled expiry on Apollo and Muse, and personal check-mode access. Only the requested Muse extension introduces tags; never add an empty ACL/grant list.
 - Preserve `apollo`'s reported encrypted-state protection before replacing its app. An unavailable equivalent protection is a migration blocker unless the user explicitly accepts the concrete security change.
 
 A configuration that only evaluates or installs a CLI does not complete daemon adoption. If a host, native configuration import, preservation gate, or required API credential remains unavailable, report the exact unverified operation. Do not describe the privileged daemon as Home Manager-managed; it is managed by the generic native system module.
@@ -319,6 +429,7 @@ These are concrete inputs required before the corresponding live changes, not va
 - Authenticated tailnet API access to export the authoritative policy, DNS, device settings, and approvals. The authenticated GUI baseline is recorded above but does not replace a current export before implementation.
 - A supported plan preserving `apollo`'s key protection, or an explicit decision accepting a specific security change before client removal.
 - Independent recovery access, backups, and activation previews showing only the reviewed Tailscale service changes and no unrelated OS changes.
+- Before applying the Muse exception: authoritative policy validation, inspection of affected user-based access and feature use, recovery access to the tagged devices, and an available Poseidon for end-to-end proof.
 
 Do not overwrite a running system declaration or replace tailnet policy with guessed defaults to bypass an unavailable prerequisite.
 
@@ -331,3 +442,6 @@ Do not overwrite a running system declaration or replace tailnet policy with gue
 - [NixOS-WSL installation documentation](https://nix-community.github.io/NixOS-WSL/install.html)
 - Local pinned nix-darwin source: `modules/services/tailscale.nix`, resolved through the repository's Darwin flake.
 - [Tailscale ACL examples: omitted `acls` versus an empty list](https://tailscale.com/docs/reference/examples/acls)
+- [Tailscale SSH: selectors and check-before-accept evaluation](https://tailscale.com/docs/features/tailscale-ssh)
+- [Tailnet policy syntax: SSH rules and SSH tests](https://tailscale.com/docs/reference/syntax/policy-file)
+- [Tailscale tags: identity, key expiry, and recovery limitations](https://tailscale.com/docs/features/tags)
