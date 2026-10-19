@@ -1,40 +1,40 @@
-# Nix-managed Tailscale and tailnet infrastructure
+# Shared Home Manager Tailscale configuration and tailnet infrastructure
 
 ## Status
 
-Design for user review. The architecture was approved in conversation; implementation and live infrastructure changes are not authorized by this document alone.
+Design for user review. The user selected shared Home Manager tooling plus generic NixOS/nix-darwin service wiring, without a Poseidon-specific system file or full NixOS-WSL adoption. Implementation and live infrastructure changes are not authorized by this document alone.
 
 ## Goal
 
-Make this repository the source of truth for Tailscale on `apollo`, `thales`, and `poseidon`, and for the tailnet-wide configuration managed through the Tailscale API. Adopt existing behavior first; do not combine adoption with access-policy redesign.
+Manage Tailscale user-side tooling through the existing shared Home Manager configuration, its privileged daemon through a reusable system-service module, and tailnet-wide resources through OpenTofu. Preserve current network behavior, local preferences, authentication ownership, identities, and key protection during adoption.
 
-Use Nix-managed `tailscale` and `tailscaled` on macOS and Linux. Do not install the App Store app, the Homebrew GUI cask, or the Homebrew headless formula as part of the target configuration.
+Home Manager does not own the privileged daemon. Native NixOS and nix-darwin modules provide systemd and launchd integration around the same shared declaration. No full NixOS-WSL system adoption is required, and no Poseidon-specific service implementation is introduced.
 
 This is the first infrastructure-management use case in the repository, not a mandate to build a generic infrastructure framework.
 
-## Approved decisions
+## Design decisions
 
-- Nix owns machine installation and service configuration.
+- Home Manager owns the common user-side Tailscale tooling through the existing root `home.nix` and `packages.nix` pattern.
 - OpenTofu and the official `tailscale/tailscale` provider own tailnet-wide resources.
-- A shared Nix module declares the common Tailscale package and daemon enablement. Native platform modules own launchd and systemd integration.
+- A generic system module declares Nix-managed daemon enablement and package selection using the native `services.tailscale` interface. Home Manager activation never installs a root service or starts a second user daemon.
 - All three repo-configured machines are in scope.
-- `poseidon` is the NixOS-WSL machine currently named `charon` in the Home Manager flake. It is not a new node or a distribution migration.
+- `poseidon` is the NixOS-WSL machine currently named `charon` in the Home Manager flake. No Poseidon-specific Tailscale module or NixOS system output is required.
 - Rename the Home Manager configuration to `daehyun@poseidon`, without keeping a `charon` alias.
-- Preserve current policy, DNS, routing, identities where possible, and unrelated machine configuration during adoption.
-- Keep machine activation and OpenTofu application separate and explicit.
+- Preserve current policy, DNS, routing, authentication ownership, key-expiry settings, security properties, node identities, and addresses during adoption. Do not automatically reenroll or replace device identities; surface any unavoidable identity change for an explicit migration decision.
+- Keep user activation, native system-service activation, and OpenTofu application explicit. A normal Home Manager switch does not install or replace the privileged daemon.
 
 ## PEP20 design principles
 
 | Principle | Consequence |
 | --- | --- |
 | Explicit is better than implicit | Every resource has one declared owner; user environment, system services, and tailnet resources remain distinct. |
-| Simple is better than complex | Use existing Nix service modules and the official provider rather than custom API reconciliation. |
-| Flat is better than nested | One shared machine module and one OpenTofu root; no speculative infrastructure framework or module hierarchy. |
-| Readability counts | Host-specific routing and client preferences are visible in host configuration, not inferred from names. |
-| Practicality beats purity | Share matching declarations without pretending launchd and systemd have identical interfaces. |
-| Errors should never pass silently | Failed service startup, enrollment, preference application, import, or API access is visible and stops the affected operation. |
-| Refuse the temptation to guess | Retrieve the existing NixOS-WSL declaration and live tailnet configuration before replacing either. |
-| One obvious way to do it | One client installation per host and one management path per tailnet resource. |
+| Simple is better than complex | Reuse the existing Home Manager package list, native system-service modules, and official provider; no custom service framework. |
+| Flat is better than nested | One shared system module, the existing shared user configuration, and one OpenTofu root; no dedicated Poseidon system configuration. |
+| Readability counts | The package declaration is shared; observed host-specific network roles remain explicit preservation requirements, not hostname-based activation branches. |
+| Practicality beats purity | Keep privileged VPN services separate from user configuration instead of forcing root service installation into Home Manager. |
+| Errors should never pass silently | Failed service startup or a CLI that cannot reach its intended daemon is a visible integration failure, not a successful setup. |
+| Refuse the temptation to guess | Inspect live settings before taking ownership; do not infer an OS declaration or reset daemon preferences. |
+| One obvious way to do it | One active daemon per host and one management path per tailnet resource; installing user tooling must not start a second daemon. |
 
 ## Discovery evidence and limits
 
@@ -50,17 +50,108 @@ Read-only inspection during design established:
 - The user confirmed that `poseidon` runs NixOS-WSL.
 - The pinned nix-darwin Tailscale module provides `services.tailscale.enable` and `services.tailscale.package`, installs the CLI, and creates a launchd daemon. It does not expose the same full preference interface as NixOS.
 
-Peer visibility is not an authoritative inventory of all tailnet devices or settings. The CLI observations do not establish current ACL contents, DNS resolver lists, route-approval configuration, or the installation variant on another host.
+Peer visibility is not an authoritative inventory of all tailnet devices or settings. The initial CLI observations did not establish ACL contents, DNS resolver lists, route approvals, or another host's installation variant. The subsequent GUI inspection below establishes a more specific baseline without changing live configuration.
+
+### Cua Driver inspection: preservation baseline
+
+The user requested inspection through `cua-driver` and preservation of the current setup. Inspection used the running Tailscale app and the authenticated Safari admin console, with screenshots cross-checked against accessibility snapshots. Only navigation, read-only disclosures, and observation were performed: no preference toggles, policy edits, saves, approvals, client updates, enrollments, disconnects, or infrastructure applies.
+
+#### Managed devices
+
+| Property | `apollo` | `thales` | `poseidon` |
+| --- | --- | --- | --- |
+| Tailscale IPv4 | `100.73.130.74` | `100.94.134.124` | `100.68.77.38` |
+| Device ID | `nMzngfCre621CNTRL` | `nrGyKDY9Dv11CNTRL` | `npByKx79tM11CNTRL` |
+| OS hostname | `apollo` | `thales` | `poseidon` |
+| Client version | `1.104.1` | `1.104.1` | `1.98.8` |
+| Observed availability | Connected | Connected | Offline; last seen Oct 16 |
+| Key expiry | Enabled; console says approximately three months remaining | Disabled | Disabled |
+| Tailscale SSH | Not shown as enabled; no SSH endpoint reported | Enabled | Enabled; SSH endpoint reported on TCP 22 |
+| Approved subnet routes | None exposed | `192.168.68.0/24`; none awaiting approval | None exposed |
+| Exit-node approval | Not allowed | Allowed | Allowed |
+| Automatic client updates reported | `false` | `false` | `false` |
+| Release track | `stable` | `stable` | `stable` |
+| Encrypted client state reported | `true` | `false` | `false` |
+
+All three devices are user-owned under the same account; no device tags were displayed for them. Preserve user ownership rather than tagging them as a cleanup step: the existing SSH policy depends on `autogroup:self`. The console showed ten machines in total; preserve the seven other device records and their access without enrolling them into machine management.
+
+The console confirms `poseidon` already has both OS hostname and Tailscale name `poseidon`. Only the repository's `charon` configuration key needs renaming. The console's WSL kernel string supports the WSL observation but does not independently prove the distribution is NixOS; that remains user-confirmed until the system declaration is retrieved.
+
+`apollo` currently reports encrypted client state. Do not remove its existing client until the Nix-managed daemon can retain equivalent supported key protection, or the user explicitly accepts the specific security change. Selecting generic service wiring does not waive this preservation gate.
+
+Do not interpret available client updates as authorization to upgrade the running daemon. Review package versions and CLI/daemon compatibility before service migration; unrelated automatic updates are not part of adoption.
+
+#### Apollo local preferences
+
+The app's Settings window visibly showed:
+
+- Allow incoming connections: enabled.
+- Use Tailscale DNS settings: enabled.
+- Use Tailscale subnets: enabled.
+- Launch Tailscale at login: enabled.
+- Hide Dock Icon: enabled; notifications: off.
+- VPN On Demand: not enabled.
+- Run as exit node: disabled.
+- Allow local network access when using an exit node: unchecked.
+- Tailnet Lock: not enabled.
+- The app's device view showed the selected exit node as `None`.
+
+Preserve incoming connectivity, DNS acceptance, subnet-route acceptance, and no selected or advertised exit node on `apollo`. Do not enable SSH, exit-node advertisement, VPN On Demand, or Tailnet Lock during adoption. The target daemon has no GUI; preserve networking and startup behavior through the native service, and do not describe GUI presentation options as equivalent daemon settings.
+
+The final Settings snapshot reported no changes from the initial Settings snapshot. Remote local preferences on `thales` and `poseidon` remain uninspected; their control-plane settings above are not substitutes for their complete local daemon configuration.
+
+#### Tailnet DNS and HTTPS
+
+- Tailnet DNS suffix: `dingo-ratio.ts.net`; do not rename it.
+- MagicDNS: enabled, using `100.100.100.100`.
+- Global nameserver group: Cloudflare Public DNS, expanded to `1.1.1.1`, `1.0.0.1`, `2606:4700:4700::1111`, and `2606:4700:4700::1001`, in that displayed order.
+- Override DNS servers: disabled. The console also displayed Local DNS settings.
+- Search domains: only the automatically included `dingo-ratio.ts.net` was displayed.
+- No restricted/split-DNS nameserver group was displayed.
+- HTTPS certificate provisioning: enabled.
+
+Preserve the distinction between accepting Tailscale DNS on a client and globally overriding local resolvers: the former is enabled on `apollo`, the latter is disabled in the tailnet. Do not enable nix-darwin's `overrideLocalDns` as a supposed MagicDNS prerequisite. Do not disable HTTPS provisioning, replace the resolver list, or add search domains.
+
+#### Current policy
+
+The JSON editor displayed the complete document through its closing brace. Its structural content was:
+
+```json
+{
+  "ssh": [
+    {
+      "action": "check",
+      "src": ["autogroup:member"],
+      "dst": ["autogroup:self"],
+      "users": ["autogroup:nonroot", "root"]
+    }
+  ],
+  "nodeAttrs": [
+    {
+      "target": ["autogroup:member"],
+      "attr": ["funnel"]
+    }
+  ]
+}
+```
+
+The displayed document also contains explanatory SSH and Funnel comments. No `acls`, `grants`, `groups`, `tagOwners`, `autoApprovers`, or `tests` fields were present. Preserve that omission, the SSH check-mode rule, root/nonroot access to owned devices, and the Funnel capability. Do not convert to grants or generate empty policy fields. Tailscale documents that omitting `acls` applies default allow-all behavior, whereas `"acls": []` denies all connections; inserting an empty list would break preservation.
+
+The Funnel capability is permission, not proof that a device currently publishes a Funnel service. Do not create, delete, or infer a published service from this policy alone. Export the authoritative policy before implementation to retain its exact source, comments, and any concurrent changes.
+
+#### Preservation priority
+
+No live setup changes are authorized by this inspection. The generic Nix-managed service target does not permit changes to existing network roles, ownership, expiry settings, key protection, or external-device access. Inventory and review platform differences before service activation; stop on an unsupported required property rather than claiming feature parity. Revalidate the baseline before any future apply because the live tailnet can change independently of this spec.
 
 ## Scope and non-goals
 
 ### In scope
 
-- Nix-managed headless Tailscale installation and service startup on the three named machines.
-- Adoption of `poseidon`'s existing NixOS-WSL system declaration into the repository.
+- A general Tailscale CLI package declaration using the existing shared Home Manager configuration, without a machine-specific module.
+- One reusable system-service declaration imported by nix-darwin and the existing NixOS configuration, with compatible Home Manager tooling and no machine-specific module.
 - The `charon` to `poseidon` Home Manager configuration-key rename and affected current commands and CI checks.
-- Explicit, non-secret host preferences required to preserve existing connectivity, subnet routing, exit-node advertisement, and currently enabled Tailscale SSH.
-- Adoption of existing tailnet policy, DNS settings, device tags, and subnet/exit-route approvals where present and supported by the provider.
+- Recording and preserving the observed host preferences, subnet routing, exit-node advertisement, and Tailscale SSH without applying one set of flags to every host.
+- Adoption of existing tailnet policy, DNS settings, device tags, subnet/exit-route approvals, and preservation of existing per-device key-expiry settings where supported by the provider.
 - Credential handling, OpenTofu state handling, adoption instructions, verification, and recovery instructions.
 
 ### Out of scope
@@ -68,32 +159,40 @@ Peer visibility is not an authoritative inventory of all tailnet devices or sett
 - Replacing Tailscale with Headscale.
 - Installing or changing clients on Windows, mobile, TV, or other machines outside the three named hosts.
 - Migrating `poseidon` to another distribution or reinstalling WSL.
+- Adopting the full NixOS-WSL system declaration, creating a Poseidon-specific system file or `nixosConfigurations` output, or changing users, boot settings, OS hostname, or WSL registration.
+- Adding a second daemon through a Home Manager user service, silently changing private-state storage, or migrating device identities without an explicit decision.
+- Installing root services through Home Manager activation scripts, automatically running sudo, or switching to userspace networking as a substitute for the current VPN.
 - Redesigning access rules, enabling additional routes, creating new device roles, changing key-expiry policy, or enabling new SSH access during adoption.
 - Combining Home Manager activation with NixOS activation as an unrelated migration.
 - Automatically enrolling machines with repository-managed auth keys.
 - Managing private node keys, login sessions, or macOS approval state as source-controlled configuration.
 - Automatically applying infrastructure from CI, deploying a remote state service, or building a universal deployment wrapper.
 
-If the existing Windows host conflicts with the WSL daemon, report the conflict and resolve the topology explicitly before activation. Do not silently disable or reconfigure the Windows client outside this scope.
+The Windows/WSL topology remains unchanged. If inspection reveals a conflict, report it before service migration rather than silently disabling either client.
 
 ## Architecture and ownership
 
 ### Repository layout
 
 ```text
+packages.nix
+  Common Tailscale CLI package, alongside other shared CLI tools.
+
+home.nix
+  Existing shared Home Manager entry point; already imports packages.nix.
+  No hostname-specific service logic or privileged activation hooks.
+
 modules/tailscale.nix
-  Common daemon enablement and package selection.
+  Shared system module: services.tailscale daemon enablement and package.
+  Imported only in system-module contexts, never as a Home Manager module.
 
 darwin/flake.nix
-  Imports the shared module for apollo and thales.
-  Holds macOS-specific integration and host-specific settings.
+  Imports the shared system module through the existing common configuration.
 
 linux/flake.nix
-  Retains standalone Home Manager with the renamed daehyun@poseidon output.
-  Adds the nixosConfigurations.poseidon system output and NixOS-WSL input.
-
-linux/poseidon.nix
-  Adopted NixOS-WSL system configuration and explicit host settings.
+  Existing standalone Home Manager output, renamed to daehyun@poseidon.
+  Exports the shared system module as nixosModules.tailscale for reuse.
+  No new NixOS-WSL input or nixosConfigurations output.
 
 infra/tailscale/
   OpenTofu provider configuration, imported resources, policy source,
@@ -102,25 +201,35 @@ infra/tailscale/
 
 Update the existing README, validation workflow, and Git exclusions rather than creating a second set of operating conventions.
 
-The empty `nixos/flake.nix` is not populated as a competing entry point. Linux system and user outputs remain together in the existing Linux flake.
+Do not create `linux/poseidon.nix`, adopt the complete WSL system, or populate the empty `nixos/flake.nix` as a new host entry point. The existing NixOS configuration imports the generic exported module; only its necessary Tailscale integration changes, with unrelated OS settings preserved. The module itself contains no hostname checks.
 
-### Machine layer
+### Shared Home Manager layer
 
-The shared module uses the common `services.tailscale` interface. Select the package explicitly and consistently from each platform's pinned package set. This shares source declarations, not binaries; macOS and Linux still have their own builds and lock files.
+Use the existing root `home.nix` import of `packages.nix` for common tooling. Prefer that established package-list convention to introducing a new module or abstraction for one package. The declaration must be usable by another Home Manager user or host without referring to `poseidon`, `apollo`, or `thales`.
 
-Do not abstract differences in service managers or unsupported module options. Use native NixOS options where available. Where nix-darwin cannot express a required persistent client preference, use a narrowly scoped, explicit platform-specific application step derived from the declared host settings. Do not create a general service-management framework.
+Home Manager installs the common CLI package, not `services.tailscale` system options. Generic native wiring supplies the privileged daemon separately; a user-only service or userspace networking is not an equivalent substitute for the existing VPN and exit-node roles.
 
-Client preferences must be inventoried before migration. Apply only explicitly owned preferences and preserve unrelated settings. Do not use a blanket reset or a `tailscale up` invocation that discards existing non-default preferences. Applying preferences must not create an endless activation wait or silently accept a failed command. Enrollment and preference application must be ordered after the daemon is available.
+Verify package compatibility and command resolution at each activation stage. Do not shadow a working App Store command with a CLI that cannot reach that backend. On macOS, coordinate the reviewed app-to-daemon cutover and Home Manager package activation rather than assuming the open-source CLI can control the App Store backend through a normal daemon socket.
 
-Adding a package through Home Manager alone does not satisfy system-service ownership.
+Do not run `tailscale up`, `tailscale set`, logout, login, or daemon installation from Home Manager activation. Existing preferences intentionally differ between the workstation and routing servers. This shared configuration must not set all hosts to the same role.
 
-### Poseidon system adoption
+### Generic system-service wiring
 
-Retrieve the currently active NixOS-WSL declaration and its relevant imports and pins before constructing `nixosConfigurations.poseidon`.
+Use one reusable `modules/tailscale.nix` with the common `services.tailscale.enable` and `services.tailscale.package` declarations. Let the native modules supply systemd or launchd integration instead of writing unit files, launchd plists, or a custom installer.
 
-Preserve its users, default WSL user, hostname, boot and WSL options, networking requirements, and `system.stateVersion`. Do not infer `system.stateVersion` from `home.stateVersion`, the current date, or a new channel version. Preserve secrets through appropriate external references rather than copying secret values into the repository.
+Import it once from the common Darwin system configuration. Export it from the existing Linux flake as `nixosModules.tailscale`, and import that export into the already-running NixOS configuration. This is a reusable module interface, not `nixosConfigurations.poseidon` or adoption of its full system declaration. The import can be used by another NixOS host without editing this module.
 
-Keep standalone Home Manager using the existing shared and Linux-specific home modules. Rename its output key and active callers; do not retain a deprecated alias. Keep historical design records as historical records rather than rewriting their deployment evidence.
+Do not put exit-node advertisement, subnet prefixes, SSH enablement, usernames, or hostname-based branches into the shared defaults. Preserve those existing machine roles and any native option overrides. If a migration needs explicit preference restoration, use reviewed host-specific values in the native system context or the explicit migration procedure, not a bespoke Poseidon module or Home Manager activation hook.
+
+Use compatible package selections between the user CLI and system daemon. The existing external NixOS configuration may use different package pins from standalone Home Manager; verify actual versions and supported interaction rather than assuming a shared package attribute means identical builds.
+
+### Configuration-key rename, not system adoption
+
+Rename the existing standalone Home Manager output from `daehyun@charon` to `daehyun@poseidon` and update its active CI and documentation callers. This naming correction does not require adopting the entire NixOS-WSL system declaration.
+
+Inspect the active NixOS configuration only far enough to integrate the generic module safely and preserve current Tailscale overrides. Keep unrelated users, WSL defaults, boot settings, state versions, and services unchanged. Do not replace the system declaration with a guessed minimal configuration.
+
+Keep the existing shared and Linux-specific Home Manager modules. Do not retain a deprecated `charon` alias. Keep historical design records as historical records rather than rewriting their deployment evidence.
 
 Renaming the Home Manager output does not itself rename the OS, the Windows WSL registration, or a Tailscale device. Do not rename those identities unless live inspection shows a mismatch that requires an explicit migration decision.
 
@@ -134,7 +243,7 @@ The initial inventory covers:
 
 - The complete policy document, including existing grants or ACLs, groups, tag owners, SSH rules, auto-approvers, and embedded policy tests where present.
 - MagicDNS, global and restricted nameservers, search paths, and other DNS settings supported by the selected provider that affect the existing configuration.
-- Existing tags and subnet/exit-route approvals for the managed hosts.
+- Existing tags, ownership, per-device key-expiry settings, and subnet/exit-route approvals for the managed hosts.
 
 Retain the policy in a readable provider-supported source file. Adopt its existing semantics; do not convert ACL style, invent tags, or create a policy from visible peer information.
 
@@ -152,20 +261,23 @@ Back up state outside Git before import or apply and after successful adoption. 
 
 ## Migration and recovery
 
-1. Inventory and back up machine settings, current policy and DNS, existing approvals, and any existing state. Confirm local or otherwise independent access before changing the connection used to administer a host.
-2. Retrieve and adopt `poseidon`'s current system declaration. Rename the Home Manager key and update current documentation and CI references.
-3. Evaluate both Darwin systems, the renamed Home Manager output, and the new NixOS-WSL system without activation.
-4. Configure provider credentials locally, validate the policy, and import the existing tailnet resources. Review the plan. Adoption must produce no intended access, DNS, or routing changes; investigate unexplained diffs before applying.
-5. Cut over one machine at a time. Inventory the installed variant first. On `apollo`, remove the App Store client and follow the documented macOS cleanup/reboot procedure before starting the Nix daemon. Do not run two variants simultaneously.
-6. Start the Nix-managed daemon, authenticate if required, and apply the reviewed host preferences. Do not promise that switching variants preserves node identity.
-7. If reenrollment creates a new device identity, explicitly reconcile affected approvals and references with a reviewed OpenTofu plan. Do not delete the old device until its replacement is verified.
-8. Verify connectivity and required host roles before touching the next machine. Review the final OpenTofu plan for drift.
+1. Revalidate and back up the Cua Driver baseline, local daemon preferences and private state, current tailnet configuration, and any OpenTofu state. Keep secret backups outside Git and the Nix store.
+2. Rename the Home Manager key and update current documentation and CI references. Add the generic module export without creating a Poseidon system output or importing its full OS declaration into this repository.
+3. Inspect existing native daemon ownership and configuration before adding the module import. Preserve unrelated system settings and existing Tailscale role overrides. Confirm independent recovery access before changing a host's VPN.
+4. Evaluate both Darwin systems, the renamed standalone Home Manager output, and the generic NixOS module. Preview the actual existing NixOS system with its added import before activation; do not invent a replacement host configuration.
+5. Configure provider credentials locally, validate the authoritative policy export, and import existing tailnet resources. Review the plan for no intended policy, DNS, ownership, expiry, or routing changes.
+6. Migrate one available machine at a time using its native system activation. If its existing daemon is already Nix-managed, adopt it without unnecessary reinstall or reenrollment. Home Manager activation alone is not service activation.
+7. Before replacing `apollo`'s App Store client, resolve the observed key-protection gate and required feature differences. Follow upstream client-removal and reboot guidance, and do not run both variants simultaneously. Keep the existing client unchanged if the gate cannot be satisfied.
+8. Activate compatible Home Manager tooling, restore only the inventoried preferences that migration requires, and verify the intended daemon and network paths. Stop for an explicit decision if reenrollment would change the device identity.
+9. Verify daemon startup after the planned native service restart and reboot or WSL distribution restart. Review the final OpenTofu plan for unexplained changes. An unavailable host remains explicitly unverified.
 
-The macOS target is deliberately headless. It has no menu-bar app or macOS VPN-settings integration. Current upstream documentation says this variant can advertise an exit node but cannot consume one, and Taildrop support is incomplete. The selected Nix-only architecture accepts these limitations. If inventory establishes an actively required unsupported feature, stop and surface the incompatibility rather than claiming full behavioral parity.
+The selected design includes shared Home Manager tooling and generic native daemon management. It excludes full Poseidon system adoption and custom privileged Home Manager hooks. Completing only the CLI package declaration does not complete this design.
 
-Nix generation rollback does not restore removed App Store software, OAuth credentials, device identities, or control-plane settings. Recovery instructions must distinguish package/service rollback, previous-client restoration, and reapplication of a saved tailnet configuration. Preserve the old device record until replacement verification is complete.
+The headless macOS daemon has no menu-bar UI or macOS VPN-settings integration. Upstream documents limitations in consuming exit nodes and Taildrop support. No exit node was selected on `apollo` during inspection, but that does not establish that the user never uses those features. Surface any required unsupported behavior before changing the installed client; do not silently waive the preservation baseline.
 
-NixOS-WSL daemon startup means startup when the WSL distribution runs; it does not promise that the distribution starts with Windows or remains available when WSL is shut down. Preserve existing Windows startup behavior; do not add a Windows scheduled task as an implicit side effect.
+Home Manager rollback covers user tooling; native system generations cover declared system configuration. Neither automatically restores removed App Store software, private keys, node identity, or tailnet API settings. Document previous-client recovery separately, back up state, and retain existing device records until a replacement has been explicitly approved and verified.
+
+For NixOS-WSL, daemon startup means startup when the distribution runs; it does not promise availability while WSL is shut down or introduce Windows startup tasks.
 
 ## Verification and acceptance criteria
 
@@ -173,36 +285,40 @@ NixOS-WSL daemon startup means startup when the WSL distribution runs; it does n
 
 - Existing Nix formatting and evaluation checks pass for `apollo` and `thales`.
 - `homeConfigurations."daehyun@poseidon"` evaluates; the obsolete `daehyun@charon` output is removed.
-- `nixosConfigurations.poseidon` evaluates with the adopted NixOS-WSL declaration and shared Tailscale module.
-- CI evaluates the renamed Home Manager output and new Linux system output. No authenticated infrastructure apply runs in CI.
+- Home Manager configuration contains only user-side options and no privileged activation hooks. Both Darwin systems import the generic native service declaration.
+- `nixosModules.tailscale` evaluates in a disposable NixOS configuration and supplies the native daemon service. No production `nixosConfigurations` output or Poseidon-specific file is introduced.
+- CI evaluates the renamed Home Manager output, existing Darwin systems, and generic NixOS service module without authenticated infrastructure applies. Evaluate the actual existing WSL system with the module import before its activation.
 - OpenTofu formatting, initialization, and validation succeed with the committed provider lock file.
 - Existing policy tests pass. Where policy tests are absent, verify concrete currently required permitted paths using supported policy validation and live traffic; do not invent denied-access requirements during adoption.
 - Current README commands use the new output names. Historical records remain intact.
 
 ### Runtime proof
 
-- Each managed host runs one intended Tailscale daemon, backed by the declared Nix package and its native service manager.
-- After service restart, and after a planned reboot or WSL distribution restart, the daemon returns to the intended authenticated state without manual service startup.
-- MagicDNS resolves real peer names and normal public DNS continues to work on the migrated hosts.
+- Each migrated host runs exactly one intended Nix-managed daemon through its native service manager, and the Home Manager CLI reports that daemon's real authenticated status.
+- Preserve device identity, local role preferences, authentication ownership, and key protection through the reviewed migration. Verify startup after a service restart and planned reboot or WSL distribution restart.
+- MagicDNS resolves real peer names and normal public DNS continues to work after user and system activation.
 - Required peer connectivity is exercised with actual traffic, not inferred from successful evaluation or a daemon process listing.
 - `thales` retains its required `192.168.68.0/24` subnet-routing behavior and exit-node advertisement. Verify subnet traffic from an authorized client that is not already on that subnet.
 - `poseidon` retains its inventoried exit-node behavior while WSL is running. If Windows also runs Tailscale, resolve and verify the documented nested-tunnel risk before accepting the configuration.
-- Verify exit-node traffic from a client that supports consuming exit nodes; a headless macOS daemon is not that client.
-- Existing Tailscale SSH paths that are actually enabled remain usable after migration.
+- Verify exit-node traffic with a client that supports consuming exit nodes; do not select an exit node on `apollo` or assume a headless macOS client can consume one to perform the check.
+- Existing enabled Tailscale SSH paths remain usable after native service migration and Home Manager activation.
 - The final OpenTofu plan has no unexplained changes. Reapplying machine configuration does not duplicate installations, re-enroll devices, or reset unrelated preferences.
 - Credentials and private node state remain outside source-controlled and Nix-store content.
+- Preserve the Cua Driver baseline: `apollo` accepts incoming connections, Tailscale DNS, and subnet routes without selecting or advertising an exit node; the tailnet DNS override stays off and HTTPS stays enabled.
+- Preserve disabled key expiry on `thales` and `poseidon`, enabled expiry on `apollo`, existing user ownership, and SSH check-mode semantics. Do not introduce device tags or empty ACL/grant lists.
+- Preserve `apollo`'s reported encrypted-state protection before replacing its app. An unavailable equivalent protection is a migration blocker unless the user explicitly accepts the concrete security change.
 
-A configuration that only evaluates is not a completed adoption. If a host or required credential remains unavailable, report that host or tailnet operation as unverified rather than claiming the full migration succeeded.
+A configuration that only evaluates or installs a CLI does not complete daemon adoption. If a host, native configuration import, preservation gate, or required API credential remains unavailable, report the exact unverified operation. Do not describe the privileged daemon as Home Manager-managed; it is managed by the generic native system module.
 
 ## Implementation prerequisites
 
 These are concrete inputs required before the corresponding live changes, not values to guess:
 
-- Access to `poseidon`'s current NixOS-WSL declaration, relevant imports and pins, and system-service configuration. SSH was unreachable during design.
-- Read-only inventory of `thales`'s installed variant and both Macs' relevant persistent client preferences.
-- Authenticated tailnet API access to export policy, DNS, tags, and approvals. Local client status does not provide this full inventory.
-- Inspection of whether `poseidon`'s Windows host also runs Tailscale.
-- Independent recovery access for macOS client removal and any reenrollment.
+- Access to each managed user's environment and native service configuration for preview, activation, and runtime verification. `poseidon` was offline during inspection. Its full system declaration need not be adopted, but its existing configuration must be accessible for a safe generic module import.
+- Compatible CLI/system-daemon package selections and a staged macOS cutover plan that does not shadow the working App Store integration before its replacement is ready.
+- Authenticated tailnet API access to export the authoritative policy, DNS, device settings, and approvals. The authenticated GUI baseline is recorded above but does not replace a current export before implementation.
+- A supported plan preserving `apollo`'s key protection, or an explicit decision accepting a specific security change before client removal.
+- Independent recovery access, backups, and activation previews showing only the reviewed Tailscale service changes and no unrelated OS changes.
 
 Do not overwrite a running system declaration or replace tailnet policy with guessed defaults to bypass an unavailable prerequisite.
 
@@ -214,3 +330,4 @@ Do not overwrite a running system declaration or replace tailnet policy with gue
 - [Tailscale: WSL 2 installation and simultaneous Windows/WSL limitations](https://tailscale.com/docs/install/windows/wsl2)
 - [NixOS-WSL installation documentation](https://nix-community.github.io/NixOS-WSL/install.html)
 - Local pinned nix-darwin source: `modules/services/tailscale.nix`, resolved through the repository's Darwin flake.
+- [Tailscale ACL examples: omitted `acls` versus an empty list](https://tailscale.com/docs/reference/examples/acls)
