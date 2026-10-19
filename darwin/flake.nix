@@ -22,6 +22,10 @@
       configuration =
         { pkgs, lib, ... }:
         {
+          imports = [
+            ../modules/tailscale.nix
+          ];
+
           nix.settings.experimental-features = "nix-command flakes";
 
           nix.gc = {

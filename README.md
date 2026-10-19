@@ -58,13 +58,18 @@ Start a new login session after activation; reconnect remote editors to reload t
 - Garbage collection runs weekly and removes unreferenced generations older than 30 days, making them unavailable for rollback.
 - Approve trusted direnv configurations with `direnv allow`. `.env` is gitignored; see `.env.example`.
 
-CI checks formatting and evaluates Linux and both Darwin configurations without activation. Evaluate locally:
+CI checks formatting and evaluates the Poseidon Home Manager configuration, both Darwin systems, and the generic NixOS Tailscale module. It does not activate a host or apply infrastructure. Evaluate locally:
 
 ```sh
 nix eval --no-update-lock-file --raw ./darwin#darwinConfigurations.apollo.system.drvPath
 nix eval --no-update-lock-file --raw ./darwin#darwinConfigurations.thales.system.drvPath
-nix eval --no-update-lock-file --raw './linux#homeConfigurations."daehyun@charon".activationPackage.drvPath'
+nix eval --no-update-lock-file --raw './linux#homeConfigurations."daehyun@poseidon".activationPackage.drvPath'
 ```
+
+## Tailscale
+
+Shared `packages.nix` installs the Tailscale CLI. `modules/tailscale.nix` enables the native daemon for both Darwin machines and is exported as `linux#nixosModules.tailscale` for the existing NixOS configuration. Home Manager does not start that daemon. Tailnet policy and DNS live in `infra/tailscale/`; CI does not apply them. See that directory for credentials, the Apollo client-preservation gate, and the separate Muse SSH apply.
+
 
 ## OMP
 
