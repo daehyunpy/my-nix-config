@@ -15,7 +15,7 @@
         "OMP": {
             "type": "custom",
             "command": "omp",
-            "args": ["acp"],
+            "args": ["acp", "--mcp"],
             "env": {}
         },
         "cursor": {
