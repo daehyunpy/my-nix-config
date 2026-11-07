@@ -1,4 +1,15 @@
 {
+    "terminal": {
+        "shell": {
+            "program": "fish"
+        },
+        "detect_venv": {
+            "on": {
+                "directories": [".env", "env", ".venv", "venv"],
+                "activate_script": "fish"
+            }
+        }
+    },
     "soft_wrap": "none",
     "disable_ai": false,
     "cli_default_open_behavior": "existing_window",

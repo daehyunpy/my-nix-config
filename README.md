@@ -105,3 +105,5 @@ Use `/model` to select from `unity-anthropic`, `unity-openai`, `unity-google`, o
 ## Zed
 
 `home-files/zed` is linked to `~/.config/zed`. The external agent runs `omp acp`, so OMP must be on Zed's `PATH`; its model configuration is separate from Zed's native agent. Windows host settings are not managed here.
+
+Zed terminals explicitly use `fish` and its virtual-environment activation script. Keep `terminal.shell.program` set to `fish`: selecting `activate_script` alone does not control Python toolchain activation in Windows-to-WSL sessions. Open a new terminal after changing these settings; no Home Manager rebuild is needed for the live link.
