@@ -32,11 +32,20 @@ Declarative system and user environment configuration for macOS, Linux, and WSL 
 - `home-files/` contents are symlinked via `mkOutOfStoreSymlink` (live link) or `.source` (copy). Prefer `mkOutOfStoreSymlink` for configs that change outside of nix (e.g., editor settings).
 - `.env` holds additional secrets (`MILVUS_ADDRESS`, `MILVUS_TOKEN`); see `.env.example` for the template. Both `.env` and `.envrc` are gitignored.
 
+## Agent Tool Compatibility
+
+OMP is the primary agent tool today, but the tool may change. Keep agent instructions, plugins, and reusable resources portable and shared rather than tied to the current tool.
+
+Use `CLAUDE.md` for compatibility across agent tools. Most agent tools read both `CLAUDE.md` and `AGENTS.md`, but Claude Code reads `CLAUDE.md` and does not automatically load `AGENTS.md`. Keeping the instructions in `CLAUDE.md` lets the same policy work across tools, including Claude Code, without a second file or tool-specific setup.
+
+Keep reusable plugins and agent resources in `.claude/` so compatible tools can share them. This directory choice is for resource compatibility, not because Claude Code is the primary tool. Keep OMP-specific integration settings in `.omp/`; reuse shared resources where supported rather than maintaining separate copies for each tool.
+
 ## Preferences
 
 - Preserve unrestricted passwordless sudo (`%admin ALL=(ALL) NOPASSWD: ALL`) on macOS. This is intentional; do not replace it with password or Touch ID authentication unless explicitly requested.
 - Prefer Homebrew for macOS applications and platform-specific packages. Install core CLI tools and services shared across macOS, Linux, and WSL using Nix instead.
 - Keep shared Nix package declarations in root `packages.nix`/`home.nix`; keep platform-specific service lifecycle configuration in the appropriate platform modules.
+- Keep repository agent instructions, including the YOLO boundary, in this single `CLAUDE.md`. Do not introduce `AGENTS.md` or a second agent-policy file.
 
 ## YOLO Boundary
 
