@@ -102,6 +102,15 @@ Require successful state retrieval and valid JSON before treating the new file a
 
 No state or credentials were transferred to Thales. Its earlier tool/worktree preparation did not establish a remote backend or state service.
 
+### Worktree state handoff
+
+Before deleting a checkout that holds authoritative local state:
+
+1. Ensure no concurrent state operation is running. Privately back up the active state and its local backup files outside the worktree; do not print their contents.
+2. After merging, use the corresponding module's default state location in the retained checkout. Do not overwrite an existing destination; reconcile its lineage, serial, bindings, and ownership first if another state is present.
+3. Move the active state and local backups, preserving private permissions. Verify bytes, lineage, and resource bindings, and retire the former active copy. Provider caches are regenerable; state is not.
+4. Initialize the retained module with its committed provider lock, confirm the intended workspace, and run a read-only refreshed plan before deleting the old worktree. For this Tailscale root, require all eight bindings and zero drift. Never use apply, destroy, or `state rm` as a cleanup shortcut.
+
 ### Adoption and ownership
 
 `imports.tf` declares the eight existing objects to adopt. It shares the device and router maps with the resources, so identifiers and instance membership have one source. Looped imports require OpenTofu/Terraform 1.7 or newer; use the pinned OpenTofu 1.13.1.

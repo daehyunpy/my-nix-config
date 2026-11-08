@@ -66,6 +66,15 @@ Keep reusable plugins and agent resources in `.claude/` so compatible tools can 
 - Preserve unrelated work, staged changes, and existing conflicts. Commit only when requested; require explicit authorization for pushing, publishing, destructive Git operations, or deleting unrelated data.
 - Never print, commit, or transmit secrets from `.env`, credentials, or private keys. Existing passwordless sudo is not authorization to use it.
 
+## Branch and Worktree Cleanup
+
+- Clean up only when requested. Before post-merge cleanup, verify the PR is actually `MERGED` into its target branch and record its merge commit and published head. A pushed branch or clean status is not proof of merging.
+- Inspect tracked, staged, untracked, and ignored files before removal. Git worktree removal can erase ignored data, including state, backups, credentials, and local configuration. Preserve non-regenerable files privately outside the worktree; discard only identified reproducible caches.
+- Hand off authoritative state to a retained operator checkout before removing its current home. Verify the backup and destination, retain one active state, and follow the [Terraform state handoff](terraform/CLAUDE.md#worktree-state-handoff) when applicable. Do not treat Git as a backup for ignored files.
+- Run `git worktree remove <path>` from a retained checkout, keeping the main checkout on `main`. Do not use force to bypass dirty or unpreserved data.
+- Delete the local branch with `git branch -d <branch>` after worktree removal. If squash merging prevents ancestry-based deletion, use `-D` only when deletion was explicitly requested, the published head matches the local tip, the PR is verified merged, and local-only data is preserved.
+- Verify the directory, worktree registration, and local branch are gone and retained state remains usable. Do not delete other worktrees, branches, stashes, or remote branches; existing server-side branch auto-deletion is separate repository policy. Cleanup never authorizes infrastructure destruction, state removal from management, or host activation.
+
 ## Validation
 
 Agents must run `bash scripts/check.sh` after changing Nix configuration and before reporting completion. Run it autonomously; do not ask the user to run checks.

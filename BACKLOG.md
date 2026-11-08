@@ -53,7 +53,7 @@ Remove completed items from this document; use Git history and linked pull reque
 
 **Status:** Deferred
 **Outcome:** Host-side Tailscale tooling and services are managed declaratively without changing device identity or existing behavior.
-**References:** Deferred phase in `docs/superpowers/specs/2026-10-18-tailscale-management-design.md` on `feat/tailscale-terraform`; stash named `WIP: Tailscale Nix configuration (not applied)` from `feat/tailscale-iac`; earlier committed implementation on `review/cursor-tailscale-pr1` at `314e775`.
+**References:** Deferred phase in `docs/superpowers/specs/2026-10-18-tailscale-management-design.md`; stash named `WIP: Tailscale Nix configuration (not applied)` from `feat/tailscale-iac`; earlier committed implementation on `review/cursor-tailscale-pr1` at `314e775`.
 **Work left behind:** The host-side implementation and output rename were left out of `feat/tailscale-terraform`. The later draft remains in the stash from `feat/tailscale-iac`, not in that branch's committed files. The earlier shared CLI, native daemon module, output rename, and module-validation CI remain committed on `review/cursor-tailscale-pr1`.
 **Dependency:** Reconcile the older spec on `main` before implementation.
 
