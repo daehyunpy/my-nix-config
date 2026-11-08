@@ -53,7 +53,7 @@ Remove completed items from this document; use Git history and linked pull reque
 
 **Status:** Deferred
 **Outcome:** Host-side Tailscale tooling and services are managed declaratively without changing device identity or existing behavior.
-**References:** Deferred phase in `docs/superpowers/specs/2026-10-18-tailscale-management-design.md` on `feat/tailscale-terraform`; stash named `WIP: Tailscale Nix configuration (not applied)` from `feat/tailscale-iac`; earlier committed implementation on `review/cursor-tailscale-pr1` at `314e775`.
+**References:** Deferred phase in `docs/superpowers/specs/2026-10-18-tailscale-management-design.md`; stash named `WIP: Tailscale Nix configuration (not applied)` from `feat/tailscale-iac`; earlier committed implementation on `review/cursor-tailscale-pr1` at `314e775`.
 **Work left behind:** The host-side implementation and output rename were left out of `feat/tailscale-terraform`. The later draft remains in the stash from `feat/tailscale-iac`, not in that branch's committed files. The earlier shared CLI, native daemon module, output rename, and module-validation CI remain committed on `review/cursor-tailscale-pr1`.
 **Dependency:** Reconcile the older spec on `main` before implementation.
 
@@ -64,6 +64,17 @@ Remove completed items from this document; use Git history and linked pull reque
 - Host package/service management remains separate from OpenTofu tailnet settings and deployment CI/CD.
 - Device identities, authentication state, local preferences, and Apollo's encrypted-state protection are preserved; recovery access is established before migrating one host at a time.
 - Actual daemon connectivity, SSH, DNS, routing, and startup behavior are verified after separately authorized activation.
+
+## INFRA-6 — Choose OpenTofu state storage and execution
+
+**Status:** Backlog
+**Outcome:** Select a state-management/backend strategy after starting with default local state.
+
+**Done when:**
+- Evaluate all options without preselecting one: default local state, SSH-based execution, SMB/shared filesystems, rclone for backups or S3 serving, HTTP state services, S3-compatible storage, PostgreSQL, and managed cloud/state services.
+- Compare locking/concurrent writes, atomicity and interrupted-write recovery, durability/versioning, authentication/encryption, backups, operating complexity, and recovery when the tailnet or a host is unavailable.
+- Treat Thales as a candidate, not a selected host; no protocol, product, or custom state location is committed to before evaluation.
+- Plan any future migration with protected backups and verified locking/recovery before moving authoritative state.
 
 ## INFRA-7 — Discover all declared Nix configurations in shared validation
 

@@ -16,6 +16,7 @@ Declarative system and user environment configuration for macOS, Linux, and WSL 
 - `nixos/` — NixOS configuration (empty, reserved for future use)
 - `kubernetes/` — Kubernetes manifests (empty, reserved for future use)
 - `openspec/` — Spec documents and change tracking (scaffolded: `specs/`, `changes/`)
+- `terraform/` — Independent OpenTofu root modules; read [terraform/CLAUDE.md](terraform/CLAUDE.md) before working on them.
 - `home.nix` — Shared home-manager config (cross-platform)
 - `packages.nix` — Shared nix packages (cross-platform)
 - `home-files/` — Dotfiles symlinked into `$HOME` via `home.file`
@@ -34,7 +35,7 @@ Declarative system and user environment configuration for macOS, Linux, and WSL 
 
 ## Coding Guidance
 
-Agents own implementation, verification, and review. Follow [Anthropic’s guidance](https://code.claude.com/docs/en/best-practices) on instructions versus deterministic enforcement and [OpenAI’s guidance](https://developers.openai.com/codex/learn/best-practices) on verification and review. Apply them through this repository’s workflow; repository policies take precedence, and shared checks must remain portable across agent tools.
+Humans do not code directly; agents own implementation, verification, and review. Follow [Anthropic’s guidance](https://code.claude.com/docs/en/best-practices) on instructions versus deterministic enforcement and [OpenAI’s guidance](https://developers.openai.com/codex/learn/best-practices) on verification and review. Apply them through this repository’s workflow; repository policies take precedence, and shared checks must remain portable across agent tools.
 
 ## Agent Tool Compatibility
 
@@ -53,7 +54,8 @@ Keep reusable plugins and agent resources in `.claude/` so compatible tools can 
 - Place worktrees under `.worktrees/` at the main repository root (for example, `.worktrees/todo-documenting/`), not inside another worktree. Perform edits, validation, and requested commits in the selected checkout; keep the main checkout on `main`.
 - Prefer Homebrew for macOS applications and platform-specific packages. Install core CLI tools and services shared across macOS, Linux, and WSL using Nix instead.
 - Keep shared Nix package declarations in root `packages.nix`/`home.nix`; keep platform-specific service lifecycle configuration in the appropriate platform modules.
-- Keep repository agent instructions, including the YOLO boundary, in this single `CLAUDE.md`. Do not introduce `AGENTS.md` or a second agent-policy file.
+- Keep repository-wide agent policy, including the YOLO boundary, in this root `CLAUDE.md`. Scoped `CLAUDE.md` workflow guides belong alongside their code and must not duplicate or override the root authorization boundary. Do not introduce `AGENTS.md`.
+- Keep coding workflows and operational details in the appropriate scoped `CLAUDE.md`; keep `README.md` focused on human-facing goals, capabilities, and orientation.
 
 ## YOLO Boundary
 
@@ -63,6 +65,15 @@ Keep reusable plugins and agent resources in `.claude/` so compatible tools can 
 - Require explicit authorization for writes outside this checkout, except the temporary/cache/store writes above. Resolve symlink targets before writing. Files in `home-files/` may be live-linked into the home directory: requested edits are allowed, but their effects can be immediate without a rebuild.
 - Preserve unrelated work, staged changes, and existing conflicts. Commit only when requested; require explicit authorization for pushing, publishing, destructive Git operations, or deleting unrelated data.
 - Never print, commit, or transmit secrets from `.env`, credentials, or private keys. Existing passwordless sudo is not authorization to use it.
+
+## Branch and Worktree Cleanup
+
+- Clean up only when requested. Before post-merge cleanup, verify the PR is actually `MERGED` into its target branch and record its merge commit and published head. A pushed branch or clean status is not proof of merging.
+- Inspect tracked, staged, untracked, and ignored files before removal. Git worktree removal can erase ignored data, including state, backups, credentials, and local configuration. Preserve non-regenerable files privately outside the worktree; discard only identified reproducible caches.
+- Hand off authoritative state to a retained operator checkout before removing its current home. Verify the backup and destination, retain one active state, and follow the [Terraform state handoff](terraform/CLAUDE.md#worktree-state-handoff) when applicable. Do not treat Git as a backup for ignored files.
+- Run `git worktree remove <path>` from a retained checkout, keeping the main checkout on `main`. Do not use force to bypass dirty or unpreserved data.
+- Delete the local branch with `git branch -d <branch>` after worktree removal. If squash merging prevents ancestry-based deletion, use `-D` only when deletion was explicitly requested, the published head matches the local tip, the PR is verified merged, and local-only data is preserved.
+- Verify the directory, worktree registration, and local branch are gone and retained state remains usable. Do not delete other worktrees, branches, stashes, or remote branches; existing server-side branch auto-deletion is separate repository policy. Cleanup never authorizes infrastructure destruction, state removal from management, or host activation.
 
 ## Validation
 

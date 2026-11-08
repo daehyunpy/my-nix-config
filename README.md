@@ -9,6 +9,7 @@ Prefer Homebrew for macOS applications and platform-specific packages. Use Nix f
 - `home.nix`, `packages.nix`: shared Home Manager configuration and packages.
 - `darwin/`, `linux/`: platform and machine configuration.
 - `home-files/`: managed dotfiles.
+- `terraform/`: Terraform-compatible infrastructure configuration, executed with OpenTofu.
 
 ## Setup
 
@@ -56,6 +57,14 @@ sudo chsh -s "$fish_path" "$USER"
 ```
 
 Start a new login session after activation; reconnect remote editors to reload the shell.
+
+## Tailscale tailnet management
+
+`terraform/tailscale/` declaratively manages the existing tailnet's policy, DNS, device key-expiry settings, and route approvals. CI validates configuration without applying it.
+
+Host-side Tailscale installation and Nix-managed services remain deferred. Live DNS is Cloudflare-only, matching the declared configuration and verified deployment.
+
+Agent workflow, credentials, state, adoption, recovery, and verification guidance live in [terraform/CLAUDE.md](terraform/CLAUDE.md).
 
 ## Maintenance
 
