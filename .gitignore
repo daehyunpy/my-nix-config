@@ -13,7 +13,7 @@ node_modules/
 # OMP plugin registries and runtime links contain machine-local cache paths.
 /.omp/plugins/
 
-# OpenTofu caches, local state, saved plans, and operator-only configuration.
+# Terraform/OpenTofu caches, local state, saved plans, and operator-only configuration.
 .terraform/
 *.tfstate
 *.tfstate.*
@@ -28,3 +28,5 @@ override.tf
 override.tf.json
 *_override.tf
 *_override.tf.json
+/terraform/**/crash.log
+/terraform/**/crash.*.log
