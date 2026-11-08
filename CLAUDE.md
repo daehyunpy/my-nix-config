@@ -1,6 +1,6 @@
 # Nix System Configuration
 
-Declarative system and user environment configuration using Nix flakes.
+Declarative system and user environment configuration for macOS, Linux, and WSL using Nix flakes. See `README.md` for project goals. WSL uses the Linux Home Manager configuration; Windows host settings are out of scope.
 
 ## Project Structure
 

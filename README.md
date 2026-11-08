@@ -1,6 +1,8 @@
 # my-nix-config
 
-Cross-platform Nix configuration. Keep the checkout at `~/.config/nix`.
+Maintain a single source of truth for my macOS, Linux, and WSL environments: packages, applications, dotfiles, and machine-specific settings. Make environments reproducible and straightforward to rebuild, share configuration where practical, and keep platform-specific exceptions explicit. Prefer declarative changes over undocumented manual setup; keep secrets outside the repository.
+
+WSL uses the Linux Home Manager configuration; Windows host settings are not managed here. Keep the checkout at `~/.config/nix`.
 
 - `home.nix`, `packages.nix`: shared Home Manager configuration and packages.
 - `darwin/`, `linux/`: platform and machine configuration.
