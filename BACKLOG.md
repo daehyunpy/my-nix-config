@@ -1,6 +1,7 @@
 # Backlog
 
 IDs are stable: do not renumber entries when reordering them.
+Remove completed items from this document; use Git history and linked pull requests for completion records. Never reuse their IDs.
 
 ## INFRA-1 — Clarify documentation responsibilities
 
