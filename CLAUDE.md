@@ -10,7 +10,7 @@ Declarative system and user environment configuration for macOS, Linux, and WSL 
   - `packages.nix` — macOS-only nix packages (currently empty)
   - `home.nix` — macOS-specific home-manager overrides
 - `linux/` — Linux configuration using home-manager standalone
-  - `flake.nix` — Three machines: `octo60`, `octo61`, `octo62` (user `dhyou`)
+  - `flake.nix` — One configuration: `daehyun@charon` (`x86_64-linux`)
   - `packages.nix` — Linux-only nix packages (currently empty)
   - `home.nix` — Linux-specific home-manager overrides
 - `nixos/` — NixOS configuration (empty, reserved for future use)
@@ -75,7 +75,7 @@ bash scripts/check.sh linux    # Linux evaluation only
 bash scripts/check.sh darwin   # Both Darwin evaluations
 ```
 
-- The full suite checks formatting with `nixfmt` from the locked Linux nixpkgs input, then evaluates `daehyun@charon`, `apollo`, and `thales`. Scoped commands are for iteration; run the full suite before completion.
+- The full suite checks validation error handling and formatting with `nixfmt` from the locked Linux nixpkgs input, then evaluates `daehyun@charon`, `apollo`, and `thales`. Scoped commands are for iteration; run the full suite before completion.
 - Requires Git and Nix with `nix-command` and `flakes` enabled. Nix may fetch the pinned formatter and inputs.
 - Formatting includes tracked and non-ignored untracked `.nix` files, skipping empty placeholders. Git-backed flake evaluation excludes untracked files; stage newly imported files before evaluation, preserving unrelated staged changes.
 - Checks stop at the first failure with a nonzero exit status. Fix failures within scope; report blockers and any checks not completed. Never claim validation passed when it did not.
@@ -97,3 +97,45 @@ home-manager switch --flake linux/
 # Format all Nix files (nixfmt is in shared packages)
 nixfmt **/*.nix
 ```
+
+## OMP
+
+Install OMP separately and launch from the selected checkout or worktree root:
+
+```sh
+omp --cwd .
+```
+
+- `.omp/config.yml` enables YOLO mode (no tool approval prompts) for this project; approval policies are not a sandbox.
+- `.omp/lsp.json` uses `nil` and `nixfmt` without automatic formatting.
+- `/nix-check [files...]` provides focused, read-only formatting and syntax checks; it does not replace the full validation required above.
+
+### Cua Driver MCP
+
+`.omp/mcp.json` registers `cua-driver mcp` for OMP; Claude Code requires separate MCP registration. The driver must be on the agent's `PATH`. macOS installation is managed by Homebrew through `darwin/casks.nix`; install the driver separately on Linux or Windows. On macOS, after activation:
+
+```sh
+open -n -g -a CuaDriver --args serve
+cua-driver permissions grant
+```
+
+On macOS, grant Accessibility, Screen Recording, and direct capture consent, then restart the agent. Check the connection with `/mcp test cua-driver` in OMP or `claude mcp get cua-driver`. The default mode allows input to every app, not just this project.
+
+### Unity Gateway
+
+Home Manager links `home-files/omp/models.yml` into OMP. Install [Unity Gateway](https://github.com/databricks/unity-gateway) and the Databricks CLI separately; `databricks` and `jq` must be on `PATH`.
+
+```sh
+databricks auth login \
+  --host https://adb-425124470313726.6.azuredatabricks.net \
+  --profile adb-425124470313726
+omp --model unity-openai/system.ai.gpt-6-1-sol
+```
+
+Use `/model` to select from `unity-anthropic`, `unity-openai`, `unity-google`, or `unity-oss`. Refresh the model registry from `ug status` when availability changes. Tokens are resolved at runtime, never stored in this repository.
+
+## Zed
+
+`home-files/zed` is linked to `~/.config/zed`. The external agent runs `omp acp`, so OMP must be on Zed's `PATH`; its model configuration is separate from Zed's native agent. Windows host settings are not managed here.
+
+Zed terminals explicitly use `fish` and its virtual-environment activation script. Keep `terminal.shell.program` set to `fish`: selecting `activate_script` alone does not control Python toolchain activation in Windows-to-WSL sessions. Open a new terminal after changing these settings; no Home Manager rebuild is needed for the live link.

@@ -60,48 +60,9 @@ Start a new login session after activation; reconnect remote editors to reload t
 ## Maintenance
 
 - Update inputs: `nix flake update --flake darwin` or `nix flake update --flake linux`, then apply.
-- Format Nix files: `nixfmt **/*.nix`.
 - Garbage collection runs weekly and removes unreferenced generations older than 30 days, making them unavailable for rollback.
 - Approve trusted direnv configurations with `direnv allow`. `.env` is gitignored; see `.env.example`.
 
-## OMP
+## Agent Workflows
 
-Install OMP separately and launch from the repository root:
-
-```sh
-omp --cwd ~/.config/nix
-```
-
-- `.omp/config.yml` enables YOLO mode (no tool approval prompts) for this project; approval policies are not a sandbox.
-- `.omp/lsp.json` uses `nil` and `nixfmt` without automatic formatting.
-- `/nix-check [files...]` runs read-only formatting and syntax checks; semantic evaluation is opt-in.
-
-### Cua Driver MCP
-
-`.mcp.json` registers `cua-driver mcp` for OMP and Claude Code; the driver must be on the agent's `PATH`. macOS installation is managed by Homebrew through `darwin/casks.nix`; install the driver separately on Linux or Windows. On macOS, after activation:
-
-```sh
-open -n -g -a CuaDriver --args serve
-cua-driver permissions grant
-```
-
-On macOS, grant Accessibility, Screen Recording, and direct capture consent, then restart the agent. Check the connection with `/mcp test cua-driver` in OMP or `claude mcp get cua-driver`. The default mode allows input to every app, not just this project.
-
-### Unity Gateway
-
-Home Manager links `home-files/omp/models.yml` into OMP. Install [Unity Gateway](https://github.com/databricks/unity-gateway) and the Databricks CLI separately; `databricks` and `jq` must be on `PATH`.
-
-```sh
-databricks auth login \
-  --host https://adb-425124470313726.6.azuredatabricks.net \
-  --profile adb-425124470313726
-omp --model unity-openai/system.ai.gpt-6-1-sol
-```
-
-Use `/model` to select from `unity-anthropic`, `unity-openai`, `unity-google`, or `unity-oss`. Refresh the model registry from `ug status` when availability changes. Tokens are resolved at runtime, never stored in this repository.
-
-## Zed
-
-`home-files/zed` is linked to `~/.config/zed`. The external agent runs `omp acp`, so OMP must be on Zed's `PATH`; its model configuration is separate from Zed's native agent. Windows host settings are not managed here.
-
-Zed terminals explicitly use `fish` and its virtual-environment activation script. Keep `terminal.shell.program` set to `fish`: selecting `activate_script` alone does not control Python toolchain activation in Windows-to-WSL sessions. Open a new terminal after changing these settings; no Home Manager rebuild is needed for the live link.
+Coding, validation, and agent/editor setup instructions live in [CLAUDE.md](CLAUDE.md). Agents perform repository changes and checks; system activation and other protected host changes require explicit user authorization.
