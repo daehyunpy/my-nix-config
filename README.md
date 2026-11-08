@@ -27,6 +27,8 @@ darwin-rebuild switch --flake ~/.config/nix/darwin
 
 Homebrew formulae, casks, and App Store apps are declared in `darwin/`. Unrestricted passwordless sudo for the admin group is intentional.
 
+The Dock pins `/System/Applications/Siri AI.app` for browsing Siri conversations, not the CoreServices Siri assistant.
+
 ### Linux
 
 Replace `username@hostname` with a configuration from `linux/flake.nix`:

@@ -62,8 +62,8 @@
           system.defaults = {
             dock = {
               persistent-apps = lib.mkDefault [
-                # Pin Siri itself rather than the system-hidden Applications launcher.
-                "/System/Library/CoreServices/Siri.app"
+                # Conversation browser; CoreServices/Siri.app invokes the assistant.
+                "/System/Applications/Siri AI.app"
                 "/System/Cryptexes/App/System/Applications/Safari.app"
                 "/System/Applications/Messages.app"
                 "/System/Applications/Mail.app"
