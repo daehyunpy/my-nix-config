@@ -13,9 +13,25 @@ provider "github" {
   owner = "daehyunpy"
 }
 
+resource "github_repository" "config" {
+  name       = "my-nix-config"
+  visibility = "public"
+
+  has_issues   = true
+  has_projects = true
+  has_wiki     = true
+
+  delete_branch_on_merge = true
+
+  # This resource adopts an existing repository, not a disposable environment.
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
 resource "github_repository_ruleset" "main" {
   name        = "main-protection"
-  repository  = "my-nix-config"
+  repository  = github_repository.config.name
   target      = "branch"
   enforcement = "active"
 
