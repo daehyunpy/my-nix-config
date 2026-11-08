@@ -108,6 +108,8 @@ python3 -B terraform/tailscale/workflow.py plan
 
 The command prints the private plan path, pinned tailnet, and SHA-256. Plans and review metadata live under the ignored `.terraform/reviewed-plans/` directory. They contain sensitive data; do not commit or share them.
 
+Present the saved plan's proposed actions and risks to the user, then stop for explicit approval of that reviewed plan. A request to change a setting or a successful plan is not approval to apply an unseen plan. Never combine planning and applying in the same unattended tool call.
+
 Only after separate authorization and a private off-checkout state backup, run `python3 -B terraform/tailscale/workflow.py apply <printed-plan-path>` in an interactive terminal. The helper:
 
 - Refuses missing default-workspace state, another checkout's plan, changed plan bytes or configuration inputs, and deletion/replacement actions.
@@ -117,6 +119,20 @@ Only after separate authorization and a private off-checkout state backup, run `
 Replan after changing source, policy, provider/CLI pins, variable inputs, or observing drift. OpenTofu also checks for stale state. Follow the backup procedure below before and after every attempted apply, including failures that may have partially changed resources. Remove old artifact directories after use; they are not durable recovery backups.
 
 These safeguards reduce accidental applies, not permissions: write credentials still allow bypassing the helper. `prevent_destroy` does not stop in-place updates. CI runs schema/format checks and the helper's credential-free safety tests, not authenticated policy validation, apply, or host-behavior checks. Tailscale SSH enablement, route advertisements, exit-node activation, and Nix client/service management remain deferred. Adding these safeguards does not authorize the pending Google DNS apply.
+
+### Verify an authorized apply
+
+An apply success message alone is not completion:
+
+1. Query the Tailscale API or CLI and compare the effective remote settings with the approved changes, including policy, DNS, route approvals, expiry, and identities that must remain unchanged.
+2. Inspect refreshed OpenTofu state to confirm the intended resource bindings and managed values without printing secrets.
+3. Run a fresh authenticated plan with refresh enabled:
+
+   ```sh
+   tofu -chdir=terraform/tailscale plan -refresh=true -input=false -detailed-exitcode
+   ```
+
+Require exit 0 with no drift after applying the approved changes. A mismatch or verification error means the operation is incomplete: report expected versus observed settings and obtain approval of a new reviewed plan before any corrective apply. This is a post-apply gate; the currently unapplied DNS addition still correctly produces a change plan.
 
 ### Backups and recovery
 
