@@ -23,6 +23,7 @@ terraform/tailscale/
   .opentofu-version       OpenTofu CLI version: 1.13.1
   .terraform.lock.hcl      Provider dependency lock; version-controlled
   versions.tf             Official tailscale/tailscale provider ~> 0.29.2
+  backend.tf              One host-local state path on the Thales SSH runner
   main.tf                 Explicit tailnet selection and complete policy ownership
   policy.hujson           User-selected ownership-based SSH and Funnel policy
   dns.tf                  One authoritative DNS configuration resource
@@ -32,7 +33,7 @@ terraform/tailscale/
 
 `terraform/` names the configuration format and ecosystem clearly; OpenTofu is the execution CLI. Do not retain a second active root under `infra/` or add a deployment framework.
 
-Moving the root must move ignored local state, backups, saved plans, and provider cache with it. Resource addresses remain unchanged. Directory renaming does not require a second state, reimport, or remote resource creation. Separate operators must also relocate their own local state before planning; saved plans from the old layout are historical, not authorization to apply.
+The earlier root rename moved ignored local state and caches without changing resource addresses. The accepted central-runner arrangement now migrates that authoritative state to Thales, outside Git worktrees. Do not reimport or create a separate state merely because source moves between checkouts; old local state is a recovery archive, not a second active backend.
 
 ### Authoritative inventory and preservation
 
@@ -82,9 +83,15 @@ Use `tailscale_dns_configuration`, not overlapping legacy DNS resources:
 
 Pin the provider to inventoried tailnet `TByk7otHmv11CNTRL`. Credentials come only from standard `TAILSCALE_OAUTH_CLIENT_ID` and `TAILSCALE_OAUTH_CLIENT_SECRET` environment variables. Any `TAILSCALE_TAILNET` environment value must match the pinned root, not redirect it. Keep `.env.example` values empty.
 
-Secrets stay outside Git and the Nix store in a private operator file with mode 0600. Never print credentials, place them in Terraform variables, or create repository-managed enrollment keys. The existing credential can inspect/adopt these resources; no credential expansion is authorized.
+Secrets stay outside Git and the Nix store. Reuse the existing scoped credential in Thales's private `~/.config/tailscale-iac/provider.env` with mode 0600 and a mode-0700 directory, supplied to provider commands through the environment. Retain the original private operator credential for off-host recovery; never print credentials, place them in Terraform variables, or create enrollment keys or broader scopes.
 
-Use local state for one operator. Ignore `.terraform/`, state/backups, saved plans, overrides, and credential-bearing variable files; retain the provider lock in version control. Back up state outside Git with restricted permissions before adoption and any later authorized apply. Local state is not a shared locking backend; concurrent operators and remote backend deployment are out of scope.
+Use `ssh thales` as the sole normal executor. Its reviewed linked worktree is `~/.config/nix/.worktrees/tailscale-runner`; keep the primary checkout on `main` and pin the runner to a reviewed commit. Install and verify the existing 1.13.1 CLI pin without activating host configurations or changing Tailscale services.
+
+`backend.tf` uses the local backend at `/Users/daehyun/.local/state/opentofu/tailscale/terraform.tfstate` on Thales. This is SSH remote execution, not a native SSH backend. All normal operations use the same host/file and default workspace, so OS-backed state locking can serialize them. Never execute authenticated operations against independent state in another host/worktree. The state directory is mode 0700 and state is mode 0600.
+
+Back up before and after state changes to versioned, mode-0600 files in private directories on the operator machine, outside Git. Migrate only after a private pre-migration backup and verify lineage, resource bindings, and a plan without unexpected changes; serial metadata may legitimately advance. Archive the former local active state after confirming the Thales state and off-host backup. No object-storage/database state service or unattended applies are introduced.
+
+If SSH is unavailable, use a copied off-host backup, retained private credential, and explicit local backend path override for an isolated recovery plan through the public Tailscale API. Establish exclusive recovery ownership before any recovery apply, then reconcile state back to Thales before resuming. LAN reachability is unverified; test off-host restore/planning rather than claiming a working alternate SSH path.
 
 Keep declarative imports for policy (`acl`), aggregate DNS (`dns_configuration`), all four key settings, and both router approvals. Import loops use the same device/router maps as the resource declarations, with current node IDs. Require at least OpenTofu/Terraform 1.7 for looped imports and retain the tested OpenTofu 1.13.1 pin. Existing state must not re-import tracked addresses; fresh state must propose imports rather than creates. Applying an import plan also applies any shown configuration updates, so the pending secondary DNS change still requires separate authorization.
 
@@ -108,6 +115,7 @@ tofu -chdir=terraform/tailscale validate
 - After any separately authorized saved-plan application, run an authenticated read-only `plan -input=false -detailed-exitcode` and require exit 0 with no changes. The 2026-11-08 cleanup application met this criterion and preserved the inventoried control-plane settings; it did not enable host-side services or add secondary DNS.
 - Confirm eight adopted resource addresses remain in local state, and the current Thales node/route settings are used. Do not log private state contents.
 - From fresh state, declarative imports must cover exactly eight addresses with no creates/deletes. From a private copy of existing operator state, imports must be skipped and the plan must contain only the separately pending DNS update. Neither verification may change the actual operator state or live tailnet.
+- Verify the installed Thales CLI pin, source worktree isolation, canonical backend path and permissions, all eight bindings, and a DNS-only SSH plan. Exercise local-backend lock contention on Thales in a disposable providerless fixture, not by changing real resources. Verify a versioned off-host state backup and isolated restore-and-plan without depending on Thales access.
 - Validator tests prove policy evaluation, not actual Muse-originated SSH or daemon startup. No client migration or live traffic acceptance is claimed in this phase.
 
 ## Deferred phase: managing Tailscale through Nix

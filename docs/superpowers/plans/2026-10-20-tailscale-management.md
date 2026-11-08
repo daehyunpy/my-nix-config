@@ -88,6 +88,17 @@ Observed: formatting and provider validation passed. The authenticated saved-pla
 
 Observed: fresh state changed from eight creates/no imports to eight imports/no creates or deletes. Existing state skips all imports. Both plans retain only the unapplied DNS update. Removing Apollo from the shared map and forgetting its temporary state binding plans no operation on that released instance. Original state remained byte-for-byte unchanged; all temporary inputs/state/plans were removed.
 
+## Task 7: Thales SSH runner and canonical state
+
+- [x] Inspect Thales over SSH: macOS, clean primary checkout on `main`, Nix available, no installed compatible OpenTofu engine or canonical state. Install the pinned OpenTofu 1.13.1 through the existing version manager.
+- [x] Use only the hostname `thales`. LAN SSH probes did not establish recovery access; retain and test an off-host backup recovery path instead.
+- [x] Declare one host-local backend path outside worktrees and document the reviewed runner worktree, private credentials, and versioned off-host backups.
+- [ ] Smoke-test backend migration/restore in disposable copies, preserving lineage and resource bindings; a serial increment is allowed.
+- [ ] Provision the reviewed runner worktree without switching the primary checkout; transfer the existing scoped credential and state with mode-0600 files/mode-0700 private directories.
+- [ ] Initialize/migrate the backend, verify eight adopted bindings and the pending-DNS-only SSH plan, pull an off-host backup, and archive the former local active state.
+- [ ] Exercise lock contention in a disposable fixture on Thales and verify off-host restore/planning. Do not apply secondary DNS, activate services, or claim LAN SSH recovery.
+
+
 ## Deferred Nix phase
 
 Do not restore `WIP: Tailscale Nix configuration (not applied)` in this phase. The spec retains shared CLI installation, generic NixOS/nix-darwin service management, the generic Fedora vendor-service drop-in, the future Home Manager rename, package compatibility, preservation/recovery gates, and actual restart/network verification. Poseidon remains Fedora WSL; Apollo's App Store encryption gate remains unresolved. No privileged Home Manager hooks or full OS adoption.

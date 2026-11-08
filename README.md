@@ -72,18 +72,34 @@ tofu -chdir=terraform/tailscale validate
 
 These checks need no tailnet credentials. CI runs them without plan, apply, or secrets.
 
-### Credentials, state, and read-only planning
+### SSH runner, credentials, and state
 
-The root pins the inventoried tailnet ID. Supply scoped OAuth credentials only through `TAILSCALE_OAUTH_CLIENT_ID` and `TAILSCALE_OAUTH_CLIENT_SECRET`; `.env.example` lists empty variable names. Any `TAILSCALE_TAILNET` value must match the pinned tailnet, not select another one. Keep operator secrets outside Git and the Nix store, in a private file with mode 0600, and pass them through the command environment rather than command-line arguments or Terraform variables.
+Run authenticated OpenTofu operations **only on `thales` over SSH**, not independently in laptop or CI worktrees. `backend.tf` declares a host-local backend; it is not an SSH backend. Its filesystem locking coordinates processes on Thales, not separate copies on other hosts.
 
-State is local and sensitive: `.terraform/`, `*.tfstate*`, saved plans, overrides, and secret variable files are ignored. `.terraform.lock.hcl` belongs in version control. Use a single operator; local state is not a shared locking backend. Back up state outside Git with restricted permissions before imports or any later authorized apply, and after adoption. If state is lost, prefer restoring its private backup. Declarative imports can recover adoption only after checking the current device inventory; never approve a creation plan for these existing resources.
+| Item | Location |
+| --- | --- |
+| Reviewed runner checkout on Thales | `~/.config/nix/.worktrees/tailscale-runner` |
+| Authoritative state on Thales | `/Users/daehyun/.local/state/opentofu/tailscale/terraform.tfstate` |
+| Existing scoped credentials on Thales | `~/.config/tailscale-iac/provider.env`, mode 0600 |
+| Versioned off-host backups on the operator machine | `~/.config/tailscale-iac/backups/`, private directories/files |
 
-The root was renamed from `infra/tailscale/` to `terraform/tailscale/` together with its ignored state, backup, saved plan, and provider cache. Resource addresses are unchanged; no state migration or reimport is required. An operator with a separate checkout must also move their local state before planning. Saved plans are sensitive, historical artifacts: generate and review a fresh plan before any future application.
+The primary Thales checkout stays on `main`. The runner is a separate worktree pinned to a reviewed commit, using OpenTofu 1.13.1. Updating source is a separate reviewed fetch/checkout in that worktree, never an implicit pull before apply. State remains outside every checkout. Use the default workspace for this tailnet.
 
-With the existing scoped credential loaded into the environment, read-only planning is:
+The provider pins the inventoried tailnet. Credentials use standard `TAILSCALE_OAUTH_CLIENT_ID`/`TAILSCALE_OAUTH_CLIENT_SECRET` variables; `.env.example` stays empty. Keep the original private credential available for disaster recovery, never in Git/Nix store or command-line arguments. No new OAuth client or scopes are needed for this migration.
+
+Read-only planning:
 
 ```sh
-tofu -chdir=terraform/tailscale plan -input=false -detailed-exitcode
+ssh thales /bin/sh -s <<'REMOTE'
+set -eu
+umask 077
+test -s "$HOME/.local/state/opentofu/tailscale/terraform.tfstate"
+cd "$HOME/.config/nix/.worktrees/tailscale-runner/terraform/tailscale"
+set -a
+. "$HOME/.config/tailscale-iac/provider.env"
+set +a
+tofu plan -input=false -detailed-exitcode
+REMOTE
 ```
 
 Exit 0 means no changes, 2 means proposed changes, and 1 means failure. Review each fresh plan before any separately authorized application. Eight existing resources are adopted. On 2026-11-08, the reviewed policy cleanup was applied with no SSH/Funnel behavior change; the post-apply plan exited 0 with no changes. DNS, route approvals, expiry, ownership, IDs, and addresses were verified unchanged. Thales's current device record and approved `192.168.2.0/24` subnet supersede its historical ID and `192.168.68.0/24` route.
@@ -91,6 +107,32 @@ Exit 0 means no changes, 2 means proposed changes, and 1 means failure. Review e
 The secondary DNS extension is declared but not yet applied: Cloudflare `1.1.1.1` plus Google `8.8.8.8`. Review a separate DNS-only plan before application; the earlier zero-drift result predates this extension.
 
 The earlier Muse-tag proposal is superseded by the simpler user-selected policy. Local adoption state was backed up privately, obsolete tag bindings were forgotten without deleting remote resources, and Thales's key/route settings were imported against its current node ID. An operator with older state must reconcile those bindings after a fresh inventory and private backup; do not apply tag-destruction or missing-node creation plans to repair bookkeeping.
+
+### Backups and recovery
+
+Before and after every state-changing operation, pull a versioned backup to the operator machine, not merely another directory on Thales:
+
+```sh
+set -eu
+umask 077
+backup_dir="$HOME/.config/tailscale-iac/backups/$(date -u +%Y-%m-%d)"
+mkdir -p "$backup_dir"
+backup=$(mktemp "$backup_dir/thales-$(date -u +%H%M%S).XXXXXX")
+ssh thales /bin/sh -s > "$backup" <<'REMOTE'
+set -eu
+test -s "$HOME/.local/state/opentofu/tailscale/terraform.tfstate"
+cd "$HOME/.config/nix/.worktrees/tailscale-runner/terraform/tailscale"
+tofu state pull
+REMOTE
+jq -e '.lineage != null and .serial != null and .resources != null' "$backup" >/dev/null
+printf 'Validated private backup: %s\n' "$backup"
+```
+
+Require SSH success and valid state JSON before treating a new file as a backup; keep earlier backups. State, plans, and credentials remain gitignored or outside Git. Do not create independent active state per branch/worktree or copy a second active state to another operator.
+
+If `ssh thales` is unavailable, stop normal operations. Restore a recent private backup into an isolated recovery directory on the operator machine and initialize a copy of this root with `-backend-config=path=/absolute/recovery/terraform.tfstate`. Use the retained private credential to review a plan through the Tailscale API, independently of Thales. Do not apply until exclusive recovery ownership is established. After recovery, reconcile and restore the authoritative state to Thales before normal operations resume. A backup is not permission for concurrent recovery and Thales applies.
+
+LAN SSH reachability has not been established. Off-host restore-and-plan verification is the recovery proof; it does not promise access to an unavailable server or recover data newer than the last backup.
 
 ### Adoption and ownership
 
@@ -109,10 +151,14 @@ A fresh state should plan eight imports, no creates/deletes, and any separately 
 
 1. Back up private state and record the live value.
 2. Remove the resource instance **and its import membership/declaration** from source. Shared `for_each` entries can remove both together; retain any identity data still needed by other resources. Do not apply a destruction plan.
-3. Forget the matching state address locally. For example, after removing the non-router Apollo entry from `local.devices`, stop managing its expiry with:
+3. Forget the matching state address on Thales. For example, after removing the non-router Apollo entry from `local.devices` and deploying that reviewed configuration:
 
    ```sh
-   tofu -chdir=terraform/tailscale state rm 'tailscale_device_key.managed["apollo"]'
+   ssh thales /bin/sh -s <<'REMOTE'
+   set -eu
+   cd "$HOME/.config/nix/.worktrees/tailscale-runner/terraform/tailscale"
+   tofu state rm 'tailscale_device_key.managed["apollo"]'
+   REMOTE
    ```
 
 4. Review a fresh plan: the released instance must not be imported, created, updated, or destroyed. Do not apply unrelated changes as part of relinquishing ownership.
