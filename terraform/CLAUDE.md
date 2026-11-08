@@ -150,3 +150,27 @@ A fresh state should plan eight imports, no creates/deletes, and any separately 
 
 No host activation is part of this phase. Apollo's App Store client and encrypted state stay intact; Thales keeps its Homebrew daemon, and Poseidon keeps its Fedora 43 WSL vendor service. The [implementation plan](../docs/superpowers/plans/2026-10-20-tailscale-management.md) records current checks and deferred live gates.
 
+## GitHub Terraform workflow
+
+Read `github/CLAUDE.md` for provider authentication, backend details, and import identifiers. Run the commands below from the GitHub module directory in the active worktree, with its authentication configured.
+
+Use Terraform compatible with the module's `required_version`. Keep provider constraints and `.terraform.lock.hcl` tracked. Keep infrastructure policy in configuration rather than duplicating it in prose.
+
+## Checks and Plans
+
+```sh
+terraform init
+terraform fmt -check
+terraform validate
+terraform plan -detailed-exitcode
+```
+
+Plan exit codes: `0` means no changes, `2` means proposed changes, and `1` means an error. Review resource actions before applying; a successful plan is not authorization to apply. Follow the root repository's authorization boundary for remote changes.
+
+After an authorized apply, run a fresh plan and verify the effective remote settings. Expect exit `0` when configuration and infrastructure agree.
+
+## State
+
+Inspect the backend before planning or applying. Local state is not shared between worktrees or machines. If an existing resource is absent from state, import it using the module guide rather than creating a duplicate.
+
+Keep credentials, state, backups, provider caches, and saved plans out of Git. Never print credentials. Local state has no cross-machine locking; use one checkout/operator, or configure a shared backend before collaborative automation.

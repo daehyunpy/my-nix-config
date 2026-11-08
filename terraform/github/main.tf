@@ -28,6 +28,8 @@ resource "github_repository_ruleset" "main" {
 
   # No bypass actors: these rules apply to administrators too.
   rules {
+    # Intentionally omit required_status_checks for this solo-maintainer project:
+    # CI still runs, but neither passing checks nor an up-to-date branch gates merging.
     deletion         = true
     non_fast_forward = true
 
@@ -39,20 +41,6 @@ resource "github_repository_ruleset" "main" {
       require_last_push_approval        = false
       required_review_thread_resolution = true
       allowed_merge_methods             = ["squash"]
-    }
-
-    required_status_checks {
-      strict_required_status_checks_policy = true
-
-      required_check {
-        context        = "Formatting and Linux evaluation"
-        integration_id = 15368
-      }
-
-      required_check {
-        context        = "Darwin evaluations"
-        integration_id = 15368
-      }
     }
   }
 }
