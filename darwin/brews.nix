@@ -1,4 +1,5 @@
 [
+  "container"
   "gemini-cli"
   "mas"
 ]

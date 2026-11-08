@@ -10,7 +10,7 @@ Declarative system and user environment configuration for macOS, Linux, and WSL 
   - `packages.nix` — macOS-only nix packages (currently empty)
   - `home.nix` — macOS-specific home-manager overrides
 - `linux/` — Linux configuration using home-manager standalone
-  - `flake.nix` — Three machines: `octo60`, `octo61`, `octo62` (user `dhyou`)
+  - `flake.nix` — One configuration: `daehyun@charon` (`x86_64-linux`)
   - `packages.nix` — Linux-only nix packages (currently empty)
   - `home.nix` — Linux-specific home-manager overrides
 - `nixos/` — NixOS configuration (empty, reserved for future use)
@@ -32,6 +32,10 @@ Declarative system and user environment configuration for macOS, Linux, and WSL 
 - `home-files/` contents are symlinked via `mkOutOfStoreSymlink` (live link) or `.source` (copy). Prefer `mkOutOfStoreSymlink` for configs that change outside of nix (e.g., editor settings).
 - `.env` holds additional secrets (`MILVUS_ADDRESS`, `MILVUS_TOKEN`); see `.env.example` for the template. Both `.env` and `.envrc` are gitignored.
 
+## Coding Guidance
+
+Agents own implementation, verification, and review. Follow [Anthropic’s guidance](https://code.claude.com/docs/en/best-practices) on instructions versus deterministic enforcement and [OpenAI’s guidance](https://developers.openai.com/codex/learn/best-practices) on verification and review. Apply them through this repository’s workflow; repository policies take precedence, and shared checks must remain portable across agent tools.
+
 ## Agent Tool Compatibility
 
 OMP is the primary agent tool today, but the tool may change. Keep agent instructions, plugins, and reusable resources portable and shared rather than tied to the current tool.
@@ -44,7 +48,9 @@ Keep reusable plugins and agent resources in `.claude/` so compatible tools can 
 
 - Preserve unrestricted passwordless sudo (`%admin ALL=(ALL) NOPASSWD: ALL`) on macOS. This is intentional; do not replace it with password or Touch ID authentication unless explicitly requested.
 - The main repository checkout must always remain on the `main` branch. Never switch it to another branch or detach its HEAD.
-- Use separate Git worktrees for all work on branches other than `main`. Place them under `.worktrees/` at the main repository root (for example, `.worktrees/todo-documenting/`), not inside another worktree.
+- Before making any repository changes—including code, configuration, documentation, and agent instructions—establish the working checkout. You may ask the user which existing worktree to use, whether to create a new one, or whether to work without a worktree. Honor an already specified choice without asking again.
+- Unless the user explicitly chooses to work without a worktree, create or reuse a task-specific branch in a separate Git worktree. Do not edit or commit directly in the main checkout without that explicit authorization.
+- Place worktrees under `.worktrees/` at the main repository root (for example, `.worktrees/todo-documenting/`), not inside another worktree. Perform edits, validation, and requested commits in the selected checkout; keep the main checkout on `main`.
 - Prefer Homebrew for macOS applications and platform-specific packages. Install core CLI tools and services shared across macOS, Linux, and WSL using Nix instead.
 - Keep shared Nix package declarations in root `packages.nix`/`home.nix`; keep platform-specific service lifecycle configuration in the appropriate platform modules.
 - Keep repository agent instructions, including the YOLO boundary, in this single `CLAUDE.md`. Do not introduce `AGENTS.md` or a second agent-policy file.
@@ -57,6 +63,23 @@ Keep reusable plugins and agent resources in `.claude/` so compatible tools can 
 - Require explicit authorization for writes outside this checkout, except the temporary/cache/store writes above. Resolve symlink targets before writing. Files in `home-files/` may be live-linked into the home directory: requested edits are allowed, but their effects can be immediate without a rebuild.
 - Preserve unrelated work, staged changes, and existing conflicts. Commit only when requested; require explicit authorization for pushing, publishing, destructive Git operations, or deleting unrelated data.
 - Never print, commit, or transmit secrets from `.env`, credentials, or private keys. Existing passwordless sudo is not authorization to use it.
+
+## Validation
+
+Agents must run `bash scripts/check.sh` after changing Nix configuration and before reporting completion. Run it autonomously; do not ask the user to run checks.
+
+```bash
+bash scripts/check.sh          # Full CI-equivalent suite
+bash scripts/check.sh format   # Formatting only
+bash scripts/check.sh linux    # Linux evaluation only
+bash scripts/check.sh darwin   # Both Darwin evaluations
+```
+
+- The full suite checks validation error handling and formatting with `nixfmt` from the locked Linux nixpkgs input, then evaluates `daehyun@charon`, `apollo`, and `thales`. Scoped commands are for iteration; run the full suite before completion.
+- Requires Git and Nix with `nix-command` and `flakes` enabled. Nix may fetch the pinned formatter and inputs.
+- Formatting includes tracked and non-ignored untracked `.nix` files, skipping empty placeholders. Git-backed flake evaluation excludes untracked files; stage newly imported files before evaluation, preserving unrelated staged changes.
+- Checks stop at the first failure with a nonzero exit status. Fix failures within scope; report blockers and any checks not completed. Never claim validation passed when it did not.
+- Evaluation does not build or activate configurations, install applications, or update lock files. CI calls the same script with platform-specific selectors.
 
 ## Applying Changes
 
@@ -74,3 +97,45 @@ home-manager switch --flake linux/
 # Format all Nix files (nixfmt is in shared packages)
 nixfmt **/*.nix
 ```
+
+## OMP
+
+Install OMP separately and launch from the selected checkout or worktree root:
+
+```sh
+omp --cwd .
+```
+
+- `.omp/config.yml` enables YOLO mode (no tool approval prompts) for this project; approval policies are not a sandbox.
+- `.omp/lsp.json` uses `nil` and `nixfmt` without automatic formatting.
+- `/nix-check [files...]` provides focused, read-only formatting and syntax checks; it does not replace the full validation required above.
+
+### Cua Driver MCP
+
+`.omp/mcp.json` registers `cua-driver mcp` for OMP; Claude Code requires separate MCP registration. The driver must be on the agent's `PATH`. macOS installation is managed by Homebrew through `darwin/casks.nix`; install the driver separately on Linux or Windows. On macOS, after activation:
+
+```sh
+open -n -g -a CuaDriver --args serve
+cua-driver permissions grant
+```
+
+On macOS, grant Accessibility, Screen Recording, and direct capture consent, then restart the agent. Check the connection with `/mcp test cua-driver` in OMP or `claude mcp get cua-driver`. The default mode allows input to every app, not just this project.
+
+### Unity Gateway
+
+Home Manager links `home-files/omp/models.yml` into OMP. Install [Unity Gateway](https://github.com/databricks/unity-gateway) and the Databricks CLI separately; `databricks` and `jq` must be on `PATH`.
+
+```sh
+databricks auth login \
+  --host https://adb-425124470313726.6.azuredatabricks.net \
+  --profile adb-425124470313726
+omp --model unity-openai/system.ai.gpt-6-1-sol
+```
+
+Use `/model` to select from `unity-anthropic`, `unity-openai`, `unity-google`, or `unity-oss`. Refresh the model registry from `ug status` when availability changes. Tokens are resolved at runtime, never stored in this repository.
+
+## Zed
+
+`home-files/zed` is linked to `~/.config/zed`. The external agent runs `omp acp`, so OMP must be on Zed's `PATH`; its model configuration is separate from Zed's native agent. Windows host settings are not managed here.
+
+Zed terminals explicitly use `fish` and its virtual-environment activation script. Keep `terminal.shell.program` set to `fish`: selecting `activate_script` alone does not control Python toolchain activation in Windows-to-WSL sessions. Open a new terminal after changing these settings; no Home Manager rebuild is needed for the live link.

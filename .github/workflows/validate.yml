@@ -23,17 +23,12 @@ jobs:
       - uses: cachix/install-nix-action@v31.11.2
         with:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Check formatting of non-empty tracked Nix files
-        run: |
-          nix shell --no-update-lock-file --inputs-from ./linux nixpkgs#nixfmt --command bash -euo pipefail <<'SCRIPT'
-          while IFS= read -r -d "" file; do
-            if [[ -s "$file" ]]; then
-              nixfmt --check "$file"
-            fi
-          done < <(git ls-files -z -- "*.nix")
-          SCRIPT
-      - name: Evaluate charon activation package
-        run: nix eval --no-update-lock-file --raw './linux#homeConfigurations."daehyun@charon".activationPackage.drvPath'
+      - name: Check validation error handling
+        run: bash tests/check.sh
+      - name: Check formatting
+        run: bash scripts/check.sh format
+      - name: Evaluate Linux configuration
+        run: bash scripts/check.sh linux
 
   darwin:
     name: Darwin evaluations
@@ -45,7 +40,5 @@ jobs:
       - uses: cachix/install-nix-action@v31.11.2
         with:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Evaluate apollo system
-        run: nix eval --no-update-lock-file --raw ./darwin#darwinConfigurations.apollo.system.drvPath
-      - name: Evaluate thales system
-        run: nix eval --no-update-lock-file --raw ./darwin#darwinConfigurations.thales.system.drvPath
+      - name: Evaluate Darwin configurations
+        run: bash scripts/check.sh darwin
