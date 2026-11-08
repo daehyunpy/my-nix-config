@@ -26,7 +26,7 @@ Before this boundary, eleven resources were imported and the earlier merged poli
 
 ## Task 2: Current tailnet declarations
 
-**Files:** `terraform/tailscale/{versions,main,dns,devices}.tf`, `policy.hujson`, `.opentofu-version`, `.terraform.lock.hcl`, root `.gitignore`, `.env.example`.
+**Files:** `terraform/tailscale/{versions,main,dns,devices,imports}.tf`, `policy.hujson`, `.opentofu-version`, `.terraform.lock.hcl`, root `.gitignore`, `.env.example`.
 
 - [x] Pin OpenTofu 1.13.1 and provider ~> 0.29.2; retain the dependency lock and explicit inventoried tailnet ID.
 - [x] Declare the user's policy behavior: member-to-self SSH `accept` for non-root/root and existing member Funnel capability. Omit unnecessary comments and empty `tagOwners`/`sshTests`, and leave `acls` and `grants` absent.
@@ -78,6 +78,15 @@ This PR adds only Terraform validation to CI. Generic Nix CI discovery, nested w
 
 Observed: formatting and provider validation passed. The authenticated saved-plan review proposed only an in-place update to `tailscale_dns_configuration.tailnet`, adding `8.8.8.8` alongside `1.1.1.1`. All non-resolver DNS fields and the other seven resources were unchanged. The temporary private plan was removed; no DNS application occurred.
 
+## Task 6: Declarative adoption and safe unmanagement
+
+- [x] Reproduce the gap: before import declarations, fresh state plans eight creates and no imports.
+- [x] Add import declarations for the policy, aggregate DNS, four device keys, and two router approvals; reuse the same device/router maps as the resources.
+- [x] Require OpenTofu/Terraform >= 1.7 for import loops while retaining the OpenTofu 1.13.1 pin.
+- [x] Document ownership/import identities, import-plan updates, and coordinated source/import removal plus local state forgetting. Do not imply `state rm` alone stops management.
+- [x] Verify fresh-state adoption, idempotence with current state, and the documented unmanagement procedure in disposable copies; no actual imports/applies or operator-state mutation.
+
+Observed: fresh state changed from eight creates/no imports to eight imports/no creates or deletes. Existing state skips all imports. Both plans retain only the unapplied DNS update. Removing Apollo from the shared map and forgetting its temporary state binding plans no operation on that released instance. Original state remained byte-for-byte unchanged; all temporary inputs/state/plans were removed.
 
 ## Deferred Nix phase
 

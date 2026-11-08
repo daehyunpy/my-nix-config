@@ -17,6 +17,11 @@ locals {
       key_expiry_disabled = false
     }
   }
+
+  router_routes = {
+    thales   = ["192.168.2.0/24", "0.0.0.0/0", "::/0"]
+    poseidon = ["0.0.0.0/0", "::/0"]
+  }
 }
 
 resource "tailscale_device_key" "managed" {
@@ -31,10 +36,7 @@ resource "tailscale_device_key" "managed" {
 }
 
 resource "tailscale_device_subnet_routes" "routers" {
-  for_each = {
-    thales   = ["192.168.2.0/24", "0.0.0.0/0", "::/0"]
-    poseidon = ["0.0.0.0/0", "::/0"]
-  }
+  for_each = local.router_routes
 
   device_id = local.devices[each.key].id
   routes    = each.value

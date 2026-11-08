@@ -27,6 +27,7 @@ terraform/tailscale/
   policy.hujson           User-selected ownership-based SSH and Funnel policy
   dns.tf                  One authoritative DNS configuration resource
   devices.tf              Existing device expiry and approved router routes
+  imports.tf              Declarative adoption of the eight existing objects
 ```
 
 `terraform/` names the configuration format and ecosystem clearly; OpenTofu is the execution CLI. Do not retain a second active root under `infra/` or add a deployment framework.
@@ -85,6 +86,10 @@ Secrets stay outside Git and the Nix store in a private operator file with mode 
 
 Use local state for one operator. Ignore `.terraform/`, state/backups, saved plans, overrides, and credential-bearing variable files; retain the provider lock in version control. Back up state outside Git with restricted permissions before adoption and any later authorized apply. Local state is not a shared locking backend; concurrent operators and remote backend deployment are out of scope.
 
+Keep declarative imports for policy (`acl`), aggregate DNS (`dns_configuration`), all four key settings, and both router approvals. Import loops use the same device/router maps as the resource declarations, with current node IDs. Require at least OpenTofu/Terraform 1.7 for looped imports and retain the tested OpenTofu 1.13.1 pin. Existing state must not re-import tracked addresses; fresh state must propose imports rather than creates. Applying an import plan also applies any shown configuration updates, so the pending secondary DNS change still requires separate authorization.
+
+Relinquishing ownership is a coordinated source-and-state operation: back up state and live settings, remove the desired resource instance and its import entry/member, then forget its state binding before applying anything. Retain identities still referenced by other resources. Review a plan proving the released address is neither re-imported nor created/updated/destroyed. `state rm` alone permits re-adoption/recreation; source removal alone can plan destructive provider deletion. Do not use `destroy` to stop managing expiry or routes.
+
 For this scope change, forget the three obsolete tag bindings from local state without invoking provider deletion. The inspected devices have no tags, and the new source must not propose tag removal. Back up state before forgetting stale Thales key/route bindings and importing those settings against its current node ID. Imports read the tailnet; they do not create or replace devices. If an operation fails, retain the private backup and stop before planning against incomplete adoption.
 
 ### Verification and current acceptance
@@ -102,6 +107,7 @@ tofu -chdir=terraform/tailscale validate
 - Submit temporary owner-based acceptance tests for `daehyun` and `root` to current Thales/Poseidon. Remove the SSH rule only in an in-memory negative control and confirm those tests fail. Neither probe writes the live policy or adds source tests.
 - After any separately authorized saved-plan application, run an authenticated read-only `plan -input=false -detailed-exitcode` and require exit 0 with no changes. The 2026-11-08 cleanup application met this criterion and preserved the inventoried control-plane settings; it did not enable host-side services or add secondary DNS.
 - Confirm eight adopted resource addresses remain in local state, and the current Thales node/route settings are used. Do not log private state contents.
+- From fresh state, declarative imports must cover exactly eight addresses with no creates/deletes. From a private copy of existing operator state, imports must be skipped and the plan must contain only the separately pending DNS update. Neither verification may change the actual operator state or live tailnet.
 - Validator tests prove policy evaluation, not actual Muse-originated SSH or daemon startup. No client migration or live traffic acceptance is claimed in this phase.
 
 ## Deferred phase: managing Tailscale through Nix

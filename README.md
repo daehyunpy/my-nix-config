@@ -76,7 +76,7 @@ These checks need no tailnet credentials. CI runs them without plan, apply, or s
 
 The root pins the inventoried tailnet ID. Supply scoped OAuth credentials only through `TAILSCALE_OAUTH_CLIENT_ID` and `TAILSCALE_OAUTH_CLIENT_SECRET`; `.env.example` lists empty variable names. Any `TAILSCALE_TAILNET` value must match the pinned tailnet, not select another one. Keep operator secrets outside Git and the Nix store, in a private file with mode 0600, and pass them through the command environment rather than command-line arguments or Terraform variables.
 
-State is local and sensitive: `.terraform/`, `*.tfstate*`, saved plans, overrides, and secret variable files are ignored. `.terraform.lock.hcl` belongs in version control. Use a single operator; local state is not a shared locking backend. Back up state outside Git with restricted permissions before imports or any later authorized apply, and after adoption. If state is lost, recover its private backup or reimport the existing resources after inspection; never apply an empty-state creation plan to an existing tailnet.
+State is local and sensitive: `.terraform/`, `*.tfstate*`, saved plans, overrides, and secret variable files are ignored. `.terraform.lock.hcl` belongs in version control. Use a single operator; local state is not a shared locking backend. Back up state outside Git with restricted permissions before imports or any later authorized apply, and after adoption. If state is lost, prefer restoring its private backup. Declarative imports can recover adoption only after checking the current device inventory; never approve a creation plan for these existing resources.
 
 The root was renamed from `infra/tailscale/` to `terraform/tailscale/` together with its ignored state, backup, saved plan, and provider cache. Resource addresses are unchanged; no state migration or reimport is required. An operator with a separate checkout must also move their local state before planning. Saved plans are sensitive, historical artifacts: generate and review a fresh plan before any future application.
 
@@ -91,6 +91,33 @@ Exit 0 means no changes, 2 means proposed changes, and 1 means failure. Review e
 The secondary DNS extension is declared but not yet applied: Cloudflare `1.1.1.1` plus Google `8.8.8.8`. Review a separate DNS-only plan before application; the earlier zero-drift result predates this extension.
 
 The earlier Muse-tag proposal is superseded by the simpler user-selected policy. Local adoption state was backed up privately, obsolete tag bindings were forgotten without deleting remote resources, and Thales's key/route settings were imported against its current node ID. An operator with older state must reconcile those bindings after a fresh inventory and private backup; do not apply tag-destruction or missing-node creation plans to repair bookkeeping.
+
+### Adoption and ownership
+
+`imports.tf` declares the eight existing objects to adopt. It shares the device and router maps with the resources, so identifiers and instance membership have one source. Looped imports require OpenTofu/Terraform 1.7 or newer; use the pinned OpenTofu 1.13.1.
+
+| Managed resource | Import identity |
+| --- | --- |
+| `tailscale_acl.tailnet` | `acl` |
+| `tailscale_dns_configuration.tailnet` | `dns_configuration` |
+| `tailscale_device_key.managed` — Apollo, Muse, Thales, Poseidon | Current node IDs in `local.devices` |
+| `tailscale_device_subnet_routes.routers` — Thales, Poseidon | Current node IDs for `local.router_routes` members |
+
+A fresh state should plan eight imports, no creates/deletes, and any separately reviewed configuration updates. Existing state skips imports for addresses already tracked. Imports can stay as adoption records. The current fresh-state plan also includes the pending Google DNS update: applying an import plan applies its shown updates too, not just bookkeeping. Do not apply it without authorization for those changes.
+
+### Stop managing without changing the live setting
+
+1. Back up private state and record the live value.
+2. Remove the resource instance **and its import membership/declaration** from source. Shared `for_each` entries can remove both together; retain any identity data still needed by other resources. Do not apply a destruction plan.
+3. Forget the matching state address locally. For example, after removing the non-router Apollo entry from `local.devices`, stop managing its expiry with:
+
+   ```sh
+   tofu -chdir=terraform/tailscale state rm 'tailscale_device_key.managed["apollo"]'
+   ```
+
+4. Review a fresh plan: the released instance must not be imported, created, updated, or destroyed. Do not apply unrelated changes as part of relinquishing ownership.
+
+`state rm` alone is insufficient: leaving an import block re-adopts the object; leaving only the resource configuration proposes creation/update. Removing source alone can instead propose a destructive provider operation. Device-key deletion re-enables expiry and route-resource deletion clears approvals, so do not use `tofu destroy` to relinquish management.
 
 ### Policy and preservation
 
