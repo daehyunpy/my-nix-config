@@ -88,16 +88,20 @@ Observed: formatting and provider validation passed. The authenticated saved-pla
 
 Observed: fresh state changed from eight creates/no imports to eight imports/no creates or deletes. Existing state skips all imports. Both plans retain only the unapplied DNS update. Removing Apollo from the shared map and forgetting its temporary state binding plans no operation on that released instance. Original state remained byte-for-byte unchanged; all temporary inputs/state/plans were removed.
 
-## Task 7: Thales SSH runner and canonical state
+## Task 7: State backend selection — deferred
 
-- [x] Inspect Thales over SSH: macOS, clean primary checkout on `main`, Nix available, no installed compatible OpenTofu engine or canonical state. Install the pinned OpenTofu 1.13.1 through the existing version manager.
-- [x] Use only the hostname `thales`. LAN SSH probes did not establish recovery access; retain and test an off-host backup recovery path instead.
-- [x] Declare one host-local backend path outside worktrees and document the reviewed runner worktree, private credentials, and versioned off-host backups.
-- [ ] Smoke-test backend migration/restore in disposable copies, preserving lineage and resource bindings; a serial increment is allowed.
-- [ ] Provision the reviewed runner worktree without switching the primary checkout; transfer the existing scoped credential and state with mode-0600 files/mode-0700 private directories.
-- [ ] Initialize/migrate the backend, verify eight adopted bindings and the pending-DNS-only SSH plan, pull an off-host backup, and archive the former local active state.
-- [ ] Exercise lock contention in a disposable fixture on Thales and verify off-host restore/planning. Do not apply secondary DNS, activate services, or claim LAN SSH recovery.
+The user chose to start with default local state and keep every future backend option open. Evaluation and any later migration are tracked in `BACKLOG.md` (INFRA-6); no Thales, SSH, HTTP, S3, rclone, SMB, database, or managed-service choice is committed to.
 
+Earlier Thales preparation installed the pinned OpenTofu engine and created an isolated source worktree. No authoritative state or credentials were transferred, no state service was started, and no host configuration or tailnet setting was activated. The explicit backend path and runner-only instructions have been removed.
+
+## Task 8: Resume default local state
+
+- [x] Remove the explicit backend declaration and document the default root-module state location.
+- [x] Add the open-ended backend decision to the repository backlog.
+- [x] Back up and relocate the existing authoritative local state into the active operator checkout, with one active file and private recovery copies.
+- [x] Initialize and validate the default local backend; verify all eight bindings, no imports/creates/deletes, and only the pending DNS update. Do not apply infrastructure.
+
+Observed: initialization, formatting, and validation passed. The active default state retained identical bytes and all eight bindings, with mode 0600 and private before/after backups. The former active file was retired. The authenticated plan exited 2 for the pending DNS update only; no imports, creates, deletes, or infrastructure apply.
 
 ## Deferred Nix phase
 
