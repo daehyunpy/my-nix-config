@@ -98,6 +98,26 @@ The secondary DNS extension is declared but not yet applied: Cloudflare `1.1.1.1
 
 The earlier Muse-tag proposal is superseded by the simpler user-selected policy. Local adoption state was backed up privately, obsolete tag bindings were forgotten without deleting remote resources, and Thales's key/route settings were imported against its current node ID. An operator with older state must reconcile those bindings after a fresh inventory and private backup; do not apply tag-destruction or missing-node creation plans to repair bookkeeping.
 
+### Guarded manual apply
+
+Use the Python 3.9+ standard-library helper for normal manual changes. With the authoritative local state initialized and credentials supplied through the environment, save a plan without applying it:
+
+```sh
+python3 -B terraform/tailscale/workflow.py plan
+```
+
+The command prints the private plan path, pinned tailnet, and SHA-256. Plans and review metadata live under the ignored `.terraform/reviewed-plans/` directory. They contain sensitive data; do not commit or share them.
+
+Only after separate authorization and a private off-checkout state backup, run `python3 -B terraform/tailscale/workflow.py apply <printed-plan-path>` in an interactive terminal. The helper:
+
+- Refuses missing default-workspace state, another checkout's plan, changed plan bytes or configuration inputs, and deletion/replacement actions.
+- Displays a private, read-only snapshot of the exact saved plan. It requires typing `apply`, the displayed tailnet, and the displayed digest prefix; there is no unattended confirmation option.
+- Rechecks configuration/artifact integrity after confirmation and applies only that snapshot, with state locking enabled and without generating a new plan.
+
+Replan after changing source, policy, provider/CLI pins, variable inputs, or observing drift. OpenTofu also checks for stale state. Follow the backup procedure below before and after every attempted apply, including failures that may have partially changed resources. Remove old artifact directories after use; they are not durable recovery backups.
+
+These safeguards reduce accidental applies, not permissions: write credentials still allow bypassing the helper. `prevent_destroy` does not stop in-place updates. CI runs schema/format checks and the helper's credential-free safety tests, not authenticated policy validation, apply, or host-behavior checks. Tailscale SSH enablement, route advertisements, exit-node activation, and Nix client/service management remain deferred. Adding these safeguards does not authorize the pending Google DNS apply.
+
 ### Backups and recovery
 
 Before and after every state-changing operation, save a versioned private backup outside the checkout:

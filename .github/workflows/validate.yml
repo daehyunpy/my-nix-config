@@ -30,6 +30,8 @@ jobs:
         run: tofu -chdir=terraform/tailscale init -backend=false -input=false -lockfile=readonly
       - name: Validate Terraform configuration
         run: tofu -chdir=terraform/tailscale validate
+      - name: Check manual-apply safeguards without credentials
+        run: python3 -B -m unittest discover -s terraform/tailscale/tests -v
 
   linux:
     name: Formatting and Linux evaluation

@@ -103,6 +103,18 @@ Earlier Thales preparation installed the pinned OpenTofu engine and created an i
 
 Observed: initialization, formatting, and validation passed. The active default state retained identical bytes and all eight bindings, with mode 0600 and private before/after backups. The former active file was retired. The authenticated plan exited 2 for the pending DNS update only; no imports, creates, deletes, or infrastructure apply.
 
+## Task 9: Guarded manual plans and applies
+
+**Files:** `terraform/tailscale/workflow.py`, `terraform/tailscale/tests/test_workflow.py`, `.gitignore`, `.github/workflows/validate.yml`, README, and the existing spec.
+
+- [x] Add focused behavioral coverage for changed plan bytes, changed/added configuration inputs, destructive actions, noninteractive confirmation, missing state, checkout provenance, and mutation of the original artifact after taking a review snapshot. The copied-artifact regression failed before the checkout-binding fix and passed afterward.
+- [x] Implement `python3 terraform/tailscale/workflow.py plan`: require authoritative default-workspace state, run `tofu plan -input=false -lock=true -detailed-exitcode -out=...`, inspect `tofu show -json`, and persist the generating checkout, private artifact/source checksums, and pinned tailnet.
+- [x] Implement `python3 terraform/tailscale/workflow.py apply PLAN`: validate the artifact and source, snapshot privately, display `tofu show -no-color`, require interactive tailnet/digest confirmation, revalidate, and invoke `tofu apply -input=false -lock=true SNAPSHOT` without replanning.
+- [x] Add credential-free unit coverage to the existing Terraform CI job, ignore Python bytecode, and document before/after backups, separate apply authorization, direct-CLI bypass, and CI/host verification limits.
+- [x] Run the full focused suite, exercise real authenticated planning and interactive refusal without applying the tailnet, and confirm the original state and DNS-only plan remain unchanged. Remove generated smoke artifacts.
+
+Observed: all 12 safety tests, Ruff checks, OpenTofu formatting/locked initialization/validation, and Nix-provided actionlint passed. The final helper saved a real private DNS-only plan tied to this checkout. A real terminal displayed the plan and tailnet/digest prompt, then refused an incorrect confirmation; piped approval was also refused. The state remained byte-for-byte unchanged and smoke artifacts were removed. No authorized live apply path was executed; Google DNS remains unapplied.
+
 ## Deferred Nix phase
 
 Do not restore `WIP: Tailscale Nix configuration (not applied)` in this phase. The spec retains shared CLI installation, generic NixOS/nix-darwin service management, the generic Fedora vendor-service drop-in, the future Home Manager rename, package compatibility, preservation/recovery gates, and actual restart/network verification. Poseidon remains Fedora WSL; Apollo's App Store encryption gate remains unresolved. No privileged Home Manager hooks or full OS adoption.
