@@ -32,6 +32,10 @@ Declarative system and user environment configuration for macOS, Linux, and WSL 
 - `home-files/` contents are symlinked via `mkOutOfStoreSymlink` (live link) or `.source` (copy). Prefer `mkOutOfStoreSymlink` for configs that change outside of nix (e.g., editor settings).
 - `.env` holds additional secrets (`MILVUS_ADDRESS`, `MILVUS_TOKEN`); see `.env.example` for the template. Both `.env` and `.envrc` are gitignored.
 
+## Coding Guidance
+
+Agents own implementation, verification, and review. Follow [Anthropic’s guidance](https://code.claude.com/docs/en/best-practices) on instructions versus deterministic enforcement and [OpenAI’s guidance](https://developers.openai.com/codex/learn/best-practices) on verification and review. Apply them through this repository’s workflow; repository policies take precedence, and shared checks must remain portable across agent tools.
+
 ## Agent Tool Compatibility
 
 OMP is the primary agent tool today, but the tool may change. Keep agent instructions, plugins, and reusable resources portable and shared rather than tied to the current tool.
