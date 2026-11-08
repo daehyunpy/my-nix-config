@@ -1,6 +1,6 @@
 # Persephone: Databricks Terminal Environment Specification
 
-**Status:** Approved on 2026-10-15. Requirements are approved; implementation has not started. This documentation-only approval and commit do not authorize implementation, publication, or live cluster changes.
+**Status:** Cancelled by the user on 2026-11-08. Implementation had not started. The earlier requirements approval is withdrawn; this is a historical record, not pending work or authorization for implementation, publication, or live cluster changes.
 
 **Purpose:** Provide a familiar, reproducible terminal environment on dedicated Databricks compute without replacing or reconfiguring the Databricks runtime.
 
@@ -8,7 +8,7 @@
 
 **Deployment root:** `/local_disk0/persephone`.
 
-This spec is the source of requirements. The [synchronized implementation plan](../plans/2026-10-15-databricks-terminal-environment.md) is subordinate to it and maps the acceptance criteria to implementation tasks.
+The requirements below and the [cancelled implementation plan](../plans/2026-10-15-databricks-terminal-environment.md) are retained for historical context only.
 
 ## 1. Context and established evidence
 
