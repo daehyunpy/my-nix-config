@@ -10,6 +10,7 @@ Prefer Homebrew for macOS applications and platform-specific packages. Use Nix f
 - `darwin/`, `linux/`: platform and machine configuration.
 - `home-files/`: managed dotfiles.
 - `terraform/`: Terraform-compatible infrastructure configuration, executed with OpenTofu.
+- `terraform/github/`: GitHub repository rules managed separately from Nix.
 
 ## Setup
 
