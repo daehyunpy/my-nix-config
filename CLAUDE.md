@@ -43,6 +43,8 @@ Keep reusable plugins and agent resources in `.claude/` so compatible tools can 
 ## Preferences
 
 - Preserve unrestricted passwordless sudo (`%admin ALL=(ALL) NOPASSWD: ALL`) on macOS. This is intentional; do not replace it with password or Touch ID authentication unless explicitly requested.
+- The main repository checkout must always remain on the `main` branch. Never switch it to another branch or detach its HEAD.
+- Use separate Git worktrees for all work on branches other than `main`. Place them under `.worktrees/` at the main repository root (for example, `.worktrees/todo-documenting/`), not inside another worktree.
 - Prefer Homebrew for macOS applications and platform-specific packages. Install core CLI tools and services shared across macOS, Linux, and WSL using Nix instead.
 - Keep shared Nix package declarations in root `packages.nix`/`home.nix`; keep platform-specific service lifecycle configuration in the appropriate platform modules.
 - Keep repository agent instructions, including the YOLO boundary, in this single `CLAUDE.md`. Do not introduce `AGENTS.md` or a second agent-policy file.
