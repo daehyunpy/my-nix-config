@@ -1,8 +1,8 @@
 # Persephone: Databricks Dedicated-Compute Terminal Environment Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Use superpowers:subagent-driven-development only where independent work satisfies the repository's delegation rules. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** This plan is cancelled. Do not execute it. Unchecked steps and commands below are historical, not pending tasks.
 
-**Status:** Synchronized with the [Persephone specification](../specs/2026-10-15-databricks-terminal-environment-design.md), approved on 2026-10-15. The spec is the source of requirements and takes precedence over this plan. Implementation has not started; this documentation-only approval and commit do not authorize implementation, publication, cluster configuration changes, compute startup, or restart. Commands below describe future acceptance checks; they have not been run as part of writing this plan.
+**Status:** Cancelled by the user on 2026-11-08 together with the [Persephone specification](../specs/2026-10-15-databricks-terminal-environment-design.md). Implementation had not started. This historical plan does not authorize implementation, publication, cluster configuration changes, compute startup, or restart. Commands below were proposed acceptance checks, not execution evidence.
 
 **Goal:** Reproduce the user's familiar, Nix-managed terminal environment on dedicated single-user Databricks compute, including isolated configuration, versioned updates, rollback, and restoration after compute replacement.
 
