@@ -98,17 +98,16 @@ Relinquishing ownership is a coordinated source-and-state operation: back up sta
 
 For this scope change, forget the three obsolete tag bindings from local state without invoking provider deletion. The inspected devices have no tags, and the new source must not propose tag removal. Back up state before forgetting stale Thales key/route bindings and importing those settings against its current node ID. Imports read the tailnet; they do not create or replace devices. If an operation fails, retain the private backup and stop before planning against incomplete adoption.
 
-### Guarded manual apply
+### Native manual OpenTofu workflow
 
-Use `terraform/tailscale/workflow.py` for normal manual plans and separately authorized applies. Keep default local state, credential-free CI, and all host/Nix activation deferrals unchanged.
+Use native OpenTofu for plans and separately authorized applies. Custom Python helpers and their tests are deferred. Keep default local state, credential-free CI, and all host/Nix activation deferrals unchanged. `terraform/CLAUDE.md` owns agent workflows, approval requirements, commands, state, backups, and verification; root `CLAUDE.md` retains global authorization policy and the README provides human-facing orientation.
 
 Present the saved plan's proposed actions and risks and stop for explicit user approval of that reviewed plan before invoking apply. A setting-change request or a successful plan does not authorize an unseen plan. Never combine planning and applying in one unattended tool call.
 
-- `plan` requires the existing authoritative default-workspace state and saves a private plan plus review metadata under `.terraform/reviewed-plans/`. Bind the artifact to its generating checkout, SHA-256, and the root's Terraform/OpenTofu configuration, variable files, HuJSON policy, provider lock, and CLI pin.
-- `apply PLAN` accepts only an artifact generated in this checkout. Refuse changed plan bytes, changed source inputs, deletion/replacement actions, missing local state, and noninteractive input/output.
-- Copy the plan into a private temporary directory, inspect its actual pinned tailnet, display that exact snapshot, and require the typed tailnet plus plan digest. Recheck source/artifact integrity after confirmation, then apply only the reviewed snapshot with OpenTofu's state lock enabled. Never generate a replacement plan during apply or offer a noninteractive approval flag.
-- Follow the existing private before/after backup procedure. A saved plan is sensitive, is not an off-checkout recovery backup, and contains its original planning inputs. Replan after changing inputs or observing drift; OpenTofu still rejects stale state.
-- These are accidental-apply safeguards, not a permission boundary: a holder of write credentials can bypass the helper. `prevent_destroy` does not block in-place updates. CI checks syntax/provider schema, not live policy or host behavior.
+- Save a plan with `tofu plan -out=...` in a private temporary directory and inspect it with `tofu show`. Plans contain sensitive data and are not off-checkout recovery backups.
+- Applying a saved plan skips OpenTofu's confirmation prompt. Apply only the exact approved artifact as a separate operation, with state locking enabled. Replan and obtain new approval after changing inputs or observing drift; OpenTofu rejects stale state.
+- Follow the private before/after backup and post-apply verification procedures. `prevent_destroy` does not block in-place updates. CI validates formatting/provider schema, not live policy or host behavior.
+- Add native `tofu test` coverage only when meaningful configuration behavior warrants it, with isolated/mocked resources rather than the live tailnet. Do not retain a custom Python test layer without its deferred helper.
 
 ### Verification and current acceptance
 
@@ -120,7 +119,7 @@ tofu -chdir=terraform/tailscale init -backend=false -input=false -lockfile=reado
 tofu -chdir=terraform/tailscale validate
 ```
 
-- CI adds credential-free Terraform formatting, locked-provider initialization, configuration validation, and manual-workflow safety tests. It does not run authenticated plans, policy validation, or applies. Existing Nix evaluation jobs remain unchanged; generic CI refactoring and repository-wide agent/worktree policies are separate changes. No deferred Nix Tailscale output or nested agent-policy file is introduced.
+- CI adds credential-free Terraform formatting, locked-provider initialization, and configuration validation only. It does not run authenticated plans, policy validation, or applies. Existing Nix evaluation jobs remain unchanged by this feature; generic CI refactoring and worktree policies are separate changes. No deferred Nix Tailscale output or additional repository-wide authorization policy is introduced. Terraform workflow guidance is scoped to `terraform/CLAUDE.md`.
 - Validate the actual HuJSON through Tailscale's read-only `POST /api/v2/tailnet/{tailnet}/acl/validate` endpoint. Check the body as well as HTTP status: failed SSH tests can return HTTP 200 with `data[].errors`.
 - Submit temporary owner-based acceptance tests for `daehyun` and `root` to current Thales/Poseidon. Remove the SSH rule only in an in-memory negative control and confirm those tests fail. Neither probe writes the live policy or adds source tests.
 - After any separately authorized saved-plan application, independently compare effective Tailscale API/CLI settings with the approved changes and preserved protections, inspect refreshed state for resource identities and managed values without printing secrets, and run an authenticated `plan -refresh=true -input=false -detailed-exitcode` requiring exit 0. Apply success alone is not proof; mismatches or verification errors remain incomplete and must report expected versus observed state. Corrective applies require approval of a new reviewed plan. The 2026-11-08 cleanup application met its acceptance criteria and preserved the inventoried control-plane settings; it did not enable host-side services or add secondary DNS.

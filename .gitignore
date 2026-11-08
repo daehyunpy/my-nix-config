@@ -6,7 +6,6 @@
 .env
 
 node_modules/
-__pycache__/
 
 # Task worktrees are local checkouts, not repository content.
 /.worktrees/

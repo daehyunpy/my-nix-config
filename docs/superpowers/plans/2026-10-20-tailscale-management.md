@@ -22,7 +22,7 @@ Before this boundary, eleven resources were imported and the earlier merged poli
 - [x] Move the whole existing `infra/tailscale/` directory, including ignored state/backups/cache, to `terraform/tailscale/`. Do not initialize a second empty adoption state.
 - [x] Leave existing Nix CI and host configuration unchanged; do not introduce dependencies on stashed NixOS/Fedora outputs.
 - [x] Add credential-free OpenTofu CI checks using the version file and locked provider.
-- [x] Finish README with the simplified policy, eight-resource ownership, safe commands, and state recovery.
+- [x] Document the simplified policy, eight-resource ownership, safe commands, and state recovery; agent operational guidance now lives in `terraform/CLAUDE.md`.
 
 ## Task 2: Current tailnet declarations
 
@@ -67,12 +67,12 @@ Observed: formatting, locked initialization, and provider validation passed. Rea
 
 On 2026-11-08, the user-authorized saved plan applied successfully: zero added, one changed, zero destroyed. Authoritative post-apply API reads confirmed the source policy and unchanged DNS, routes, IDs/IPs, tags, ownership, and expiry. The final plan exited 0 with no changes. Pre/post state, API snapshots, and verification are private under `~/.config/tailscale-iac/backups/2026-11-08/apply-130634/`. No host activation or secondary DNS change occurred; actual SSH traffic and daemon startup were not exercised. The DNS resource remains provider-marked alpha.
 
-This PR adds only Terraform validation to CI. Generic Nix CI discovery, nested workflow instructions, and repository-wide worktree policy changes are excluded. The original mixed branch preserves that separate work; Nix Tailscale implementation stays stashed.
+This PR adds only Terraform validation to CI and retains the Nix validation inherited from main. Additional generic CI refactoring, CI-specific agent guides, and worktree-policy changes are excluded. The user-requested Terraform workflow guide lives in `terraform/CLAUDE.md`; Nix Tailscale implementation stays stashed.
 
 ## Task 5: Secondary DNS correction
 
 - [x] Add Google `8.8.8.8` alongside Cloudflare `1.1.1.1` in the existing DNS resource; keep MagicDNS on, override off, no extra search paths, and exit-node DNS use off for both.
-- [x] Update the spec and README: this is additional-provider redundancy, not ordered failover, and clients retain local DNS preference.
+- [x] Update the spec and agent guide: this is additional-provider redundancy, not ordered failover, and clients retain local DNS preference.
 - [x] Validate and inspect a fresh plan; require only the DNS resource update and retain all existing settings.
 - [ ] Apply only after separate authorization, then verify the resolver list and a zero-change final plan. The earlier application did not include secondary DNS.
 
@@ -103,17 +103,18 @@ Earlier Thales preparation installed the pinned OpenTofu engine and created an i
 
 Observed: initialization, formatting, and validation passed. The active default state retained identical bytes and all eight bindings, with mode 0600 and private before/after backups. The former active file was retired. The authenticated plan exited 2 for the pending DNS update only; no imports, creates, deletes, or infrastructure apply.
 
-## Task 9: Guarded manual plans and applies
+## Task 9: Custom Python apply helper — deferred
 
-**Files:** `terraform/tailscale/workflow.py`, `terraform/tailscale/tests/test_workflow.py`, `.gitignore`, `.github/workflows/validate.yml`, README, and the existing spec.
+The previously implemented helper is deferred by the latest BTW decision: use native OpenTofu for now. Its code, tests, and CI step have been removed. Reconsider custom safeguards only if they justify the additional maintenance.
 
-- [x] Add focused behavioral coverage for changed plan bytes, changed/added configuration inputs, destructive actions, noninteractive confirmation, missing state, checkout provenance, and mutation of the original artifact after taking a review snapshot. The copied-artifact regression failed before the checkout-binding fix and passed afterward.
-- [x] Implement `python3 terraform/tailscale/workflow.py plan`: require authoritative default-workspace state, run `tofu plan -input=false -lock=true -detailed-exitcode -out=...`, inspect `tofu show -json`, and persist the generating checkout, private artifact/source checksums, and pinned tailnet.
-- [x] Implement `python3 terraform/tailscale/workflow.py apply PLAN`: validate the artifact and source, snapshot privately, display `tofu show -no-color`, require interactive tailnet/digest confirmation, revalidate, and invoke `tofu apply -input=false -lock=true SNAPSHOT` without replanning.
-- [x] Add credential-free unit coverage to the existing Terraform CI job, ignore Python bytecode, and document before/after backups, separate apply authorization, direct-CLI bypass, and CI/host verification limits.
-- [x] Run the full focused suite, exercise real authenticated planning and interactive refusal without applying the tailnet, and confirm the original state and DNS-only plan remain unchanged. Remove generated smoke artifacts.
+## Task 10: Native workflow and agent guidance
 
-Observed: all 12 safety tests, Ruff checks, OpenTofu formatting/locked initialization/validation, and Nix-provided actionlint passed. The final helper saved a real private DNS-only plan tied to this checkout. A real terminal displayed the plan and tailnet/digest prompt, then refused an incorrect confirmation; piped approval was also refused. The state remained byte-for-byte unchanged and smoke artifacts were removed. No authorized live apply path was executed; Google DNS remains unapplied.
+- [x] Put reviewed-plan approval, commands, and post-apply API/state/zero-drift verification in `terraform/CLAUDE.md`. Root `CLAUDE.md` retains global policy and links the scoped guide; README remains human-facing.
+- [x] Replace helper instructions with native plan/show/apply commands, private saved plans, and an explicit warning that saved-plan apply skips confirmation.
+- [x] Remove the custom helper, tests, CI step, and now-unused bytecode exclusion. Keep CI credential-free and preserve the Nix deferral.
+- [x] Smoke-test native formatting, locked initialization, validation, plan saving, and show without applying. Confirm the DNS-only plan and unchanged authoritative state; remove temporary plan artifacts.
+
+Observed: shared Nix checks passed, including validation error handling, formatting, and Linux/both Darwin evaluations. OpenTofu formatting, locked initialization, validation, and actionlint passed. Native plan/show used a mode-0600 saved plan in a mode-0700 temporary directory; only the pending DNS nameserver update was proposed, with no imports/creates/deletes. Authoritative state remained byte-for-byte unchanged and temporary artifacts were removed. No infrastructure apply occurred.
 
 ## Deferred Nix phase
 

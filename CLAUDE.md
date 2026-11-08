@@ -16,6 +16,7 @@ Declarative system and user environment configuration for macOS, Linux, and WSL 
 - `nixos/` — NixOS configuration (empty, reserved for future use)
 - `kubernetes/` — Kubernetes manifests (empty, reserved for future use)
 - `openspec/` — Spec documents and change tracking (scaffolded: `specs/`, `changes/`)
+- `terraform/` — Independent OpenTofu root modules; read [terraform/CLAUDE.md](terraform/CLAUDE.md) before working on them.
 - `home.nix` — Shared home-manager config (cross-platform)
 - `packages.nix` — Shared nix packages (cross-platform)
 - `home-files/` — Dotfiles symlinked into `$HOME` via `home.file`
@@ -34,7 +35,7 @@ Declarative system and user environment configuration for macOS, Linux, and WSL 
 
 ## Coding Guidance
 
-Agents own implementation, verification, and review. Follow [Anthropic’s guidance](https://code.claude.com/docs/en/best-practices) on instructions versus deterministic enforcement and [OpenAI’s guidance](https://developers.openai.com/codex/learn/best-practices) on verification and review. Apply them through this repository’s workflow; repository policies take precedence, and shared checks must remain portable across agent tools.
+Humans do not code directly; agents own implementation, verification, and review. Follow [Anthropic’s guidance](https://code.claude.com/docs/en/best-practices) on instructions versus deterministic enforcement and [OpenAI’s guidance](https://developers.openai.com/codex/learn/best-practices) on verification and review. Apply them through this repository’s workflow; repository policies take precedence, and shared checks must remain portable across agent tools.
 
 ## Agent Tool Compatibility
 
@@ -53,7 +54,8 @@ Keep reusable plugins and agent resources in `.claude/` so compatible tools can 
 - Place worktrees under `.worktrees/` at the main repository root (for example, `.worktrees/todo-documenting/`), not inside another worktree. Perform edits, validation, and requested commits in the selected checkout; keep the main checkout on `main`.
 - Prefer Homebrew for macOS applications and platform-specific packages. Install core CLI tools and services shared across macOS, Linux, and WSL using Nix instead.
 - Keep shared Nix package declarations in root `packages.nix`/`home.nix`; keep platform-specific service lifecycle configuration in the appropriate platform modules.
-- Keep repository agent instructions, including the YOLO boundary, in this single `CLAUDE.md`. Do not introduce `AGENTS.md` or a second agent-policy file.
+- Keep repository-wide agent policy, including the YOLO boundary, in this root `CLAUDE.md`. Scoped `CLAUDE.md` workflow guides belong alongside their code and must not duplicate or override the root authorization boundary. Do not introduce `AGENTS.md`.
+- Keep coding workflows and operational details in the appropriate scoped `CLAUDE.md`; keep `README.md` focused on human-facing goals, capabilities, and orientation.
 
 ## YOLO Boundary
 
