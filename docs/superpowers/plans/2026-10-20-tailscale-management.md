@@ -2,7 +2,7 @@
 
 > **For agentic workers:** Use executing-plans. Implement only Terraform-compatible tailnet configuration. Retain the Nix design and its stash. The explicitly authorized saved-plan application below is complete; further changes require separate review and authorization.
 
-**Goal:** Adopt the current ownership-based SSH policy and existing DNS, expiry, and route settings without changing the live tailnet or host installations.
+**Goal:** Manage the existing tailnet through native OpenTofu while preserving SSH/Funnel behavior, device key expiry, and route approvals. Initial adoption is complete; the declared Google DNS extension remains unapplied pending separate saved-plan review and explicit apply authorization. Host/client changes remain deferred.
 
 **Architecture:** One OpenTofu root at `terraform/tailscale/` owns eight existing resources using the official provider. The user-selected simple policy supersedes the earlier Muse-specific tag transition. Nix client/service management remains a separate deferred phase.
 
