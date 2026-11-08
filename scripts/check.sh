@@ -19,14 +19,23 @@ esac
 
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
+if [[ "$scope" == all ]]; then
+  printf '\n==> Checking validation error handling\n'
+  bash tests/check.sh
+fi
+
 if [[ "$scope" == all || "$scope" == format ]]; then
   printf '\n==> Checking Nix formatting\n'
+  file_list=$(mktemp)
+  trap 'rm -f "$file_list"' EXIT
+  # Discover files in the foreground so Git failures stop validation.
+  git ls-files --cached --others --exclude-standard -z -- '*.nix' > "$file_list"
   files=()
   while IFS= read -r -d '' file; do
     if [[ -s "$file" ]]; then
       files+=("./$file")
     fi
-  done < <(git ls-files --cached --others --exclude-standard -z -- '*.nix')
+  done < "$file_list"
   if [[ ${#files[@]} -gt 0 ]]; then
     nix shell --no-update-lock-file --inputs-from ./linux nixpkgs#nixfmt \
       --command nixfmt --check "${files[@]}"

@@ -23,6 +23,8 @@ jobs:
       - uses: cachix/install-nix-action@v31.11.2
         with:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check validation error handling
+        run: bash tests/check.sh
       - name: Check formatting
         run: bash scripts/check.sh format
       - name: Evaluate Linux configuration
