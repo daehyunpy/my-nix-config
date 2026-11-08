@@ -41,6 +41,7 @@ Remove completed items from this document; use Git history and linked pull reque
 
 **Status:** Backlog
 **Outcome:** The repository reflects its purpose: manage my machines, development environments, and network infrastructure declaratively, with reproducible configuration and controlled deployment.
+**Spec:** [Repository identity and structure](docs/superpowers/specs/2026-11-08-repository-structure-design.md) (approved).
 
 **Done when:**
 - The project purpose treats Nix as one implementation tool, not the entire repository; it includes dotfiles, cross-platform machine configuration, Tailscale infrastructure managed through OpenTofu, and planned CI/CD for infrastructure and always-on servers.
