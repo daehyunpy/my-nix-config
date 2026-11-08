@@ -167,7 +167,13 @@ terraform plan -detailed-exitcode
 
 Plan exit codes: `0` means no changes, `2` means proposed changes, and `1` means an error. Generate and review the plan, present the proposed actions and risks to the user, then stop for explicit approval of that reviewed plan before applying. A request to change a setting or a successful plan is not approval to apply an unseen plan. Never combine planning and applying in the same unattended tool call. Follow the root repository's authorization boundary for remote changes.
 
-After an authorized apply, run a fresh plan and verify the effective remote settings. Expect exit `0` when configuration and infrastructure agree.
+After an authorized apply, verify the desired state before reporting completion:
+
+- Query the service's API or CLI and compare the effective remote settings with the approved changes, including protections that must remain unchanged.
+- Inspect refreshed Terraform state to confirm the intended resource identities and managed values, without printing secrets.
+- Run a fresh plan with refresh enabled and `-detailed-exitcode`; require exit `0` for no drift.
+
+An apply success message alone is not proof. Treat mismatches or verification errors as incomplete work; report expected versus observed state and do not apply corrective changes without approval of a new plan.
 
 ## State
 
