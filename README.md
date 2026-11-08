@@ -62,7 +62,7 @@ Start a new login session after activation; reconnect remote editors to reload t
 
 `terraform/tailscale/` declaratively manages the existing tailnet's policy, DNS, device key-expiry settings, and route approvals. CI validates configuration without applying it.
 
-Host-side Tailscale installation and Nix-managed services remain deferred. The desired DNS configuration is Cloudflare-only; Google remains live from the earlier approved apply until its removal plan is separately approved and applied.
+Host-side Tailscale installation and Nix-managed services remain deferred. Live DNS is Cloudflare-only, matching the declared configuration and verified deployment.
 
 Agent workflow, credentials, state, adoption, recovery, and verification guidance live in [terraform/CLAUDE.md](terraform/CLAUDE.md).
 

@@ -40,7 +40,7 @@ State, state backups, provider caches, saved plans, and secret variable files ar
 
 Exit 0 means no changes, 2 means proposed changes, and 1 means failure. Review each fresh plan before any separately authorized application. Eight existing resources are adopted. On 2026-11-08, the reviewed policy cleanup was applied with no SSH/Funnel behavior change; the post-apply plan exited 0 with no changes. DNS, route approvals, expiry, ownership, IDs, and addresses were verified unchanged. Thales's current device record and approved `192.168.2.0/24` subnet supersede its historical ID and `192.168.68.0/24` route.
 
-The separately approved Google DNS extension was applied on 2026-11-08 and verified with API/state checks and a zero-change plan. The user then requested only Cloudflare `1.1.1.1`; source now excludes Google, but the new removal plan requires separate approval. Do not report live DNS as Cloudflare-only until that plan is applied and verified.
+The Cloudflare-only follow-up was reviewed, explicitly authorized, and applied on 2026-11-08. Live global DNS now contains only `1.1.1.1`; independent API/state checks and a fresh authenticated plan confirmed zero drift. Google was removed, with all other managed settings and host/client configuration preserved.
 
 The earlier Muse-tag proposal is superseded by the simpler user-selected policy. Local adoption state was backed up privately, obsolete tag bindings were forgotten without deleting remote resources, and Thales's key/route settings were imported against its current node ID. An operator with older state must reconcile those bindings after a fresh inventory and private backup; do not apply tag-destruction or missing-node creation plans to repair bookkeeping.
 

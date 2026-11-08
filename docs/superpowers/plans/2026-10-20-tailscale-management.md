@@ -10,7 +10,7 @@
 
 ## Execution boundary
 
-The initial no-apply boundary allowed source changes, private state adoption, validation, and read-only inspection. The user later separately authorized the policy cleanup and Google DNS extension; both were applied and verified. The subsequent Cloudflare-only request needs a new removal plan and fresh approval before apply. Earlier authorization does not cover other policy/DNS changes, tags, client/service activation, enrollment, or credential creation/expansion.
+The initial no-apply boundary allowed source changes, private state adoption, validation, and read-only inspection. The user later separately authorized the policy cleanup, Google DNS extension, and Cloudflare-only removal; all were applied and verified. Every further change requires a new reviewed plan and explicit approval. Earlier authorization does not cover other policy/DNS changes, tags, client/service activation, enrollment, or credential creation/expansion.
 
 Before this boundary, eleven resources were imported and the earlier merged policy alone was applied. Fresh API inspection now shows the user's simpler policy already live, a different Thales device record, and subnet `192.168.2.0/24`. Adopt these current facts rather than restoring the historical snapshot. No successful Muse-originated SSH or daemon migration is claimed.
 
@@ -76,7 +76,7 @@ This PR adds only Terraform validation to CI and retains the Nix validation inhe
 - [x] Validate and inspect a fresh plan; require only the DNS resource update and retain all existing settings.
 - [x] Apply the exact saved plan after separate authorization, then verify the resolver list and a zero-change final plan. No host/client changes.
 
-On 2026-11-08, the user authorized the reviewed artifact `d21fa52cfdaf`. OpenTofu reported zero added, one changed, zero destroyed. API reads confirmed Cloudflare plus Google, unchanged DNS preferences, policy, device identities/addresses/ownership/tags/expiry, and advertised/approved routes. All eight state bindings were preserved; the only other raw state difference was semantically equivalent ACL JSON formatting. The final refreshed plan exited 0. Private state, API, plan, and verification evidence is under `~/.config/tailscale-iac/backups/2026-11-08/dns-apply-214625-270538/`. The user then requested Cloudflare-only DNS; Task 11 tracks that new, not-yet-authorized removal.
+On 2026-11-08, the user authorized the reviewed artifact `d21fa52cfdaf`. OpenTofu reported zero added, one changed, zero destroyed. API reads confirmed Cloudflare plus Google, unchanged DNS preferences, policy, device identities/addresses/ownership/tags/expiry, and advertised/approved routes. All eight state bindings were preserved; the only other raw state difference was semantically equivalent ACL JSON formatting. The final refreshed plan exited 0. Private state, API, plan, and verification evidence is under `~/.config/tailscale-iac/backups/2026-11-08/dns-apply-214625-270538/`. The later Cloudflare-only preference and separately approved removal are recorded in Task 11.
 
 ## Task 6: Declarative adoption and safe unmanagement
 
@@ -121,7 +121,9 @@ Before the DNS application, shared Nix checks passed, including validation error
 - [x] Set the latest desired resolver list to only `1.1.1.1`; retain MagicDNS, disabled local override, empty search paths, and disabled exit-node DNS use.
 - [x] Record the completed Google extension and make its later removal a separate approval boundary.
 - [x] Validate and present a fresh saved plan removing only Google, with the other seven resources unchanged.
-- [ ] Apply only after explicit approval of that new plan, then verify API/state preservation and a zero-change final plan.
+- [x] Apply only after explicit approval of that new plan, then verify API/state preservation and a zero-change final plan.
+
+On 2026-11-08 at 22:13 UTC, the user-approved artifact `f878d4dc6b1c` removed Google with zero added, one changed, zero destroyed. API reads confirmed only `1.1.1.1`, unchanged MagicDNS/local-override/search-path/exit-node settings, policy, device identities/addresses/ownership/tags/expiry/SSH flags, and advertised/approved routes. All eight state bindings and the other seven managed settings were preserved. The fresh authenticated plan exited 0 with no changes. Private before/after state, API snapshots, the approved plan, and verification evidence are under `~/.config/tailscale-iac/backups/2026-11-08/cloudflare-only-221322-895845/`. The temporary applied plan was retired. No host/client activation or backend migration occurred.
 
 ## Deferred Nix phase
 
