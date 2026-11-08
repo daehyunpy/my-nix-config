@@ -2,7 +2,7 @@
 
 > **For agentic workers:** Use executing-plans. Implement only Terraform-compatible tailnet configuration. Retain the Nix design and its stash. The explicitly authorized saved-plan application below is complete; further changes require separate review and authorization.
 
-**Goal:** Manage the existing tailnet through native OpenTofu while preserving SSH/Funnel behavior, device key expiry, and route approvals. Initial adoption is complete; the declared Google DNS extension remains unapplied pending separate saved-plan review and explicit apply authorization. Host/client changes remain deferred.
+**Goal:** Manage the existing tailnet through native OpenTofu with Cloudflare `1.1.1.1` as the sole global DNS resolver, preserving SSH/Funnel behavior, device key expiry, and route approvals. Every live change requires a reviewed saved plan and explicit apply authorization. Host/client changes remain deferred.
 
 **Architecture:** One OpenTofu root at `terraform/tailscale/` owns eight existing resources using the official provider. The user-selected simple policy supersedes the earlier Muse-specific tag transition. Nix client/service management remains a separate deferred phase.
 
@@ -10,7 +10,7 @@
 
 ## Execution boundary
 
-The initial no-apply boundary allowed source changes, private state adoption, validation, and read-only inspection. The user later authorized applying this root. That application is complete: one policy-only cleanup, no host changes. Do not treat it as authorization for additional policy/DNS changes, tags, client/service activation, enrollment, or credential creation/expansion.
+The initial no-apply boundary allowed source changes, private state adoption, validation, and read-only inspection. The user later separately authorized the policy cleanup and Google DNS extension; both were applied and verified. The subsequent Cloudflare-only request needs a new removal plan and fresh approval before apply. Earlier authorization does not cover other policy/DNS changes, tags, client/service activation, enrollment, or credential creation/expansion.
 
 Before this boundary, eleven resources were imported and the earlier merged policy alone was applied. Fresh API inspection now shows the user's simpler policy already live, a different Thales device record, and subnet `192.168.2.0/24`. Adopt these current facts rather than restoring the historical snapshot. No successful Muse-originated SSH or daemon migration is claimed.
 
@@ -69,14 +69,14 @@ On 2026-11-08, the user-authorized saved plan applied successfully: zero added, 
 
 This PR adds only Terraform validation to CI and retains the Nix validation inherited from main. Additional generic CI refactoring, CI-specific agent guides, and worktree-policy changes are excluded. The user-requested Terraform workflow guide lives in `terraform/CLAUDE.md`; Nix Tailscale implementation stays stashed.
 
-## Task 5: Secondary DNS correction
+## Task 5: Secondary DNS extension — applied, superseded by Task 11
 
 - [x] Add Google `8.8.8.8` alongside Cloudflare `1.1.1.1` in the existing DNS resource; keep MagicDNS on, override off, no extra search paths, and exit-node DNS use off for both.
 - [x] Update the spec and agent guide: this is additional-provider redundancy, not ordered failover, and clients retain local DNS preference.
 - [x] Validate and inspect a fresh plan; require only the DNS resource update and retain all existing settings.
-- [ ] Apply only after separate authorization, then verify the resolver list and a zero-change final plan. The earlier application did not include secondary DNS.
+- [x] Apply the exact saved plan after separate authorization, then verify the resolver list and a zero-change final plan. No host/client changes.
 
-Observed: formatting and provider validation passed. The authenticated saved-plan review proposed only an in-place update to `tailscale_dns_configuration.tailnet`, adding `8.8.8.8` alongside `1.1.1.1`. All non-resolver DNS fields and the other seven resources were unchanged. The temporary private plan was removed; no DNS application occurred.
+On 2026-11-08, the user authorized the reviewed artifact `d21fa52cfdaf`. OpenTofu reported zero added, one changed, zero destroyed. API reads confirmed Cloudflare plus Google, unchanged DNS preferences, policy, device identities/addresses/ownership/tags/expiry, and advertised/approved routes. All eight state bindings were preserved; the only other raw state difference was semantically equivalent ACL JSON formatting. The final refreshed plan exited 0. Private state, API, plan, and verification evidence is under `~/.config/tailscale-iac/backups/2026-11-08/dns-apply-214625-270538/`. The user then requested Cloudflare-only DNS; Task 11 tracks that new, not-yet-authorized removal.
 
 ## Task 6: Declarative adoption and safe unmanagement
 
@@ -86,7 +86,7 @@ Observed: formatting and provider validation passed. The authenticated saved-pla
 - [x] Document ownership/import identities, import-plan updates, and coordinated source/import removal plus local state forgetting. Do not imply `state rm` alone stops management.
 - [x] Verify fresh-state adoption, idempotence with current state, and the documented unmanagement procedure in disposable copies; no actual imports/applies or operator-state mutation.
 
-Observed: fresh state changed from eight creates/no imports to eight imports/no creates or deletes. Existing state skips all imports. Both plans retain only the unapplied DNS update. Removing Apollo from the shared map and forgetting its temporary state binding plans no operation on that released instance. Original state remained byte-for-byte unchanged; all temporary inputs/state/plans were removed.
+Before the DNS application, fresh state changed from eight creates/no imports to eight imports/no creates or deletes. Existing state skipped all imports. Both plans then retained only the unapplied DNS update. Removing Apollo from the shared map and forgetting its temporary state binding planned no operation on that released instance. Original state remained byte-for-byte unchanged; all temporary inputs/state/plans were removed.
 
 ## Task 7: State backend selection — deferred
 
@@ -101,7 +101,7 @@ Earlier Thales preparation installed the pinned OpenTofu engine and created an i
 - [x] Back up and relocate the existing authoritative local state into the active operator checkout, with one active file and private recovery copies.
 - [x] Initialize and validate the default local backend; verify all eight bindings, no imports/creates/deletes, and only the pending DNS update. Do not apply infrastructure.
 
-Observed: initialization, formatting, and validation passed. The active default state retained identical bytes and all eight bindings, with mode 0600 and private before/after backups. The former active file was retired. The authenticated plan exited 2 for the pending DNS update only; no imports, creates, deletes, or infrastructure apply.
+Before the DNS application, initialization, formatting, and validation passed. The active default state retained identical bytes and all eight bindings, with mode 0600 and private before/after backups. The former active file was retired. The authenticated plan exited 2 for the then-pending DNS update only; no imports, creates, deletes, or infrastructure apply occurred during that verification.
 
 ## Task 9: Custom Python apply helper — deferred
 
@@ -114,7 +114,14 @@ The previously implemented helper is deferred by the latest BTW decision: use na
 - [x] Remove the custom helper, tests, CI step, and now-unused bytecode exclusion. Keep CI credential-free and preserve the Nix deferral.
 - [x] Smoke-test native formatting, locked initialization, validation, plan saving, and show without applying. Confirm the DNS-only plan and unchanged authoritative state; remove temporary plan artifacts.
 
-Observed: shared Nix checks passed, including validation error handling, formatting, and Linux/both Darwin evaluations. OpenTofu formatting, locked initialization, validation, and actionlint passed. Native plan/show used a mode-0600 saved plan in a mode-0700 temporary directory; only the pending DNS nameserver update was proposed, with no imports/creates/deletes. Authoritative state remained byte-for-byte unchanged and temporary artifacts were removed. No infrastructure apply occurred.
+Before the DNS application, shared Nix checks passed, including validation error handling, formatting, and Linux/both Darwin evaluations. OpenTofu formatting, locked initialization, validation, and actionlint passed. Native plan/show used a mode-0600 saved plan in a mode-0700 temporary directory; only the then-pending DNS nameserver update was proposed, with no imports/creates/deletes. Authoritative state remained byte-for-byte unchanged and temporary artifacts were removed. No infrastructure apply occurred during that smoke test.
+
+## Task 11: Cloudflare-only DNS
+
+- [x] Set the latest desired resolver list to only `1.1.1.1`; retain MagicDNS, disabled local override, empty search paths, and disabled exit-node DNS use.
+- [x] Record the completed Google extension and make its later removal a separate approval boundary.
+- [x] Validate and present a fresh saved plan removing only Google, with the other seven resources unchanged.
+- [ ] Apply only after explicit approval of that new plan, then verify API/state preservation and a zero-change final plan.
 
 ## Deferred Nix phase
 

@@ -8,11 +8,6 @@ resource "tailscale_dns_configuration" "tailnet" {
     use_with_exit_node = false
   }
 
-  nameservers {
-    address            = "8.8.8.8"
-    use_with_exit_node = false
-  }
-
   lifecycle {
     prevent_destroy = true
   }

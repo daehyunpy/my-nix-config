@@ -8,7 +8,7 @@ Agents run the commands below from the repository root in the selected worktree.
 
 `terraform/tailscale/` owns the complete tailnet policy, DNS, device key-expiry settings, and approved subnet/exit routes. It does not manage tags, install clients, or change daemon preferences. Shared Home Manager tooling and generic Nix-managed services remain a deferred phase in the [design spec](../docs/superpowers/specs/2026-10-18-tailscale-management-design.md); their implementation is stashed. Existing Home Manager names and services remain unchanged.
 
-**The reviewed Terraform application is complete.** It changed only policy formatting/unused fields; host activation and additional changes remain outside that authorization. Use the pinned OpenTofu version in `.opentofu-version` and the committed provider dependency lock:
+**The initial policy cleanup is complete.** It changed only policy formatting/unused fields. Further applications require their own reviewed plan and explicit authorization. Use the pinned OpenTofu version in `.opentofu-version` and the committed provider dependency lock:
 
 ```sh
 tofu -chdir=terraform/tailscale fmt -check
@@ -40,7 +40,7 @@ State, state backups, provider caches, saved plans, and secret variable files ar
 
 Exit 0 means no changes, 2 means proposed changes, and 1 means failure. Review each fresh plan before any separately authorized application. Eight existing resources are adopted. On 2026-11-08, the reviewed policy cleanup was applied with no SSH/Funnel behavior change; the post-apply plan exited 0 with no changes. DNS, route approvals, expiry, ownership, IDs, and addresses were verified unchanged. Thales's current device record and approved `192.168.2.0/24` subnet supersede its historical ID and `192.168.68.0/24` route.
 
-The secondary DNS extension is declared but not yet applied: Cloudflare `1.1.1.1` plus Google `8.8.8.8`. Review a separate DNS-only plan before application; the earlier zero-drift result predates this extension.
+The separately approved Google DNS extension was applied on 2026-11-08 and verified with API/state checks and a zero-change plan. The user then requested only Cloudflare `1.1.1.1`; source now excludes Google, but the new removal plan requires separate approval. Do not report live DNS as Cloudflare-only until that plan is applied and verified.
 
 The earlier Muse-tag proposal is superseded by the simpler user-selected policy. Local adoption state was backed up privately, obsolete tag bindings were forgotten without deleting remote resources, and Thales's key/route settings were imported against its current node ID. An operator with older state must reconcile those bindings after a fresh inventory and private backup; do not apply tag-destruction or missing-node creation plans to repair bookkeeping.
 
@@ -67,7 +67,7 @@ tofu -chdir=terraform/tailscale apply -input=false -lock=true "$plan_dir/tailsca
 
 Saved plans retain their original inputs; they do not follow later source edits. Replan and obtain fresh approval after changing source, policy, provider/CLI pins, variable inputs, or observing drift. OpenTofu checks for stale state and locks the authoritative state file; do not disable locking. Follow the backup procedure below before and after every attempted apply, including failures that may have partially changed resources, and remove private plan artifacts after use.
 
-`prevent_destroy` does not stop in-place updates. CI runs credential-free formatting and schema validation, not authenticated policy validation, apply, or host-behavior checks. Tailscale SSH enablement, route advertisements, exit-node activation, and Nix client/service management remain deferred. This workflow does not authorize the pending Google DNS apply.
+`prevent_destroy` does not stop in-place updates. CI runs credential-free formatting and schema validation, not authenticated policy validation, apply, or host-behavior checks. Tailscale SSH enablement, route advertisements, exit-node activation, and Nix client/service management remain deferred. Every further resolver change requires approval of its reviewed saved plan.
 
 ### Verify an authorized apply
 
@@ -81,7 +81,7 @@ An apply success message alone is not completion:
    tofu -chdir=terraform/tailscale plan -refresh=true -input=false -detailed-exitcode
    ```
 
-Require exit 0 with no drift after applying the approved changes. A mismatch or verification error means the operation is incomplete: report expected versus observed settings and obtain approval of a new reviewed plan before any corrective apply. This is a post-apply gate; the currently unapplied DNS addition still correctly produces a change plan.
+Require exit 0 with no drift after applying the approved changes. A mismatch or verification error means the operation is incomplete: report expected versus observed settings and obtain approval of a new reviewed plan before any corrective apply. This is a post-apply gate, not permission to apply a newly requested configuration change without review.
 
 ### Backups and recovery
 
@@ -113,7 +113,7 @@ No state or credentials were transferred to Thales. Its earlier tool/worktree pr
 | `tailscale_device_key.managed` — Apollo, Muse, Thales, Poseidon | Current node IDs in `local.devices` |
 | `tailscale_device_subnet_routes.routers` — Thales, Poseidon | Current node IDs for `local.router_routes` members |
 
-A fresh state should plan eight imports, no creates/deletes, and any separately reviewed configuration updates. Existing state skips imports for addresses already tracked. Imports can stay as adoption records. The current fresh-state plan also includes the pending Google DNS update: applying an import plan applies its shown updates too, not just bookkeeping. Do not apply it without authorization for those changes.
+A fresh state should plan eight imports, no creates/deletes, and any separately reviewed configuration updates. Existing state skips imports for addresses already tracked. Imports can stay as adoption records. Applying an import plan also applies its shown configuration updates, not just bookkeeping; obtain approval for the entire plan.
 
 ### Stop managing without changing the live setting
 
@@ -132,7 +132,7 @@ A fresh state should plan eight imports, no creates/deletes, and any separately 
 ### Policy and preservation
 
 - Keep `acls` and `grants` omitted; an empty list would replace the existing default network access.
-- Preserve MagicDNS, local DNS override disabled, and no extra search paths. Add Google `8.8.8.8` alongside Cloudflare `1.1.1.1` for provider redundancy, with exit-node DNS use disabled for both. This is not strict primary/secondary failover; either provider may receive queries. Clients still prefer local DNS because override remains disabled. Public-provider address groups expand automatically in the console.
+- Use only Cloudflare's logical nameserver `1.1.1.1`, with `use_with_exit_node = false`. Preserve MagicDNS, local DNS override disabled, and no extra search paths. Clients still prefer local DNS because override remains disabled. Public-provider address groups expand automatically in the console; do not add Google or another provider without a newly reviewed and approved change.
 - The provider marks `tailscale_dns_configuration` as alpha. Keep the dependency lock and review provider upgrades deliberately.
 - The SSH policy accepts member-to-self access as `autogroup:nonroot` or `root`, without periodic browser checks. It applies to members' own devices, not only Muse or only `daehyun`. Comments and unused empty `tagOwners`/`sshTests` fields are omitted.
 - Validate HuJSON through Tailscale's read-only `POST /api/v2/tailnet/{tailnet}/acl/validate` endpoint. Temporary validator-only SSH tests can exercise ownership behavior without changing the source. Inspect `data[].errors` as well as HTTP status; failed tests can return HTTP 200. Do not assume the pinned provider's plan runs these tests.

@@ -2,15 +2,17 @@
 
 ## Status and execution boundary
 
-**Terraform phase: implemented; secondary DNS pending application.** `terraform/tailscale/` manages eight resources: the complete policy, DNS configuration, four device-key expiry settings, and the two routers' approved routes. Existing resources were imported, not recreated. The earlier policy-only application completed with a zero-change plan. The follow-on DNS extension adds Google alongside Cloudflare and must be planned separately; it has not been applied. Nix-based client/service management remains deferred, retained below and in the stash named `WIP: Tailscale Nix configuration (not applied)`.
+**Terraform phase: implemented; Cloudflare-only DNS follow-up pending application.** `terraform/tailscale/` manages eight resources: the complete policy, DNS configuration, four device-key expiry settings, and the two routers' approved routes. Existing resources were imported, not recreated. The policy cleanup and Google DNS extension were separately authorized, applied, and verified. The latest preference is only Cloudflare `1.1.1.1`; its new Google-removal plan needs separate approval. Nix-based client/service management remains deferred, retained below and in the stash named `WIP: Tailscale Nix configuration (not applied)`.
 
 The user subsequently authorized applying the reviewed Terraform root. On 2026-11-08, its saved plan changed only `tailscale_acl.tailnet` to remove comments/unused fields, preserving SSH/Funnel behavior. The post-apply plan exited 0 with no changes; DNS, routes, expiry, ownership, tags, IDs, and addresses were verified unchanged. Pre/post state and API snapshots were backed up privately outside Git. This completed application does not authorize future unrelated changes, host activation, client replacement, enrollment, tags, or new/expanded credentials.
+
+Later on 2026-11-08, the user explicitly approved the reviewed DNS-only plan `d21fa52cfdaf`. Its apply changed one resource, adding Google, and independent API/state verification plus a refreshed plan confirmed zero drift. Other managed settings were preserved; OpenTofu only normalized equivalent ACL JSON text in local state. The subsequent Cloudflare-only request is a new change: review its removal plan and obtain fresh approval before applying it.
 
 The user selected the simpler ownership-based SSH policy supplied in the conversation. It supersedes the earlier Muse-specific tagged design. Do not implement tag ownership transitions, Muse-only selectors, or personal check-mode rules from that earlier proposal.
 
 ## Goal and ownership boundaries
 
-Manage existing tailnet resources as code without changing the current setup. Terraform owns control-plane policy, DNS, key-expiry settings, and approved routes. Existing daemons continue to own host preferences and route advertisements. A later Nix phase will adopt user tooling and privileged services independently.
+Manage existing tailnet resources as code with Cloudflare `1.1.1.1` as the sole global resolver, preserving policy, device, route, and host behavior. Terraform owns control-plane policy, DNS, key-expiry settings, and approved routes; every live change requires its own reviewed plan and explicit authorization. Existing daemons continue to own host preferences and route advertisements. A later Nix phase will adopt user tooling and privileged services independently.
 
 Home Manager manages user tooling, not the root daemon. Neither the current Terraform root nor future Home Manager activation may install a competing daemon, run privileged activation hooks, or reenroll devices.
 
@@ -73,9 +75,9 @@ Use `tailscale_dns_configuration`, not overlapping legacy DNS resources:
 
 - MagicDNS enabled; tailnet suffix `dingo-ratio.ts.net` unchanged.
 - Local DNS override disabled; no extra search paths.
-- Preserve Cloudflare's logical nameserver `1.1.1.1` and add Google's logical nameserver `8.8.8.8` for independent-provider redundancy. Both use `use_with_exit_node = false`.
+- Keep only Cloudflare's logical nameserver `1.1.1.1` with `use_with_exit_node = false`; the earlier Google redundancy proposal is superseded.
 - The GUI expands known public providers to their address groups; do not declare each expanded address as a separate resolver.
-- “Secondary” means an additional resolver, not guaranteed ordered failover: clients may query multiple resolvers or choose by performance. DNS queries may reach either provider. With local override disabled, clients continue to prefer their local DNS configuration.
+- Do not add a secondary provider or assume ordered resolver failover without a newly reviewed and approved change. With local override disabled, clients continue to prefer their local DNS configuration.
 - Do not alter HTTPS provisioning, split DNS, or individual clients' DNS-acceptance preferences.
 
 ### Credentials and state
@@ -92,7 +94,7 @@ If state is lost, restore a recent private backup to the default location in the
 
 Backend selection is a backlog task in `BACKLOG.md` (INFRA-6), with all storage/execution options open. No protocol, product, host, or custom state location is selected. The abandoned Thales preparation did not transfer state or credentials or start a backend service.
 
-Keep declarative imports for policy (`acl`), aggregate DNS (`dns_configuration`), all four key settings, and both router approvals. Import loops use the same device/router maps as the resource declarations, with current node IDs. Require at least OpenTofu/Terraform 1.7 for looped imports and retain the tested OpenTofu 1.13.1 pin. Existing state must not re-import tracked addresses; fresh state must propose imports rather than creates. Applying an import plan also applies any shown configuration updates, so the pending secondary DNS change still requires separate authorization.
+Keep declarative imports for policy (`acl`), aggregate DNS (`dns_configuration`), all four key settings, and both router approvals. Import loops use the same device/router maps as the resource declarations, with current node IDs. Require at least OpenTofu/Terraform 1.7 for looped imports and retain the tested OpenTofu 1.13.1 pin. Existing state must not re-import tracked addresses; fresh state must propose imports rather than creates. Applying an import plan also applies any shown configuration updates; obtain approval for those changes rather than treating imports as bookkeeping only.
 
 Relinquishing ownership is a coordinated source-and-state operation: back up state and live settings, remove the desired resource instance and its import entry/member, then forget its state binding before applying anything. Retain identities still referenced by other resources. Review a plan proving the released address is neither re-imported nor created/updated/destroyed. `state rm` alone permits re-adoption/recreation; source removal alone can plan destructive provider deletion. Do not use `destroy` to stop managing expiry or routes.
 
@@ -124,8 +126,8 @@ tofu -chdir=terraform/tailscale validate
 - Submit temporary owner-based acceptance tests for `daehyun` and `root` to current Thales/Poseidon. Remove the SSH rule only in an in-memory negative control and confirm those tests fail. Neither probe writes the live policy or adds source tests.
 - After any separately authorized saved-plan application, independently compare effective Tailscale API/CLI settings with the approved changes and preserved protections, inspect refreshed state for resource identities and managed values without printing secrets, and run an authenticated `plan -refresh=true -input=false -detailed-exitcode` requiring exit 0. Apply success alone is not proof; mismatches or verification errors remain incomplete and must report expected versus observed state. Corrective applies require approval of a new reviewed plan. The 2026-11-08 cleanup application met its acceptance criteria and preserved the inventoried control-plane settings; it did not enable host-side services or add secondary DNS.
 - Confirm eight adopted resource addresses remain in local state, and the current Thales node/route settings are used. Do not log private state contents.
-- From fresh state, declarative imports must cover exactly eight addresses with no creates/deletes. From a private copy of existing operator state, imports must be skipped and the plan must contain only the separately pending DNS update. Neither verification may change the actual operator state or live tailnet.
-- Verify the active checkout's default state path, private-file exclusions, all eight adopted bindings, and a plan with no imports/creates/deletes and only the independently pending DNS update. Preserve a private backup before relocating the active local file.
+- From fresh state, declarative imports must cover exactly eight addresses with no creates/deletes. Existing state must skip imports and contain only separately reviewed, requested changes; after an authorized apply, require a zero-change plan. Verification must not itself apply resources or alter the authoritative state.
+- Verify the active checkout's default state path, private-file exclusions, all eight adopted bindings, and a plan without imports/creates/deletes. Any pending DNS delta must match the latest reviewed request. Preserve a private backup before relocating the active local file.
 - Validator tests prove policy evaluation, not actual Muse-originated SSH or daemon startup. No client migration or live traffic acceptance is claimed in this phase.
 
 ## Deferred phase: managing Tailscale through Nix
