@@ -1,4 +1,4 @@
-name: Validate Nix
+name: Validate configuration
 
 on:
   push:
@@ -13,6 +13,24 @@ defaults:
     shell: bash
 
 jobs:
+  terraform:
+    name: Tailscale Terraform validation
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - uses: opentofu/setup-opentofu@v1
+        with:
+          tofu_version_file: terraform/tailscale/.opentofu-version
+          tofu_wrapper: false
+      - name: Check Terraform formatting
+        run: tofu -chdir=terraform/tailscale fmt -check
+      - name: Initialize locked provider without a backend
+        run: tofu -chdir=terraform/tailscale init -backend=false -input=false -lockfile=readonly
+      - name: Validate Terraform configuration
+        run: tofu -chdir=terraform/tailscale validate
+
   linux:
     name: Formatting and Linux evaluation
     runs-on: ubuntu-24.04
