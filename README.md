@@ -4,6 +4,8 @@ Maintain a single source of truth for my macOS, Linux, and WSL environments: pac
 
 WSL uses the Linux Home Manager configuration; Windows host settings are not managed here. Keep the checkout at `~/.config/nix`.
 
+Prefer Homebrew for macOS applications and platform-specific packages. Use Nix for core CLI tools and services shared across macOS, Linux, and WSL; share package declarations while keeping platform-specific service management explicit.
+
 - `home.nix`, `packages.nix`: shared Home Manager configuration and packages.
 - `darwin/`, `linux/`: platform and machine configuration.
 - `home-files/`: managed dotfiles.
