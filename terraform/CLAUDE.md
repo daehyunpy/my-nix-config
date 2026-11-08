@@ -1,8 +1,8 @@
 # Terraform Workflow
 
-Each configuration directory under `terraform/` is an independent OpenTofu root module; `terraform/` itself is not one. Use the module's CLI pin and committed provider lock. Keep infrastructure policy and device inventory authoritative in configuration.
+Each configuration directory under `terraform/` is an independent Terraform-compatible root module; `terraform/` itself is not one. Tailscale uses pinned OpenTofu; GitHub uses Terraform under its module guide. Use each module's committed provider lock and existing authoritative state.
 
-Agents run the commands below from the repository root in the selected worktree. Follow the [repository authorization boundary](../CLAUDE.md#yolo-boundary); instructions and successful checks do not authorize remote changes.
+Run Tailscale commands from the repository root and GitHub commands from `terraform/github/`, in the checkout holding that module's state. Follow the [repository authorization boundary](../CLAUDE.md#yolo-boundary); instructions and successful checks do not authorize remote changes.
 
 ## Tailscale tailnet management
 
@@ -156,7 +156,7 @@ Read `github/CLAUDE.md` for provider authentication, backend details, and import
 
 Use Terraform compatible with the module's `required_version`. Keep provider constraints and `.terraform.lock.hcl` tracked. Keep infrastructure policy in configuration rather than duplicating it in prose.
 
-## Checks and Plans
+### Checks and plans
 
 ```sh
 terraform init
@@ -175,7 +175,7 @@ After an authorized apply, verify the desired state before reporting completion:
 
 An apply success message alone is not proof. Treat mismatches or verification errors as incomplete work; report expected versus observed state and do not apply corrective changes without approval of a new plan.
 
-## State
+### State
 
 Inspect the backend before planning or applying. Local state is not shared between worktrees or machines. If an existing resource is absent from state, import it using the module guide rather than creating a duplicate.
 
