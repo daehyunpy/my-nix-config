@@ -64,14 +64,6 @@ Start a new login session after activation; reconnect remote editors to reload t
 - Garbage collection runs weekly and removes unreferenced generations older than 30 days, making them unavailable for rollback.
 - Approve trusted direnv configurations with `direnv allow`. `.env` is gitignored; see `.env.example`.
 
-CI checks formatting and evaluates Linux and both Darwin configurations without activation. Evaluate locally:
-
-```sh
-nix eval --no-update-lock-file --raw ./darwin#darwinConfigurations.apollo.system.drvPath
-nix eval --no-update-lock-file --raw ./darwin#darwinConfigurations.thales.system.drvPath
-nix eval --no-update-lock-file --raw './linux#homeConfigurations."daehyun@charon".activationPackage.drvPath'
-```
-
 ## OMP
 
 Install OMP separately and launch from the repository root:

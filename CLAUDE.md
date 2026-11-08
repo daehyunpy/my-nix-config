@@ -58,6 +58,23 @@ Keep reusable plugins and agent resources in `.claude/` so compatible tools can 
 - Preserve unrelated work, staged changes, and existing conflicts. Commit only when requested; require explicit authorization for pushing, publishing, destructive Git operations, or deleting unrelated data.
 - Never print, commit, or transmit secrets from `.env`, credentials, or private keys. Existing passwordless sudo is not authorization to use it.
 
+## Validation
+
+Agents must run `bash scripts/check.sh` after changing Nix configuration and before reporting completion. Run it autonomously; do not ask the user to run checks.
+
+```bash
+bash scripts/check.sh          # Full CI-equivalent suite
+bash scripts/check.sh format   # Formatting only
+bash scripts/check.sh linux    # Linux evaluation only
+bash scripts/check.sh darwin   # Both Darwin evaluations
+```
+
+- The full suite checks formatting with `nixfmt` from the locked Linux nixpkgs input, then evaluates `daehyun@charon`, `apollo`, and `thales`. Scoped commands are for iteration; run the full suite before completion.
+- Requires Git and Nix with `nix-command` and `flakes` enabled. Nix may fetch the pinned formatter and inputs.
+- Formatting includes tracked and non-ignored untracked `.nix` files, skipping empty placeholders. Git-backed flake evaluation excludes untracked files; stage newly imported files before evaluation, preserving unrelated staged changes.
+- Checks stop at the first failure with a nonzero exit status. Fix failures within scope; report blockers and any checks not completed. Never claim validation passed when it did not.
+- Evaluation does not build or activate configurations, install applications, or update lock files. CI calls the same script with platform-specific selectors.
+
 ## Applying Changes
 
 ```bash
