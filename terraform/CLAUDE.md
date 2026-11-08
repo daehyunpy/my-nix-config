@@ -165,7 +165,7 @@ terraform validate
 terraform plan -detailed-exitcode
 ```
 
-Plan exit codes: `0` means no changes, `2` means proposed changes, and `1` means an error. Review resource actions before applying; a successful plan is not authorization to apply. Follow the root repository's authorization boundary for remote changes.
+Plan exit codes: `0` means no changes, `2` means proposed changes, and `1` means an error. Generate and review the plan, present the proposed actions and risks to the user, then stop for explicit approval of that reviewed plan before applying. A request to change a setting or a successful plan is not approval to apply an unseen plan. Never combine planning and applying in the same unattended tool call. Follow the root repository's authorization boundary for remote changes.
 
 After an authorized apply, run a fresh plan and verify the effective remote settings. Expect exit `0` when configuration and infrastructure agree.
 
