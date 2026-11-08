@@ -74,7 +74,7 @@ Install OMP separately and launch from the repository root:
 omp --cwd ~/.config/nix
 ```
 
-- `.omp/config.yml` prompts for Bash and Eval execution, including under `--auto-approve`; approval policies are not a sandbox.
+- `.omp/config.yml` enables YOLO mode (no tool approval prompts) for this project; approval policies are not a sandbox.
 - `.omp/lsp.json` uses `nil` and `nixfmt` without automatic formatting.
 - `/nix-check [files...]` runs read-only formatting and syntax checks; semantic evaluation is opt-in.
 

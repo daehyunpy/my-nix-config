@@ -1,9 +1,6 @@
 # Keep provider credentials and model selection in the user's OMP profile.
 tools:
-  approvalMode: write
-  approval:
-    bash: prompt
-    eval: prompt
+  approvalMode: yolo
 
 lsp:
   enabled: true
