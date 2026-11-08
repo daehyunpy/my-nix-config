@@ -53,11 +53,28 @@ Remove completed items from this document; use Git history and linked pull reque
 
 **Status:** Deferred
 **Outcome:** Host-side Tailscale tooling and services are managed declaratively without changing device identity or existing behavior.
-**Reference:** Deferred phase in `docs/superpowers/specs/2026-10-18-tailscale-management-design.md` on `feat/tailscale-terraform`.
+**References:** Deferred phase in `docs/superpowers/specs/2026-10-18-tailscale-management-design.md` on `feat/tailscale-terraform`; stash named `WIP: Tailscale Nix configuration (not applied)` from `feat/tailscale-iac`; earlier committed implementation on `review/cursor-tailscale-pr1` at `314e775`.
+**Work left behind:** The host-side implementation and output rename were left out of `feat/tailscale-terraform`. The later draft remains in the stash from `feat/tailscale-iac`, not in that branch's committed files. The earlier shared CLI, native daemon module, output rename, and module-validation CI remain committed on `review/cursor-tailscale-pr1`.
 **Dependency:** Reconcile the older spec on `main` before implementation.
 
 **Done when:**
 - Home Manager installs the shared CLI, and reusable nix-darwin/NixOS modules or a Fedora/WSL vendor-service drop-in manage native services.
+- Review both the earlier Cursor implementation and the later stash against current package versions and host state before reusing them. Do not merge the Cursor branch wholesale: its `infra/tailscale/` root, Muse-tag policy, historical Thales identity/subnet, and assumption that Poseidon uses NixOS are superseded by the Terraform-only design and current inventory.
+- Rename the standalone Home Manager output from `daehyun@charon` to `daehyun@poseidon`, updating all active commands, checks, and documentation without an alias. Do not rename the OS, WSL registration, or Tailscale node.
 - Host package/service management remains separate from OpenTofu tailnet settings and deployment CI/CD.
 - Device identities, authentication state, local preferences, and Apollo's encrypted-state protection are preserved; recovery access is established before migrating one host at a time.
 - Actual daemon connectivity, SSH, DNS, routing, and startup behavior are verified after separately authorized activation.
+
+## INFRA-7 — Discover all declared Nix configurations in shared validation
+
+**Status:** Backlog
+**Outcome:** Local and CI validation cover every declared Home Manager and Darwin configuration without maintaining host-name lists.
+**Reference:** Discovery-based CI changes on `feat/tailscale-iac`, excluded from the Terraform-only port.
+**Work left behind:** The discovery implementation and workflow guidance remain committed on `feat/tailscale-iac` at `3cb17b6`; they were not brought into `feat/tailscale-terraform`. Use that branch as the reference when adapting this work to the current shared validation and single-file agent policy.
+
+**Done when:**
+- Move configuration discovery into `scripts/check.sh`, keeping it the shared local/CI entry point rather than restoring duplicated inline workflow commands.
+- Evaluate every declared `homeConfigurations` activation package and `darwinConfigurations` system, and fail when a configuration set is empty or any evaluation fails.
+- Preserve existing formatting, file-discovery error handling, platform selectors, and credential-free Terraform validation.
+- Verify coverage with an additional temporary configuration and verify that empty sets and failed evaluations return nonzero.
+- Document the discovery convention in the root `CLAUDE.md` and update human-facing validation guidance as needed. Do not port `.github/workflows/CLAUDE.md`; repository agent policy stays in the single root file.
