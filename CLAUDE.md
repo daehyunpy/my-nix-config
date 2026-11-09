@@ -4,23 +4,15 @@ Declarative machine environments and network infrastructure for macOS, Linux, an
 
 ## Project Structure
 
-- `nix/home/` — Shared cross-platform Home Manager configuration (`default.nix`) and packages (`packages.nix`).
-- `nix/darwin/` — macOS flake with outputs `apollo` and `thales`; shared system settings in `configuration.nix`, user overrides in `home.nix`, and machine identity/exceptions in `hosts/`.
-  - `brews.nix`, `casks.nix`, `mas.nix` — Homebrew formulae, casks, and Mac App Store apps.
-- `nix/linux/` — Standalone Home Manager flake with output `daehyun@charon` (`x86_64-linux`); shared setup in `configuration.nix`, user overrides in `home.nix`, and machine identity/exceptions in `hosts/`.
-- `dotfiles/` — Payloads installed through Home Manager; Zed, OMP models, and SSH configuration use live out-of-store links; Conda, tmux, and WezTerm use copied sources.
+- `nix/` — Machine and user environments; read [nix/CLAUDE.md](nix/CLAUDE.md) for configuration conventions, package policy, validation, activation, and formatting.
+- `dotfiles/` — Managed user configuration payloads; installation and live-link behavior are owned by the [Nix guide](nix/CLAUDE.md#dotfile-installation).
 - `infra/` — Independent Terraform-compatible root modules; read [infra/CLAUDE.md](infra/CLAUDE.md) for the shared workflow and module-local guides for provider details. Tailscale uses pinned OpenTofu; GitHub uses Terraform.
-- `scripts/check.sh` — Shared local/CI Nix validation; `scripts/check-test.sh` protects its failure handling.
-- Subsystem-local `tests/` directories hold behavioral tests and fixtures when needed; do not create empty test scaffolds. Nix flakes explicitly expose applicable checks; OpenTofu uses its module-local test directory.
+- `scripts/check.sh` — Shared local/CI Nix validation; follow the [Nix validation workflow](nix/CLAUDE.md#validation) when changing it or Nix configuration.
+- Subsystem-local `tests/` directories hold behavioral tests and fixtures when needed; do not create empty test scaffolds.
 - `docs/superpowers/specs/`, `docs/superpowers/plans/` — Design specifications and implementation plans.
 
-## Conventions
+## Local Secrets
 
-- `brews.nix`, `casks.nix`, `packages.nix` are Nix lists. `mas.nix` is an attrset (`{ name = app-store-id; }`). Keep entries sorted alphabetically.
-- Shared user configuration goes in `nix/home/default.nix` and `nix/home/packages.nix`. Platform-specific configuration goes in `nix/darwin/` or `nix/linux/`.
-- Both flakes define a `pkgs.unstable` overlay (from `nixpkgs-unstable`) for accessing bleeding-edge packages. Use `pkgs.unstable.<pkg>` when the stable channel is too old.
-- Flakes explicitly compose modules; shared settings belong in platform `configuration.nix` files, and machine-specific overrides belong in `hosts/*.nix` (e.g., Thales's extra casks).
-- `dotfiles/` contents are symlinked via `mkOutOfStoreSymlink` (live link) or `.source` (copy). Prefer `mkOutOfStoreSymlink` for configs that change outside of Nix (e.g., editor settings). Preserve the installation mode when relocating existing files.
 - `.env` holds additional secrets (`MILVUS_ADDRESS`, `MILVUS_TOKEN`); see `.env.example` for the template. Both `.env` and `.envrc` are gitignored.
 
 ## Coding Guidance
@@ -37,13 +29,10 @@ Keep reusable plugins and agent resources in `.claude/` so compatible tools can 
 
 ## Preferences
 
-- Preserve unrestricted passwordless sudo (`%admin ALL=(ALL) NOPASSWD: ALL`) on macOS. This is intentional; do not replace it with password or Touch ID authentication unless explicitly requested.
 - The main repository checkout must always remain on the `main` branch. Never switch it to another branch or detach its HEAD.
 - Before making any repository changes—including code, configuration, documentation, and agent instructions—establish the working checkout. You may ask the user which existing worktree to use, whether to create a new one, or whether to work without a worktree. Honor an already specified choice without asking again.
 - Unless the user explicitly chooses to work without a worktree, create or reuse a task-specific branch in a separate Git worktree. Do not edit or commit directly in the main checkout without that explicit authorization.
 - Place worktrees under `.worktrees/` at the main repository root (for example, `.worktrees/todo-documenting/`), not inside another worktree. Perform edits, validation, and requested commits in the selected checkout; keep the main checkout on `main`.
-- Prefer Homebrew for macOS applications and platform-specific packages. Install core CLI tools and services shared across macOS, Linux, and WSL using Nix instead.
-- Keep shared Nix package declarations in `nix/home/packages.nix`/`nix/home/default.nix`; keep platform-specific service lifecycle configuration in the appropriate platform modules.
 - Keep repository-wide agent policy, including the YOLO boundary, in this root `CLAUDE.md`. Scoped `CLAUDE.md` workflow guides belong alongside their code and must not duplicate or override the root authorization boundary. Do not introduce `AGENTS.md`.
 - Keep coding workflows and operational details in the appropriate scoped `CLAUDE.md`; keep `README.md` focused on human-facing goals, capabilities, and orientation.
 
@@ -79,49 +68,6 @@ Keep reusable plugins and agent resources in `.claude/` so compatible tools can 
 - Delete the local branch with `git branch -d <branch>` after worktree removal. If squash merging prevents ancestry-based deletion, use `-D` only when deletion was explicitly requested, the published head matches the local tip, the PR is verified merged, and local-only data is preserved.
 - Verify the directory, worktree registration, and local branch are gone and retained state remains usable. Do not delete other worktrees, branches, stashes, or remote branches; existing server-side branch auto-deletion is separate repository policy. Cleanup never authorizes infrastructure destruction, state removal from management, or host activation.
 
-## Validation
-
-Agents must run `bash scripts/check.sh` after changing Nix configuration and before reporting completion. Run it autonomously; do not ask the user to run checks.
-
-```bash
-bash scripts/check.sh          # Full CI-equivalent suite
-bash scripts/check.sh format   # Formatting only
-bash scripts/check.sh linux    # Linux evaluation only
-bash scripts/check.sh darwin   # Both Darwin evaluations
-```
-
-- The full suite checks validation error handling and formatting with `nixfmt` from the locked Linux nixpkgs input, then evaluates `daehyun@charon`, `apollo`, and `thales`. Scoped commands are for iteration; run the full suite before completion.
-- Requires Git and Nix with `nix-command` and `flakes` enabled. Nix may fetch the pinned formatter and inputs.
-- Formatting includes tracked and non-ignored untracked `.nix` files, skipping empty placeholders. Git-backed flake evaluation excludes untracked files; stage newly imported files before evaluation, preserving unrelated staged changes.
-- Checks stop at the first failure with a nonzero exit status. Fix failures within scope; report blockers and any checks not completed. Never claim validation passed when it did not.
-- Evaluation does not build or activate configurations, install applications, or update lock files. CI calls the same script with platform-specific selectors.
-
-## Applying Changes
-
-```bash
-# macOS (nix-darwin)
-darwin-rebuild switch --flake nix/darwin/
-
-# Linux (home-manager)
-home-manager switch --flake nix/linux/
-```
-
-## Formatting
-
-Run from the selected checkout root in Bash. This uses the same Git-based discovery as `scripts/check.sh`: tracked and non-ignored untracked Nix files, excluding empty placeholders.
-
-```bash
-# Format Nix files (nixfmt is in shared packages)
-bash -euo pipefail <<'BASH'
-git ls-files --cached --others --exclude-standard -z -- '*.nix' |
-  while IFS= read -r -d '' file; do
-    if [[ -s "$file" ]]; then
-      nixfmt "./$file"
-    fi
-  done
-BASH
-```
-
 ## OMP
 
 Install OMP separately and launch from the selected checkout or worktree root:
@@ -132,7 +78,7 @@ omp --cwd .
 
 - `.omp/config.yml` enables YOLO mode (no tool approval prompts) for this project; approval policies are not a sandbox.
 - `.omp/lsp.json` uses `nil` and `nixfmt` without automatic formatting.
-- `/nix-check [files...]` provides focused, read-only formatting and syntax checks; it does not replace the full validation required above.
+- `/nix-check [files...]` follows the [scoped Nix validation guidance](nix/CLAUDE.md#validation).
 
 ### Cua Driver MCP
 

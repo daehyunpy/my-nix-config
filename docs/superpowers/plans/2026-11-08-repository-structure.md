@@ -103,7 +103,7 @@ nix eval --no-update-lock-file --raw "./nix/darwin#darwinConfigurations.$host.sy
 - [x] Update CI's OpenTofu pin and `-chdir` paths to `infra/tailscale/`. Keep it credential-free with backend-disabled initialization and no plan/apply steps.
 - [x] Update README identity to `system-config`, explain the unchanged `~/.config/nix` checkout and separately pending remote rename, and document the new ownership boundaries and entry points. Describe existing infrastructure as implemented and deployment automation as planned.
 - [x] Update root policy's project map, Nix paths, live-dotfile paths, infrastructure guide links, and machine-specific-module convention without changing authorization rules or unrelated agent setup. Keep the existing scoped infrastructure workflow guide and root policy roles distinct.
-- [x] Keep INFRA-4 open until separately authorized operational criteria are satisfied. Add current implementation/cutover status rather than claiming a remote rename or host activation.
+- [x] Retire delivered backlog entries INFRA-1 and INFRA-4 as requested; preserve remote rename, state handoff, Linux-build, hosted-CI, and host-cutover gates in the specification without claiming those operations completed.
 - [x] Historical specs/plans retain their evidence. Add a brief supersession note to the active Tailscale design/plan if they still provide conflicting operational paths; do not rewrite historical observations or deferred behavior.
 
 ## Task 5: Integrate, review, and prove behavior
@@ -146,3 +146,10 @@ The new GitHub module follows the existing directory rename into `infra/github/`
 The full local Nix suite and credential-free GitHub Terraform formatting, backend-disabled initialization, and validation passed after restoration. Unaffected migration files matched the temporary stash exactly, and all six current local state/backup files remained unchanged. No commit, push, activation, or authenticated infrastructure operation was performed.
 
 A later rebase onto `c8860fb` retains the upstream split shared/provider-specific guides at their relocated paths. Current verification is recorded in the [specification evidence](../specs/2026-11-08-repository-structure-design.md#implementation-evidence).
+
+## Requested documentation ownership and backlog closure
+
+- [x] Move Nix-specific conventions, package policy, dotfile installation, validation, activation references, and formatting from root `CLAUDE.md` into `nix/CLAUDE.md`.
+- [x] Preserve root authorization, PR/merge, worktree-cleanup, and tool-compatibility policy unchanged; link the scoped guide from the root, README, and focused Nix command.
+- [x] Review current ticket criteria and merged work; remove delivered INFRA-1 and INFRA-4 without renumbering unfinished INFRA-2, INFRA-3, INFRA-5, INFRA-6, or INFRA-7.
+- [x] Replace the retired backlog-anchor link with this specification's durable ticket record, and keep separately authorized operational gates visible.

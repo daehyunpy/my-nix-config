@@ -1,7 +1,7 @@
 # INFRA-4 — Repository identity and responsibility-first structure
 
-**Status:** Approved; repository implementation applied in the worktree, operational gates pending.
-**Ticket:** [INFRA-4](../../../BACKLOG.md#infra-4--rename-and-restructure-the-repository)
+**Status:** Source-layout delivery complete; separately authorized operational gates remain pending.
+**Ticket:** INFRA-4 (delivery record retained in this specification and Git history).
 **Selected direction:** Responsibility-first layout; repository name `system-config`.
 
 ## Problem
@@ -47,6 +47,7 @@ system-config/
 ├── CLAUDE.md
 ├── BACKLOG.md
 ├── nix/
+│   ├── CLAUDE.md                  # Nix conventions and operational workflows
 │   ├── home/
 │   │   ├── default.nix
 │   │   ├── packages.nix
@@ -110,6 +111,7 @@ Existing root support files, including `.gitignore`, `.env.example`, and `.envrc
 - `hosts/*.nix` are ordinary modules, not additional flakes. They own machine identity and exceptions. Apollo and Thales retain their existing identity and settings; Thales retains its additional applications. Charon retains its home directory and Git identity override.
 - Preserve each platform's existing stable and unstable package inputs and overlay behavior. Preserve `home.stateVersion`, `system.stateVersion`, application-link handling, garbage-collection settings, login shells, and unrestricted passwordless sudo.
 - Preserve the Homebrew-versus-Nix package policy. Existing empty platform `packages.nix` lists and their imports are removed rather than moved; nonempty platform lists present at migration time remain platform-owned.
+- `nix/CLAUDE.md` owns Nix-specific configuration conventions, package policy, validation, activation references, formatting, and dotfile installation guidance. Commands run from the repository/worktree root; the guide links to, and does not duplicate or override, the root authorization boundary.
 
 ### Dotfiles
 
@@ -117,7 +119,7 @@ Move the existing `home-files/` payloads to `dotfiles/` without changing their c
 
 Copied sources reference `../../dotfiles/...` from `nix/home/default.nix`. Existing out-of-store links target the corresponding files beneath `${home.homeDirectory}/.config/nix/dotfiles/...`. Their destination paths in the user's home directory remain unchanged.
 
-Shared agent resources remain in root `.claude/`, OMP integration remains in root `.omp/`, and all repository agent policy remains in the single root `CLAUDE.md`. Installed user configuration under `dotfiles/omp/` has a different role and is not merged into root `.omp/`.
+Shared agent resources remain in root `.claude/`, and OMP integration remains in root `.omp/`. Repository-wide policy and authorization remain in the single root `CLAUDE.md`; Nix-specific conventions and workflows live in `nix/CLAUDE.md`, with infrastructure workflows in the existing scoped guides. Installed user configuration under `dotfiles/omp/` has a different role and is not merged into root `.omp/`.
 
 ### External infrastructure and deployment
 
@@ -189,7 +191,7 @@ Before moving the live checkout to the new layout, inventory the affected manage
 
 After authorized activation, verify that the managed destinations resolve to `dotfiles/` and their contents remain usable. If activation cannot proceed or fails, restore the previous layout and preserved local payloads before resuming normal use. Any configuration rollback also requires explicit authorization. No permanent old-path compatibility links remain after success.
 
-Renaming the remote repository and changing remotes are separately authorized publication operations. Implementation can finish local restructuring without claiming that the remote has been renamed. INFRA-4 remains incomplete until the authorized rename and all applicable cutover checks have actually occurred.
+Renaming the remote repository and changing remotes are separately authorized publication operations. The delivered source-layout ticket is retired from the active backlog; that retirement does not claim the remote rename, operator-state handoff, or host cutover has occurred. Those operational gates remain recorded below.
 
 ## Verification and acceptance criteria
 
@@ -230,6 +232,7 @@ Writing this specification or merging the structural changes does not satisfy th
 - After that rebase, the full local Nix validation and credential-free GitHub Terraform formatting, backend-disabled initialization, and validation passed. The staged migration was restored without losing unaffected files, and all six current local state/backup files were unchanged.
 - Rebased again onto `origin/main` at `c8860fb`, preserving its reviewed-saved-plan workflow and split shared/provider-specific guides. The new Tailscale guide follows the directory rename into `infra/tailscale/`; command paths and links use `infra/`, and the common source-layout state-handoff gate remains enforced. All 48 unaffected migration paths matched the temporary stash exactly, all six local state/backup files were unchanged, and the full local Nix suite and integrity checks for 11 Markdown files passed.
 - The pre-PR review found that crash-log exclusions were still anchored only to `terraform/`. Added matching `infra/` exclusions while retaining the original protections for operator locations awaiting handoff; all eight old/new-root crash-log cases are ignored, and production Terraform sources remain trackable. A fresh comparison against immutable `origin/main` matched all three selected evaluated inventories, 19 relocated payload/provider files, and both Nix lockfiles exactly. Credential-free checks passed for both infrastructure modules.
+- At the user's request, moved Nix-specific conventions, package policy, validation, activation references, formatting, and dotfile installation guidance into `nix/CLAUDE.md`. The root guide retains unchanged repository-wide authorization, PR/merge, worktree-cleanup, and tool-compatibility rules. Retired delivered backlog entries INFRA-1 and INFRA-4 while retaining unfinished work and the operational gates in this specification.
 
 **Unverified gates:** The Linux activation build was attempted but failed because it requires `x86_64-linux`; this `aarch64-darwin` host has no remote builder configured. Hosted CI has not run for the unpushed implementation. Remote repository rename, operator-state handoff, live-link cutover, and host activation were not performed.
 

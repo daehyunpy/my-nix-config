@@ -2,7 +2,7 @@
 description: Check Nix formatting and syntax without activating a configuration
 argument-hint: "[Nix file paths or validation scope]"
 ---
-Validate this repository's Nix configuration. Requested scope: $ARGUMENTS
+Follow the [Nix workflow guide](../../nix/CLAUDE.md) and validate this repository's Nix configuration. Requested scope: $ARGUMENTS
 
 - Use the requested scope; otherwise check Nix files changed in the current task. If there are no task changes, discover and check all non-empty `.nix` files.
 - Run `nixfmt --check` and `nix-instantiate --parse` for each selected file. These are checks: do not rewrite files. Parsing checks syntax only, not module options or package availability.
