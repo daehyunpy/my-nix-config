@@ -3,18 +3,6 @@
 IDs are stable: do not renumber entries when reordering them.
 Remove completed items from this document; use Git history and linked pull requests for completion records. Never reuse their IDs.
 
-## INFRA-1 — Clarify documentation responsibilities
-
-**Status:** Backlog
-**Outcome:** Human documentation and agent instructions have distinct responsibilities and accurately describe the current repository.
-
-**Done when:**
-- `README.md` covers project purpose, current capabilities, prerequisites, setup, operation, and maintenance for humans.
-- `CLAUDE.md` covers repository conventions, constraints, authorization boundaries, and verification requirements for agents.
-- Planned work stays in `BACKLOG.md`; planned CI/CD, infrastructure, and restructuring are not described as implemented.
-- Documented paths, machine names, configuration outputs, and commands match the current checkout; stale details are removed.
-- Each piece of guidance lives in its owning document, with cross-references instead of duplicated or conflicting instructions.
-
 ## INFRA-2 — Automate Tailscale deployments
 
 **Status:** Backlog
@@ -36,18 +24,6 @@ Remove completed items from this document; use Git history and linked pull reque
 - Secure remote access and a protected workflow support activation of reviewed configurations.
 - Server health and connectivity are verified after activation, with a recovery path if deployment fails.
 - `README.md` documents supported servers, deployment, and rollback.
-
-## INFRA-4 — Rename and restructure the repository
-
-**Status:** Backlog
-**Outcome:** The repository reflects its purpose: manage my machines, development environments, and network infrastructure declaratively, with reproducible configuration and controlled deployment.
-
-**Done when:**
-- The project purpose treats Nix as one implementation tool, not the entire repository; it includes dotfiles, cross-platform machine configuration, Tailscale infrastructure managed through OpenTofu, and planned CI/CD for infrastructure and always-on servers.
-- The repository name covers machine configuration, dotfiles, infrastructure, and deployment automation.
-- Directory boundaries separate those responsibilities while preserving shared and platform-specific configuration.
-- Repository and checkout references, relative paths, workflows, and documentation are updated as part of the migration.
-- Configuration evaluation and deployment paths are verified after restructuring.
 
 ## INFRA-5 — Manage Tailscale clients and services through Nix
 
@@ -88,4 +64,4 @@ Remove completed items from this document; use Git history and linked pull reque
 - Evaluate every declared `homeConfigurations` activation package and `darwinConfigurations` system, and fail when a configuration set is empty or any evaluation fails.
 - Preserve existing formatting, file-discovery error handling, platform selectors, and credential-free Terraform validation.
 - Verify coverage with an additional temporary configuration and verify that empty sets and failed evaluations return nonzero.
-- Document the discovery convention in the root `CLAUDE.md` and update human-facing validation guidance as needed. Do not port `.github/workflows/CLAUDE.md`; repository agent policy stays in the single root file.
+- Document the discovery convention in `nix/CLAUDE.md` and update human-facing validation guidance as needed. Do not port `.github/workflows/CLAUDE.md`; repository-wide agent policy stays in the single root file.

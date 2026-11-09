@@ -30,3 +30,5 @@ override.tf.json
 *_override.tf.json
 /terraform/**/crash.log
 /terraform/**/crash.*.log
+/infra/**/crash.log
+/infra/**/crash.*.log

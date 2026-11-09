@@ -1,7 +1,4 @@
-{ pkgs, ... }:
 {
-  home.packages = import ./packages.nix pkgs;
-
   # Preserve the current app handling independently of home.stateVersion.
   targets.darwin.copyApps.enable = true;
   targets.darwin.linkApps.enable = false;

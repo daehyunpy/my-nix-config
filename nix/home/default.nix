@@ -25,13 +25,13 @@ in
       EDITOR = "${pkgs.helix}/bin/hx";
     };
     file = {
-      ".config/conda".source = ./home-files/conda;
-      ".config/tmux".source = ./home-files/tmux;
-      ".config/wezterm".source = ./home-files/wezterm;
-      ".config/zed".source = makeOutOfStore "${homePathString}/.config/nix/home-files/zed";
+      ".config/conda".source = ../../dotfiles/conda;
+      ".config/tmux".source = ../../dotfiles/tmux;
+      ".config/wezterm".source = ../../dotfiles/wezterm;
+      ".config/zed".source = makeOutOfStore "${homePathString}/.config/nix/dotfiles/zed";
       ".omp/agent/models.yml".source =
-        makeOutOfStore "${homePathString}/.config/nix/home-files/omp/models.yml";
-      ".ssh/config".source = makeOutOfStore "${homePathString}/.config/nix/home-files/ssh/config";
+        makeOutOfStore "${homePathString}/.config/nix/dotfiles/omp/models.yml";
+      ".ssh/config".source = makeOutOfStore "${homePathString}/.config/nix/dotfiles/ssh/config";
     };
   };
 

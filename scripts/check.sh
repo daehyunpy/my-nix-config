@@ -21,7 +21,7 @@ cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
 if [[ "$scope" == all ]]; then
   printf '\n==> Checking validation error handling\n'
-  bash tests/check.sh
+  bash scripts/check-test.sh
 fi
 
 if [[ "$scope" == all || "$scope" == format ]]; then
@@ -37,21 +37,21 @@ if [[ "$scope" == all || "$scope" == format ]]; then
     fi
   done < "$file_list"
   if [[ ${#files[@]} -gt 0 ]]; then
-    nix shell --no-update-lock-file --inputs-from ./linux nixpkgs#nixfmt \
+    nix shell --no-update-lock-file --inputs-from ./nix/linux nixpkgs#nixfmt \
       --command nixfmt --check "${files[@]}"
   fi
 fi
 
 if [[ "$scope" == all || "$scope" == linux ]]; then
   printf '\n==> Evaluating Linux: daehyun@charon\n'
-  nix eval --no-update-lock-file --raw './linux#homeConfigurations."daehyun@charon".activationPackage.drvPath'
+  nix eval --no-update-lock-file --raw './nix/linux#homeConfigurations."daehyun@charon".activationPackage.drvPath'
   printf '\n'
 fi
 
 if [[ "$scope" == all || "$scope" == darwin ]]; then
   for host in apollo thales; do
     printf '\n==> Evaluating Darwin: %s\n' "$host"
-    nix eval --no-update-lock-file --raw "./darwin#darwinConfigurations.$host.system.drvPath"
+    nix eval --no-update-lock-file --raw "./nix/darwin#darwinConfigurations.$host.system.drvPath"
     printf '\n'
   done
 fi

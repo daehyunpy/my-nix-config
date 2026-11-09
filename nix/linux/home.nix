@@ -1,7 +1,5 @@
-{ pkgs, config, ... }:
+{ config, ... }:
 {
-  home.packages = import ./packages.nix pkgs;
-
   nix.gc = {
     automatic = true;
     dates = "weekly";

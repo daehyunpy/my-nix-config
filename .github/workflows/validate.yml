@@ -22,14 +22,14 @@ jobs:
           persist-credentials: false
       - uses: opentofu/setup-opentofu@v1
         with:
-          tofu_version_file: terraform/tailscale/.opentofu-version
+          tofu_version_file: infra/tailscale/.opentofu-version
           tofu_wrapper: false
       - name: Check Terraform formatting
-        run: tofu -chdir=terraform/tailscale fmt -check
+        run: tofu -chdir=infra/tailscale fmt -check
       - name: Initialize locked provider without a backend
-        run: tofu -chdir=terraform/tailscale init -backend=false -input=false -lockfile=readonly
+        run: tofu -chdir=infra/tailscale init -backend=false -input=false -lockfile=readonly
       - name: Validate Terraform configuration
-        run: tofu -chdir=terraform/tailscale validate
+        run: tofu -chdir=infra/tailscale validate
 
   linux:
     name: Formatting and Linux evaluation
@@ -42,7 +42,7 @@ jobs:
         with:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
       - name: Check validation error handling
-        run: bash tests/check.sh
+        run: bash scripts/check-test.sh
       - name: Check formatting
         run: bash scripts/check.sh format
       - name: Evaluate Linux configuration
