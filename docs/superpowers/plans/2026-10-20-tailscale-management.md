@@ -22,7 +22,7 @@ Before this boundary, eleven resources were imported and the earlier merged poli
 - [x] Move the whole existing `infra/tailscale/` directory, including ignored state/backups/cache, to `terraform/tailscale/`. Do not initialize a second empty adoption state.
 - [x] Leave existing Nix CI and host configuration unchanged; do not introduce dependencies on stashed NixOS/Fedora outputs.
 - [x] Add credential-free OpenTofu CI checks using the version file and locked provider.
-- [x] Document the simplified policy, eight-resource ownership, safe commands, and state recovery; agent operational guidance now lives in `terraform/CLAUDE.md`.
+- [x] Document the simplified policy, eight-resource ownership, safe commands, and state recovery; shared agent workflow lives in `terraform/CLAUDE.md`, with Tailscale commands and provider details in `terraform/tailscale/CLAUDE.md`.
 
 ## Task 2: Current tailnet declarations
 
@@ -67,7 +67,7 @@ Observed: formatting, locked initialization, and provider validation passed. Rea
 
 On 2026-11-08, the user-authorized saved plan applied successfully: zero added, one changed, zero destroyed. Authoritative post-apply API reads confirmed the source policy and unchanged DNS, routes, IDs/IPs, tags, ownership, and expiry. The final plan exited 0 with no changes. Pre/post state, API snapshots, and verification are private under `~/.config/tailscale-iac/backups/2026-11-08/apply-130634/`. No host activation or secondary DNS change occurred; actual SSH traffic and daemon startup were not exercised. The DNS resource remains provider-marked alpha.
 
-This PR adds only Terraform validation to CI and retains the Nix validation inherited from main. Additional generic CI refactoring, CI-specific agent guides, and worktree-policy changes are excluded. The user-requested Terraform workflow guide lives in `terraform/CLAUDE.md`; Nix Tailscale implementation stays stashed.
+This PR adds only Terraform validation to CI and retains the Nix validation inherited from main. Additional generic CI refactoring, CI-specific agent guides, and worktree-policy changes are excluded. The shared Terraform workflow guide lives in `terraform/CLAUDE.md`, with Tailscale commands and provider details in `terraform/tailscale/CLAUDE.md`; Nix Tailscale implementation stays stashed.
 
 ## Task 5: Secondary DNS extension — applied, superseded by Task 11
 
@@ -109,7 +109,7 @@ The previously implemented helper is deferred by the latest BTW decision: use na
 
 ## Task 10: Native workflow and agent guidance
 
-- [x] Put reviewed-plan approval, commands, and post-apply API/state/zero-drift verification in `terraform/CLAUDE.md`. Root `CLAUDE.md` retains global policy and links the scoped guide; README remains human-facing.
+- [x] Put shared reviewed-plan approval and post-apply state/zero-drift verification in `terraform/CLAUDE.md`, with Tailscale commands and API checks in `terraform/tailscale/CLAUDE.md`. Root `CLAUDE.md` retains global policy and links the scoped guides; README remains human-facing.
 - [x] Replace helper instructions with native plan/show/apply commands, private saved plans, and an explicit warning that saved-plan apply skips confirmation.
 - [x] Remove the custom helper, tests, CI step, and now-unused bytecode exclusion. Keep CI credential-free and preserve the Nix deferral.
 - [x] Smoke-test native formatting, locked initialization, validation, plan saving, and show without applying. Confirm the DNS-only plan and unchanged authoritative state; remove temporary plan artifacts.

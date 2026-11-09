@@ -1,182 +1,50 @@
 # Terraform Workflow
 
-Each configuration directory under `terraform/` is an independent Terraform-compatible root module; `terraform/` itself is not one. Tailscale uses pinned OpenTofu; GitHub uses Terraform under its module guide. Use each module's committed provider lock and existing authoritative state.
+Each configuration directory under `terraform/` is an independent Terraform-compatible root module; `terraform/` itself is not one. Keep infrastructure policy and inventory authoritative in configuration. Follow the [repository authorization boundary](../CLAUDE.md#yolo-boundary); this guide defines workflow, not permission to change remote resources.
 
-Run Tailscale commands from the repository root and GitHub commands from `terraform/github/`, in the checkout holding that module's state. Follow the [repository authorization boundary](../CLAUDE.md#yolo-boundary); instructions and successful checks do not authorize remote changes.
+| Module guide | CLI | Command working directory |
+| --- | --- | --- |
+| [Tailscale](tailscale/CLAUDE.md) | OpenTofu pinned by `tailscale/.opentofu-version` | Repository root; use `tofu -chdir=terraform/tailscale` |
+| [GitHub](github/CLAUDE.md) | Terraform compatible with `github/main.tf` | `terraform/github/` |
 
-## Tailscale tailnet management
+Read the module guide for authentication, commands, backend details, import identities, and provider-specific verification. Use the checkout holding that module's authoritative state for plans and state-changing operations, not a fresh worktree with an empty state.
 
-`terraform/tailscale/` owns the complete tailnet policy, DNS, device key-expiry settings, and approved subnet/exit routes. It does not manage tags, install clients, or change daemon preferences. Shared Home Manager tooling and generic Nix-managed services remain a deferred phase in the [design spec](../docs/superpowers/specs/2026-10-18-tailscale-management-design.md); their implementation is stashed. Existing Home Manager names and services remain unchanged.
+## Checks and reviewed plans
 
-**The initial policy cleanup is complete.** It changed only policy formatting/unused fields. Further applications require their own reviewed plan and explicit authorization. Use the pinned OpenTofu version in `.opentofu-version` and the committed provider dependency lock:
+1. Use the module's CLI version and committed `.terraform.lock.hcl`. Run formatting and schema validation with `init -backend=false -input=false -lockfile=readonly` where documented. Do not update provider locks as a side effect of validation.
+2. Locate the authoritative backend and workspace before an authenticated plan. Initialize with the committed lock and load credentials only at runtime, as described in the module guide.
+3. Create a saved plan in a private temporary directory (`umask 077`, `mktemp -d`) and inspect that exact artifact with `show`. Saved plans contain sensitive data; never commit, publish, or share the raw file. A temporary plan is not a recovery backup.
+4. Present proposed actions and risks, then stop for explicit approval of that exact saved plan. A setting-change request or successful plan is not approval of an unseen plan. Never combine planning and applying in the same unattended tool call.
+5. After approval and a validated private state backup, apply the reviewed saved-plan file in a separate operation with locking enabled. Passing a saved plan skips the CLI confirmation prompt; bare `apply` instead generates a new plan and is not the reviewed-artifact workflow.
 
-```sh
-tofu -chdir=terraform/tailscale fmt -check
-tofu -chdir=terraform/tailscale init -backend=false -input=false -lockfile=readonly
-tofu -chdir=terraform/tailscale validate
-```
+Plan exit codes with `-detailed-exitcode`: `0` means no changes, `2` means proposed changes, and `1` means failure. Do not treat exit `2` as a failed plan or ignore exit `1`.
 
-These checks need no tailnet credentials. CI runs them without plan, apply, or secrets.
+Saved plans retain their original inputs. Replan and obtain fresh approval after changes to source, policy, CLI/provider pins, variable inputs, or observed drift. Never disable state locking. `prevent_destroy` does not prevent in-place changes or replace plan review.
 
-### Credentials and default local state
-
-Start with OpenTofu's default local backend: no explicit backend declaration or custom location. With `-chdir=terraform/tailscale`, the authoritative file is `terraform/tailscale/terraform.tfstate` in the active operator checkout.
-
-Use one operator and one authoritative state file. Branches and worktrees do not isolate the live tailnet; do not keep independently active state copies for the same resources. Back up state before moving it to another checkout, and retire the former active copy after verification.
-
-The provider pins the inventoried tailnet. Supply scoped credentials only through `TAILSCALE_OAUTH_CLIENT_ID` and `TAILSCALE_OAUTH_CLIENT_SECRET`; any `TAILSCALE_TAILNET` value must match that root. Keep operator secrets outside Git and the Nix store in a mode-0600 private file. `.env.example` contains empty names only.
-
-Initialize the local working directory, then plan with credentials loaded into the environment:
-
-```sh
-umask 077
-tofu -chdir=terraform/tailscale init -input=false -lockfile=readonly
-tofu -chdir=terraform/tailscale plan -input=false -detailed-exitcode
-```
-
-Commit `.terraform.lock.hcl`: it pins provider versions and checksums, not state access. OpenTofu locks local state automatically using OS APIs; temporary `.terraform.tfstate.lock.info` metadata is gitignored. Do not create or commit a permanent state lock file. This lock coordinates the same local state file, not independent copies in other worktrees or hosts.
-
-State, state backups, provider caches, saved plans, and secret variable files are gitignored. Backend selection is deferred to `BACKLOG.md` (INFRA-6) with all options open. No backend protocol, product, host, or custom state location is selected.
-
-Exit 0 means no changes, 2 means proposed changes, and 1 means failure. Review each fresh plan before any separately authorized application. Eight existing resources are adopted. On 2026-11-08, the reviewed policy cleanup was applied with no SSH/Funnel behavior change; the post-apply plan exited 0 with no changes. DNS, route approvals, expiry, ownership, IDs, and addresses were verified unchanged. Thales's current device record and approved `192.168.2.0/24` subnet supersede its historical ID and `192.168.68.0/24` route.
-
-The Cloudflare-only follow-up was reviewed, explicitly authorized, and applied on 2026-11-08. Live global DNS now contains only `1.1.1.1`; independent API/state checks and a fresh authenticated plan confirmed zero drift. Google was removed, with all other managed settings and host/client configuration preserved.
-
-The earlier Muse-tag proposal is superseded by the simpler user-selected policy. Local adoption state was backed up privately, obsolete tag bindings were forgotten without deleting remote resources, and Thales's key/route settings were imported against its current node ID. An operator with older state must reconcile those bindings after a fresh inventory and private backup; do not apply tag-destruction or missing-node creation plans to repair bookkeeping.
-
-### Manual OpenTofu workflow
-
-Use the native OpenTofu CLI; custom Python helpers and their tests are deferred. After the credential-free checks and default-local initialization above, with scoped credentials in the environment, create and inspect a private saved plan:
-
-```sh
-umask 077
-plan_dir="$(mktemp -d)"
-tofu -chdir=terraform/tailscale plan -input=false -lock=true -out="$plan_dir/tailscale.tfplan"
-tofu -chdir=terraform/tailscale show -no-color "$plan_dir/tailscale.tfplan"
-```
-
-Saved plans contain sensitive data. Keep this temporary directory private and never commit or share its contents; it is not a durable recovery backup. The state file remains in the module's default local location.
-
-Present the saved plan's proposed actions and risks to the user, then stop for explicit approval of that reviewed plan. A request to change a setting or a successful plan is not approval to apply an unseen plan. Never combine planning and applying in the same unattended tool call.
-
-**Applying a saved plan skips OpenTofu's confirmation prompt.** Only after approval of this exact plan and a private off-checkout state backup, run the following as a separate operation:
-
-```sh
-tofu -chdir=terraform/tailscale apply -input=false -lock=true "$plan_dir/tailscale.tfplan"
-```
-
-Saved plans retain their original inputs; they do not follow later source edits. Replan and obtain fresh approval after changing source, policy, provider/CLI pins, variable inputs, or observing drift. OpenTofu checks for stale state and locks the authoritative state file; do not disable locking. Follow the backup procedure below before and after every attempted apply, including failures that may have partially changed resources, and remove private plan artifacts after use.
-
-`prevent_destroy` does not stop in-place updates. CI runs credential-free formatting and schema validation, not authenticated policy validation, apply, or host-behavior checks. Tailscale SSH enablement, route advertisements, exit-node activation, and Nix client/service management remain deferred. Every further resolver change requires approval of its reviewed saved plan.
-
-### Verify an authorized apply
+## Verify an authorized apply
 
 An apply success message alone is not completion:
 
-1. Query the Tailscale API or CLI and compare the effective remote settings with the approved changes, including policy, DNS, route approvals, expiry, and identities that must remain unchanged.
-2. Inspect refreshed OpenTofu state to confirm the intended resource bindings and managed values without printing secrets.
-3. Run a fresh authenticated plan with refresh enabled:
+1. Query the service's API or CLI and compare effective settings and preserved identities with the approved changes, using the module-specific criteria.
+2. Inspect refreshed state for the intended resource bindings and managed values without printing secrets.
+3. Run a fresh authenticated plan with refresh enabled and `-detailed-exitcode`; require exit `0` and no drift.
 
-   ```sh
-   tofu -chdir=terraform/tailscale plan -refresh=true -input=false -detailed-exitcode
-   ```
+A mismatch or verification error means the operation is incomplete. Report expected versus observed state; any corrective apply needs a newly reviewed and approved plan. Remove private saved-plan artifacts after use, retaining recovery backups.
 
-Require exit 0 with no drift after applying the approved changes. A mismatch or verification error means the operation is incomplete: report expected versus observed settings and obtain approval of a new reviewed plan before any corrective apply. This is a post-apply gate, not permission to apply a newly requested configuration change without review.
+## State and recovery
 
-### Backups and recovery
+- Keep one operator and one authoritative state per module. Worktrees and branches do not isolate live resources; local locks coordinate the same state file, not independent copies or machines. Do not select or migrate a shared backend implicitly.
+- Keep credentials, state, state backups, provider caches, saved plans, and secret variable files out of Git and the Nix store. The provider lock is tracked; it pins dependencies, not state access.
+- Before and after each state-changing operation, including imports, ownership removal, and attempted applies that may partially fail, save and validate a private versioned backup outside the checkout. For a deliberately fresh adoption with no prior state, establish ownership and verify inventory before importing; back up the resulting state before the next mutation.
+- Require successful state retrieval and valid JSON with lineage, serial, and resources before treating a file as a backup. Keep earlier backups. Recover lost state from a verified backup into the intended backend/workspace before reviewing a fresh plan; recovery and ordinary operations must not run concurrently.
+- An object missing from state is not proof it should be created. Locate existing authoritative state first, then use the module's adoption procedure if a fresh adoption is actually intended.
+- To relinquish management without changing a live object, remove both resource and import membership before forgetting its state binding. Never apply a destruction plan as a bookkeeping shortcut; check provider-specific deletion behavior in the module guide.
 
-Before and after every state-changing operation, save a versioned private backup outside the checkout:
+## Worktree state handoff
 
-```sh
-set -eu
-umask 077
-backup_dir="$HOME/.config/tailscale-iac/backups/$(date -u +%Y-%m-%d)"
-mkdir -p "$backup_dir"
-backup=$(mktemp "$backup_dir/local-$(date -u +%H%M%S).XXXXXX")
-tofu -chdir=terraform/tailscale state pull > "$backup"
-jq -e '.lineage != null and .serial != null and .resources != null' "$backup" >/dev/null
-printf 'Validated private backup: %s\n' "$backup"
-```
+Before deleting a checkout holding authoritative local state:
 
-Require successful state retrieval and valid JSON before treating the new file as a backup; keep earlier backups. If state is lost, first restore a recent private backup to the default `terraform/tailscale/terraform.tfstate` location in the intended operator checkout and review a plan with the matching source and credentials. Establish exclusive recovery ownership before any apply; do not run recovery and normal applies concurrently. Declarative imports are a recovery/adoption option after checking the current inventory, not permission to create replacement resources.
-
-No state or credentials were transferred to Thales. Its earlier tool/worktree preparation did not establish a remote backend or state service.
-
-### Worktree state handoff
-
-Before deleting a checkout that holds authoritative local state:
-
-1. Ensure no concurrent state operation is running. Privately back up the active state and its local backup files outside the worktree; do not print their contents.
-2. After merging, use the corresponding module's default state location in the retained checkout. Do not overwrite an existing destination; reconcile its lineage, serial, bindings, and ownership first if another state is present.
-3. Move the active state and local backups, preserving private permissions. Verify bytes, lineage, and resource bindings, and retire the former active copy. Provider caches are regenerable; state is not.
-4. Initialize the retained module with its committed provider lock, confirm the intended workspace, and run a read-only refreshed plan before deleting the old worktree. For this Tailscale root, require all eight bindings and zero drift. Never use apply, destroy, or `state rm` as a cleanup shortcut.
-
-### Adoption and ownership
-
-`imports.tf` declares the eight existing objects to adopt. It shares the device and router maps with the resources, so identifiers and instance membership have one source. Looped imports require OpenTofu/Terraform 1.7 or newer; use the pinned OpenTofu 1.13.1.
-
-| Managed resource | Import identity |
-| --- | --- |
-| `tailscale_acl.tailnet` | `acl` |
-| `tailscale_dns_configuration.tailnet` | `dns_configuration` |
-| `tailscale_device_key.managed` — Apollo, Muse, Thales, Poseidon | Current node IDs in `local.devices` |
-| `tailscale_device_subnet_routes.routers` — Thales, Poseidon | Current node IDs for `local.router_routes` members |
-
-A fresh state should plan eight imports, no creates/deletes, and any separately reviewed configuration updates. Existing state skips imports for addresses already tracked. Imports can stay as adoption records. Applying an import plan also applies its shown configuration updates, not just bookkeeping; obtain approval for the entire plan.
-
-### Stop managing without changing the live setting
-
-1. Back up private state and record the live value.
-2. Remove the resource instance **and its import membership/declaration** from source. Shared `for_each` entries can remove both together; retain any identity data still needed by other resources. Do not apply a destruction plan.
-3. Forget the matching state address locally after making the corresponding configuration change. For example, after removing the non-router Apollo entry from `local.devices`:
-
-   ```sh
-   tofu -chdir=terraform/tailscale state rm 'tailscale_device_key.managed["apollo"]'
-   ```
-
-4. Review a fresh plan: the released instance must not be imported, created, updated, or destroyed. Do not apply unrelated changes as part of relinquishing ownership.
-
-`state rm` alone is insufficient: leaving an import block re-adopts the object; leaving only the resource configuration proposes creation/update. Removing source alone can instead propose a destructive provider operation. Device-key deletion re-enables expiry and route-resource deletion clears approvals, so do not use `tofu destroy` to relinquish management.
-
-### Policy and preservation
-
-- Keep `acls` and `grants` omitted; an empty list would replace the existing default network access.
-- Use only Cloudflare's logical nameserver `1.1.1.1`, with `use_with_exit_node = false`. Preserve MagicDNS, local DNS override disabled, and no extra search paths. Clients still prefer local DNS because override remains disabled. Public-provider address groups expand automatically in the console; do not add Google or another provider without a newly reviewed and approved change.
-- The provider marks `tailscale_dns_configuration` as alpha. Keep the dependency lock and review provider upgrades deliberately.
-- The SSH policy accepts member-to-self access as `autogroup:nonroot` or `root`, without periodic browser checks. It applies to members' own devices, not only Muse or only `daehyun`. Comments and unused empty `tagOwners`/`sshTests` fields are omitted.
-- Validate HuJSON through Tailscale's read-only `POST /api/v2/tailnet/{tailnet}/acl/validate` endpoint. Temporary validator-only SSH tests can exercise ownership behavior without changing the source. Inspect `data[].errors` as well as HTTP status; failed tests can return HTTP 200. Do not assume the pinned provider's plan runs these tests.
-- Preserve the member Funnel capability without creating a published service, and preserve existing device ownership, identities, routes, DNS, and expiry. No credential expansion is needed for a tag transition because no transition is in scope.
-- Validation proves policy evaluation, not an actual SSH session or working daemon. Host migration and network/runtime proof remain separate from this Terraform-only phase.
-
-No host activation is part of this phase. Apollo's App Store client and encrypted state stay intact; Thales keeps its Homebrew daemon, and Poseidon keeps its Fedora 43 WSL vendor service. The [implementation plan](../docs/superpowers/plans/2026-10-20-tailscale-management.md) records current checks and deferred live gates.
-
-## GitHub Terraform workflow
-
-Read `github/CLAUDE.md` for provider authentication, backend details, and import identifiers. Run the commands below from the GitHub module directory in the active worktree, with its authentication configured.
-
-Use Terraform compatible with the module's `required_version`. Keep provider constraints and `.terraform.lock.hcl` tracked. Keep infrastructure policy in configuration rather than duplicating it in prose.
-
-### Checks and plans
-
-```sh
-terraform init
-terraform fmt -check
-terraform validate
-terraform plan -detailed-exitcode
-```
-
-Plan exit codes: `0` means no changes, `2` means proposed changes, and `1` means an error. Generate and review the plan, present the proposed actions and risks to the user, then stop for explicit approval of that reviewed plan before applying. A request to change a setting or a successful plan is not approval to apply an unseen plan. Never combine planning and applying in the same unattended tool call. Follow the root repository's authorization boundary for remote changes.
-
-After an authorized apply, verify the desired state before reporting completion:
-
-- Query the service's API or CLI and compare the effective remote settings with the approved changes, including protections that must remain unchanged.
-- Inspect refreshed Terraform state to confirm the intended resource identities and managed values, without printing secrets.
-- Run a fresh plan with refresh enabled and `-detailed-exitcode`; require exit `0` for no drift.
-
-An apply success message alone is not proof. Treat mismatches or verification errors as incomplete work; report expected versus observed state and do not apply corrective changes without approval of a new plan.
-
-### State
-
-Inspect the backend before planning or applying. Local state is not shared between worktrees or machines. If an existing resource is absent from state, import it using the module guide rather than creating a duplicate.
-
-Keep credentials, state, backups, provider caches, and saved plans out of Git. Never print credentials. Local state has no cross-machine locking; use one checkout/operator, or configure a shared backend before collaborative automation.
+1. Ensure no concurrent state operation is running. Privately back up the active state and its local backups outside the worktree; do not print their contents.
+2. After merging, select the module's default state location in the retained checkout. Do not overwrite an existing destination; reconcile lineage, serial, bindings, workspace, and ownership first.
+3. Move the active state and local backups with private permissions. Verify bytes and resource bindings before retiring the former active copy. Provider caches are regenerable; state is not.
+4. Initialize the retained module with its committed lock, confirm the intended workspace, and require all module-specific bindings plus a zero-drift refreshed plan before deleting the old worktree. Never use apply, destroy, or `state rm` as a cleanup shortcut.

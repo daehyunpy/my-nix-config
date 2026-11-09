@@ -66,6 +66,20 @@ Keep reusable plugins and agent resources in `.claude/` so compatible tools can 
 - Preserve unrelated work, staged changes, and existing conflicts. Commit only when requested; require explicit authorization for pushing, publishing, destructive Git operations, or deleting unrelated data.
 - Never print, commit, or transmit secrets from `.env`, credentials, or private keys. Existing passwordless sudo is not authorization to use it.
 
+## Pull Requests and Merging
+
+- Integrate task branches through a GitHub PR targeting `main`, using squash merge. A request to "merge" means merge the PR, not merge a task branch into local `main`. If no PR exists, follow the [authorization boundary](#yolo-boundary) before committing or publishing the branch and creating one.
+- Before merging, inspect the current PR head, CI results, and review findings. Resolve failures and material findings; merge only the reviewed head.
+- Keep task commits off local `main` until the PR is merged remotely. After verifying the remote merge, run the following from the clean main checkout, which must already be on `main`:
+
+  ```sh
+  git fetch origin main
+  git merge --ff-only origin/main
+  ```
+
+- Do not use plain `git pull` for synchronization: the shared Git configuration enables rebasing. If fast-forwarding fails, preserve local-only commits and working changes, report the divergence, and obtain authorization before rewriting history.
+- Merging does not authorize branch or worktree cleanup; follow the separate procedure below only when requested.
+
 ## Branch and Worktree Cleanup
 
 - Clean up only when requested. Before post-merge cleanup, verify the PR is actually `MERGED` into its target branch and record its merge commit and published head. A pushed branch or clean status is not proof of merging.
