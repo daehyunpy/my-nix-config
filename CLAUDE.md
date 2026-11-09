@@ -15,12 +15,12 @@ Declarative system and user environment configuration for macOS, Linux, and WSL 
   - `home.nix` — Linux-specific home-manager overrides
 - `nixos/` — NixOS configuration (empty, reserved for future use)
 - `kubernetes/` — Kubernetes manifests (empty, reserved for future use)
-- `openspec/` — Spec documents and change tracking (scaffolded: `specs/`, `changes/`)
+- `docs/superpowers/` — Design specs and implementation plans
 - `terraform/` — Terraform configurations; see `terraform/CLAUDE.md` for the shared workflow and module-local guides for provider details.
 - `home.nix` — Shared home-manager config (cross-platform)
 - `packages.nix` — Shared nix packages (cross-platform)
 - `home-files/` — Dotfiles symlinked into `$HOME` via `home.file`
-  - `claude`, `cursor`, `cursor-user`, `zed` — Editor/tool configs (symlinked live via `mkOutOfStoreSymlink`)
+  - `omp/models.yml`, `zed` — Agent/editor configs (symlinked live via `mkOutOfStoreSymlink`)
   - `conda`, `tmux`, `wezterm` — Shell/terminal configs (copied via `.source`)
   - `ssh` — SSH config (symlinked live via `mkOutOfStoreSymlink`)
 
@@ -104,9 +104,18 @@ home-manager switch --flake linux/
 
 ## Formatting
 
+Run from the selected checkout root in Bash. This uses the same Git-based discovery as `scripts/check.sh`: tracked and non-ignored untracked Nix files, excluding empty placeholders.
+
 ```bash
-# Format all Nix files (nixfmt is in shared packages)
-nixfmt **/*.nix
+# Format Nix files (nixfmt is in shared packages)
+bash -euo pipefail <<'BASH'
+git ls-files --cached --others --exclude-standard -z -- '*.nix' |
+  while IFS= read -r -d '' file; do
+    if [[ -s "$file" ]]; then
+      nixfmt "./$file"
+    fi
+  done
+BASH
 ```
 
 ## OMP
