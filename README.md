@@ -65,7 +65,7 @@ Start a new login session after activation; reconnect remote editors to reload t
 
 Host-side Tailscale installation and Nix-managed services remain deferred. Live DNS is Cloudflare-only, matching the declared configuration and verified deployment.
 
-Agent workflow, credentials, state, adoption, recovery, and verification guidance live in [terraform/CLAUDE.md](terraform/CLAUDE.md).
+Tailscale commands, credentials, adoption, and provider-specific verification live in the [module guide](terraform/tailscale/CLAUDE.md). Common planning, approval, state, and recovery rules live in the [shared Terraform workflow](terraform/CLAUDE.md).
 
 ## Maintenance
 
