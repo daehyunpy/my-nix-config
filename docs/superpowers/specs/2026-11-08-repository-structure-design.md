@@ -1,7 +1,7 @@
 # INFRA-4 — Repository identity and responsibility-first structure
 
 **Status:** Source-layout delivery complete; separately authorized operational gates remain pending.
-**Ticket:** INFRA-4 (delivery record retained in this specification and Git history).
+**Ticket:** INFRA-4 (delivery record: [PR #9](https://github.com/daehyunpy/my-nix-config/pull/9), this specification, and Git history).
 **Selected direction:** Responsibility-first layout; repository name `system-config`.
 
 ## Problem
@@ -234,7 +234,7 @@ Writing this specification or merging the structural changes does not satisfy th
 - The pre-PR review found that crash-log exclusions were still anchored only to `terraform/`. Added matching `infra/` exclusions while retaining the original protections for operator locations awaiting handoff; all eight old/new-root crash-log cases are ignored, and production Terraform sources remain trackable. A fresh comparison against immutable `origin/main` matched all three selected evaluated inventories, 19 relocated payload/provider files, and both Nix lockfiles exactly. Credential-free checks passed for both infrastructure modules.
 - At the user's request, moved Nix-specific conventions, package policy, validation, activation references, formatting, and dotfile installation guidance into `nix/CLAUDE.md`. The root guide retains unchanged repository-wide authorization, PR/merge, worktree-cleanup, and tool-compatibility rules. Retired delivered backlog entries INFRA-1 and INFRA-4 while retaining unfinished work and the operational gates in this specification.
 
-**Unverified gates:** The Linux activation build was attempted but failed because it requires `x86_64-linux`; this `aarch64-darwin` host has no remote builder configured. Hosted CI has not run for the unpushed implementation. Remote repository rename, operator-state handoff, live-link cutover, and host activation were not performed.
+**Unverified gates:** The Linux activation build was attempted but failed because it requires `x86_64-linux`; this `aarch64-darwin` host has no remote builder configured. Check hosted CI on the published PR; successful local checks are not hosted-CI evidence. Remote repository rename, operator-state handoff, live-link cutover, and host activation were not performed.
 
 ## Dependencies and review
 
