@@ -65,3 +65,27 @@ Remove completed items from this document; use Git history and linked pull reque
 - Preserve existing formatting, file-discovery error handling, platform selectors, and credential-free Terraform validation.
 - Verify coverage with an additional temporary configuration and verify that empty sets and failed evaluations return nonzero.
 - Document the discovery convention in `nix/CLAUDE.md` and update human-facing validation guidance as needed. Do not port `.github/workflows/CLAUDE.md`; repository-wide agent policy stays in the single root file.
+
+## INFRA-8 — Rename the GitHub repository through Terraform
+
+**Status:** Backlog
+**Outcome:** The existing `daehyunpy/my-nix-config` repository is renamed to `system-config` without replacing the repository or weakening its protections.
+**Reference:** Remaining rename gate in the [repository structure spec](docs/superpowers/specs/2026-11-08-repository-structure-design.md#authorized-operational-completion).
+
+**Done when:**
+- Set `github_repository.config.name` to `system-config` in `infra/github/main.tf`, preserving the resource address, `prevent_destroy`, and the ruleset's repository reference.
+- Privately back up the existing local state and review a saved plan containing only the intended in-place rename and dependent reference updates, with no resource creation, destruction, replacement, or unrelated setting changes.
+- Apply only the exact reviewed plan after explicit user approval. Verify the repository's immutable identity, history, access, and existing ruleset identity/protections are preserved; require a fresh refreshed plan with exit 0 and no changes.
+- Update Git remotes and current documentation, operational links, and import examples to the new name. Keep the checkout at `~/.config/nix` and preserve local state and backup locations; do not rewrite historical evidence indiscriminately.
+
+## INFRA-9 — Verify Linux Home Manager configuration builds
+
+**Status:** Backlog
+**Outcome:** The declared Linux Home Manager activation package is successfully built with the committed flake inputs, without activating it.
+**Reference:** Outstanding Linux build verification in the [repository structure plan](docs/superpowers/plans/2026-11-08-repository-structure.md#task-5-integrate-review-and-prove-behavior).
+
+**Done when:**
+- Select a suitable `x86_64-linux` host or CI runner. A remote builder configured on the Mac is not required.
+- Successfully run `nix build --no-link --no-update-lock-file './nix/linux#homeConfigurations."daehyun@charon".activationPackage'` on the selected Linux builder, using the committed lockfile.
+- Record the tested revision, build platform, and resulting activation-package output. Evaluation or obtaining a derivation path alone does not count as build verification.
+- Diagnose any build failure and review necessary configuration or dependency fixes explicitly; do not silently remove packages or update inputs to force success. Do not run Home Manager activation or change host services as part of this verification.
