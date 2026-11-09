@@ -79,3 +79,5 @@ Tailscale commands, credentials, adoption, and provider-specific verification li
 ## Agent Workflows
 
 Repository-wide coding policy and agent/editor setup instructions live in [CLAUDE.md](CLAUDE.md). Nix conventions and workflows live in [nix/CLAUDE.md](nix/CLAUDE.md); infrastructure workflows live in [infra/CLAUDE.md](infra/CLAUDE.md) and its module guides. Agents perform repository changes and checks; system activation and other protected host changes require explicit user authorization.
+
+The repository's OMP configuration includes shared model-role defaults for coding, planning, and background work; provider credentials stay in the user's OMP profile.
