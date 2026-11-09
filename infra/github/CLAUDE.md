@@ -2,7 +2,7 @@
 
 `main.tf` manages repository settings and the `main-protection` ruleset for `daehyunpy/my-nix-config`, separately from Nix. Keep the existing `github_repository_ruleset` resource; CI workflow implementation remains in `.github/workflows/validate.yml` at the repository root.
 
-Read the [shared Terraform workflow](../CLAUDE.md) for reviewed-plan approval, verification, backups, and state handoff. Run commands below from `terraform/github/` in the checkout holding this module's authoritative state.
+Read the [shared Terraform workflow](../CLAUDE.md) for reviewed-plan approval, verification, backups, and state handoff. Run commands below from `infra/github/` in the checkout holding this module's authoritative state.
 
 ## CLI, authentication, and checks
 

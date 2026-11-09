@@ -9,16 +9,16 @@ This module owns the complete tailnet policy, DNS, device key-expiry settings, a
 Use OpenTofu 1.13.1 from [.opentofu-version](.opentofu-version) and the committed provider lock. CI runs these checks without tailnet credentials, authenticated policy validation, plan, or apply:
 
 ```sh
-tofu -chdir=terraform/tailscale fmt -check
-tofu -chdir=terraform/tailscale init -backend=false -input=false -lockfile=readonly
-tofu -chdir=terraform/tailscale validate
+tofu -chdir=infra/tailscale fmt -check
+tofu -chdir=infra/tailscale init -backend=false -input=false -lockfile=readonly
+tofu -chdir=infra/tailscale validate
 ```
 
 ## Credentials and state
 
 The provider pins the inventoried tailnet in `main.tf`. Supply scoped credentials only through `TAILSCALE_OAUTH_CLIENT_ID` and `TAILSCALE_OAUTH_CLIENT_SECRET`; any `TAILSCALE_TAILNET` value must match it. Keep operator secrets outside Git and the Nix store in a mode-0600 private file. The repository's `.env.example` contains empty names only.
 
-Use the default local backend: no explicit backend declaration or custom location. The authoritative state is `terraform/tailscale/terraform.tfstate` in the active operator checkout. OpenTofu uses OS locking for that file; temporary `.terraform.tfstate.lock.info` metadata is ignored, not a permanent lock to commit. Backend selection is deferred to `BACKLOG.md` (INFRA-6); no remote backend, host, or custom state path is selected. No state or credentials were transferred to Thales.
+Use the default local backend: no explicit backend declaration or custom location. After the exclusive source-layout handoff, the authoritative state is `infra/tailscale/terraform.tfstate` in the active operator checkout. OpenTofu uses OS locking for that file; temporary `.terraform.tfstate.lock.info` metadata is ignored, not a permanent lock to commit. Backend selection is deferred to `BACKLOG.md` (INFRA-6); no remote backend, host, or custom state path is selected. No state or credentials were transferred to Thales.
 
 ## Saved-plan commands
 
@@ -26,16 +26,16 @@ With credentials loaded and the authoritative state located, initialize and crea
 
 ```sh
 umask 077
-tofu -chdir=terraform/tailscale init -input=false -lockfile=readonly
+tofu -chdir=infra/tailscale init -input=false -lockfile=readonly
 plan_dir="$(mktemp -d)"
-tofu -chdir=terraform/tailscale plan -input=false -lock=true -out="$plan_dir/tailscale.tfplan"
-tofu -chdir=terraform/tailscale show -no-color "$plan_dir/tailscale.tfplan"
+tofu -chdir=infra/tailscale plan -input=false -lock=true -out="$plan_dir/tailscale.tfplan"
+tofu -chdir=infra/tailscale show -no-color "$plan_dir/tailscale.tfplan"
 ```
 
 Stop for approval of this saved plan. After approval and the private backup below, apply it as a separate operation, retaining the same `plan_dir`:
 
 ```sh
-tofu -chdir=terraform/tailscale apply -input=false -lock=true "$plan_dir/tailscale.tfplan"
+tofu -chdir=infra/tailscale apply -input=false -lock=true "$plan_dir/tailscale.tfplan"
 ```
 
 ## Provider-specific verification
@@ -43,7 +43,7 @@ tofu -chdir=terraform/tailscale apply -input=false -lock=true "$plan_dir/tailsca
 Compare the effective API/CLI policy, DNS, approved routes, key expiry, device ownership, and identities against the approved changes and preservation requirements below. Confirm all eight resource bindings in refreshed state, then run:
 
 ```sh
-tofu -chdir=terraform/tailscale plan -refresh=true -input=false -detailed-exitcode
+tofu -chdir=infra/tailscale plan -refresh=true -input=false -detailed-exitcode
 ```
 
 The shared completion gate requires exit `0` with no drift. Policy validation does not prove an actual SSH session or working client daemon; host/runtime proof remains a separate deferred phase.
@@ -58,7 +58,7 @@ umask 077
 backup_dir="$HOME/.config/tailscale-iac/backups/$(date -u +%Y-%m-%d)"
 mkdir -p "$backup_dir"
 backup=$(mktemp "$backup_dir/local-$(date -u +%H%M%S).XXXXXX")
-tofu -chdir=terraform/tailscale state pull > "$backup"
+tofu -chdir=infra/tailscale state pull > "$backup"
 jq -e '.lineage != null and .serial != null and .resources != null' "$backup" >/dev/null
 printf 'Validated private backup: %s\n' "$backup"
 ```
@@ -83,7 +83,7 @@ The old Muse-tag proposal is superseded. Older state may contain obsolete tag bi
 To release an object without changing its live setting, follow the shared ownership-removal procedure. For example, after removing Apollo from `local.devices` and therefore both resource/import membership, forget its binding:
 
 ```sh
-tofu -chdir=terraform/tailscale state rm 'tailscale_device_key.managed["apollo"]'
+tofu -chdir=infra/tailscale state rm 'tailscale_device_key.managed["apollo"]'
 ```
 
 Review a fresh plan: the released instance must not be imported, created, updated, or destroyed. Removing state alone re-adopts or recreates an object while source remains; removing source alone can propose destruction. Device-key deletion re-enables expiry and route-resource deletion clears approvals. Do not use `tofu destroy` to relinquish management or apply unrelated changes during release.

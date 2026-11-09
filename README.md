@@ -1,16 +1,18 @@
-# my-nix-config
+# system-config
 
-Maintain a single source of truth for my macOS, Linux, and WSL environments: packages, applications, dotfiles, and machine-specific settings. Make environments reproducible and straightforward to rebuild, share configuration where practical, and keep platform-specific exceptions explicit. Prefer declarative changes over undocumented manual setup; keep secrets outside the repository.
+Maintain a single source of truth for my macOS, Linux, and WSL environments and network infrastructure: packages, applications, dotfiles, machine-specific settings, and Tailscale tailnet configuration. Make environments reproducible and straightforward to rebuild, share configuration where practical, and keep platform-specific exceptions explicit. Prefer declarative changes over undocumented manual setup; keep secrets outside the repository. Deployment automation remains planned work in [BACKLOG.md](BACKLOG.md).
 
-WSL uses the Linux Home Manager configuration; Windows host settings are not managed here. Keep the checkout at `~/.config/nix`.
+WSL uses the Linux Home Manager configuration; Windows host settings are not managed here. Keep the checkout at `~/.config/nix`, independently of the repository name. The GitHub repository rename from `my-nix-config` to `system-config` is pending a separately authorized operation.
 
 Prefer Homebrew for macOS applications and platform-specific packages. Use Nix for core CLI tools and services shared across macOS, Linux, and WSL; share package declarations while keeping platform-specific service management explicit.
 
-- `home.nix`, `packages.nix`: shared Home Manager configuration and packages.
-- `darwin/`, `linux/`: platform and machine configuration.
-- `home-files/`: managed dotfiles.
-- `terraform/`: independent provider-based infrastructure configurations.
-- `terraform/github/`: GitHub repository rules managed separately from Nix.
+- `nix/home/`: shared Home Manager configuration and packages.
+- `nix/darwin/`, `nix/linux/`: independent platform flakes, shared platform configuration, and machine-specific `hosts/` modules.
+- `dotfiles/`: managed configuration payloads; Nix declares their installation.
+- `infra/`: independent provider-based infrastructure configurations.
+- `infra/tailscale/`: existing Terraform-compatible tailnet configuration, executed with OpenTofu.
+- `infra/github/`: GitHub repository rules managed separately from Nix, using Terraform.
+- `scripts/check.sh`: shared local and CI Nix validation; subsystem tests live with their owning configuration.
 
 ## Setup
 
@@ -25,26 +27,26 @@ printf '%s\n' 'experimental-features = nix-command flakes' >> ~/.config/nix/nix.
 
 ```sh
 # Bootstrap nix-darwin
-nix run nix-darwin -- switch --flake ~/.config/nix/darwin
+nix run nix-darwin -- switch --flake ~/.config/nix/nix/darwin
 
 # Apply changes
-darwin-rebuild switch --flake ~/.config/nix/darwin
+darwin-rebuild switch --flake ~/.config/nix/nix/darwin
 ```
 
-Homebrew formulae, casks, and App Store apps are declared in `darwin/`. Unrestricted passwordless sudo for the admin group is intentional.
+Homebrew formulae, casks, and App Store apps are declared in `nix/darwin/`. Unrestricted passwordless sudo for the admin group is intentional.
 
 The Dock pins `/System/Applications/Siri AI.app` for browsing Siri conversations, not the CoreServices Siri assistant.
 
 ### Linux
 
-Replace `username@hostname` with a configuration from `linux/flake.nix`:
+Replace `username@hostname` with a configuration from `nix/linux/flake.nix` (currently `daehyun@charon`):
 
 ```sh
 # Bootstrap Home Manager
-nix run home-manager -- switch --flake ~/.config/nix/linux#username@hostname
+nix run home-manager -- switch --flake ~/.config/nix/nix/linux#username@hostname
 
 # Apply changes
-home-manager switch --flake ~/.config/nix/linux#username@hostname
+home-manager switch --flake ~/.config/nix/nix/linux#username@hostname
 ```
 
 To use the Nix-managed Fish as your login shell:
@@ -61,17 +63,18 @@ Start a new login session after activation; reconnect remote editors to reload t
 
 ## Tailscale tailnet management
 
-`terraform/tailscale/` declaratively manages the existing tailnet's policy, DNS, device key-expiry settings, and route approvals. CI validates configuration without applying it.
+`infra/tailscale/` declaratively manages the existing tailnet's policy, DNS, device key-expiry settings, and route approvals. CI validates configuration without applying it.
 
 Host-side Tailscale installation and Nix-managed services remain deferred. Live DNS is Cloudflare-only, matching the declared configuration and verified deployment.
 
-Tailscale commands, credentials, adoption, and provider-specific verification live in the [module guide](terraform/tailscale/CLAUDE.md). Common planning, approval, state, and recovery rules live in the [shared Terraform workflow](terraform/CLAUDE.md).
+Tailscale commands, credentials, adoption, and provider-specific verification live in the [module guide](infra/tailscale/CLAUDE.md). Common planning, approval, state, and recovery rules live in the [shared Terraform workflow](infra/CLAUDE.md). The source relocation does not move ignored operator state: complete the documented state handoff before authenticated use of a relocated root.
 
 ## Maintenance
 
-- Update inputs: `nix flake update --flake darwin` or `nix flake update --flake linux`, then apply.
+- Update inputs: `nix flake update --flake nix/darwin` or `nix flake update --flake nix/linux`, then apply.
 - Garbage collection runs weekly and removes unreferenced generations older than 30 days, making them unavailable for rollback.
 - Approve trusted direnv configurations with `direnv allow`. `.env` is gitignored; see `.env.example`.
+- Before updating an existing live checkout to this layout, review the [dotfile cutover and recovery requirements](docs/superpowers/specs/2026-11-08-repository-structure-design.md#live-link-cutover-and-recovery). Moving `home-files/` to `dotfiles/` requires coordinated, authorized activation to repair existing live-link targets.
 
 ## Agent Workflows
 

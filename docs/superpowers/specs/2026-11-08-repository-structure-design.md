@@ -1,14 +1,16 @@
 # INFRA-4 — Repository identity and responsibility-first structure
 
-**Status:** Approved
+**Status:** Approved; repository implementation applied in the worktree, operational gates pending.
 **Ticket:** [INFRA-4](../../../BACKLOG.md#infra-4--rename-and-restructure-the-repository)
 **Selected direction:** Responsibility-first layout; repository name `system-config`.
 
 ## Problem
 
-The repository manages machine environments and dotfiles, with network infrastructure and deployment automation planned. Its current name, `my-nix-config`, presents Nix as the entire purpose. Shared Home Manager configuration lives at the root, platform flakes embed both shared settings and machine definitions, and managed dotfiles live under `home-files/`.
+The repository manages machine environments, dotfiles, and an existing OpenTofu-managed Tailscale tailnet, with deployment automation planned. Its current name, `my-nix-config`, presents Nix as the entire purpose. Shared Home Manager configuration lives at the root, platform flakes embed both shared settings and machine definitions, managed dotfiles live under `home-files/`, and infrastructure source lives under `terraform/tailscale/`.
 
 The layout should make ownership clear without changing machine behavior or combining restructuring with infrastructure adoption. Current main has two Darwin outputs, `apollo` and `thales`, and one standalone Linux Home Manager output, `daehyun@charon`. These actual outputs, rather than older machine inventories in historical documents, define the migration baseline.
+
+The implementation baseline is `origin/main` at `01ce185`, which integrated Tailscale management after this specification was first approved. Move that existing infrastructure configuration rather than creating an empty destination or restoring the older tailnet policy.
 
 ## Goals
 
@@ -22,7 +24,7 @@ The layout should make ownership clear without changing machine behavior or comb
 
 - Consolidating flakes, updating dependencies, or changing package selections.
 - Renaming hosts, changing Home Manager output keys, or adopting a full NixOS system.
-- Implementing Tailscale resources or host services, OpenTofu state backends, or deployment automation. These remain INFRA-2, INFRA-3, and INFRA-5 work.
+- Implementing new Tailscale resources or host services, OpenTofu state backends, or deployment automation. These remain INFRA-2, INFRA-3, INFRA-5, and INFRA-6 work. Relocating existing infrastructure source is in scope.
 - Moving the checkout out of `~/.config/nix`, or renaming Nix's own `~/.config/nix/nix.conf`.
 - Changing dotfile contents or their live-symlink versus copied-source behavior.
 - Activating systems, renaming the remote repository, pushing changes, or changing local remotes without separate explicit authorization.
@@ -78,7 +80,9 @@ system-config/
 │   ├── wezterm/
 │   └── zed/
 ├── infra/
-│   └── tailscale/                 # Owned by separate infrastructure work
+│   ├── CLAUDE.md                  # Existing scoped infrastructure workflow
+│   ├── github/                   # Existing Terraform repository configuration
+│   └── tailscale/                # Existing OpenTofu configuration
 │       └── tests/                # Only when infrastructure tests exist
 ├── scripts/
 │   ├── check.sh
@@ -117,7 +121,7 @@ Shared agent resources remain in root `.claude/`, OMP integration remains in roo
 
 ### External infrastructure and deployment
 
-`infra/tailscale/` is the destination for separately implemented OpenTofu tailnet configuration. Host-side packages and service lifecycle configuration belong under `nix/`; they are not OpenTofu responsibilities.
+Move the existing `terraform/tailscale/` OpenTofu root to `infra/tailscale/`, preserving its resource declarations, imports, policy, CLI pin, and provider lock byte-for-byte. Move its existing scoped workflow guide to `infra/CLAUDE.md`, updating operational paths but retaining the root authorization boundary. Host-side packages and service lifecycle configuration belong under `nix/`; they are not OpenTofu responsibilities.
 
 GitHub workflows remain in `.github/workflows/`. Shared validation orchestration remains in `scripts/`; subsystem tests live with their owning subsystem as described below. Future subsystem-specific deployment logic belongs with the subsystem that owns it; no generic deployment framework or empty `deploy/` hierarchy is added.
 
@@ -146,6 +150,8 @@ These rules define where future tests belong and how behavioral changes are deve
 | `darwin/` | `nix/darwin/`, extracting shared settings and host modules |
 | `linux/` | `nix/linux/`, extracting shared settings and host modules |
 | `home-files/` | `dotfiles/` |
+| `terraform/tailscale/` tracked source | `infra/tailscale/`; no state or cache copied |
+| `terraform/CLAUDE.md` | `infra/CLAUDE.md`; update scoped workflow references |
 | `nixos/flake.nix`, `kubernetes/.gitkeep` | Remove only while still empty placeholders |
 | `tests/check.sh` | `scripts/check-test.sh`; update validation and CI callers |
 | Other scripts, workflows, agent resources, and documentation | Retain locations; update current operational references |
@@ -165,6 +171,14 @@ Update current README instructions, repository policy, backlog links, and applic
 
 Activation commands remain human-authorized operations, not a side effect of validation or migration scripts.
 
+### Local infrastructure state preservation
+
+Keep all existing ignored state files and backups local and outside Git, Nix sources, and verification output. Preserve their contents and locations during worktree implementation; do not copy an authoritative state into a second active checkout. Retain the existing broad ignore rules for state, backups, caches, saved plans, and secret variable files at the new source location.
+
+Only tracked infrastructure source moves in this worktree. The active operator checkout's existing `terraform/tailscale/terraform.tfstate` and backups remain where they are. The relocated root is not ready for authenticated planning or application merely because validation passes: never initialize replacement resource ownership from an empty state.
+
+Before an operator checkout adopts the new source layout, follow the scoped guide's state handoff procedure: establish exclusive ownership, validate a local recovery backup, reject an occupied destination, move the existing state and backups to that checkout's default `infra/tailscale/` location, verify unchanged bytes and bindings, and retire the former active location. This operational handoff is separate from the implementation and must not be performed implicitly by Git or validation. Keep the default local backend; do not select remote storage or a custom state path.
+
 ## Live-link cutover and recovery
 
 Keeping the checkout location does not eliminate the `home-files/` rename hazard: already activated out-of-store links still point at the old payload paths. A Git checkout of the new layout alone can therefore break live editor, OMP, and SSH configuration links before Home Manager is activated.
@@ -181,15 +195,17 @@ Renaming the remote repository and changing remotes are separately authorized pu
 
 ### Repository implementation
 
-- [ ] New directories follow the ownership rules; no empty future-service scaffolds or obsolete entry points remain.
-- [ ] The three existing configuration outputs retain their names and evaluate at the new flake locations without lockfile updates.
-- [ ] Both lockfiles are unchanged, and effective package selections, identities, settings, and state-version baselines match a pre-migration inventory. Compare normalized behavior, allowing source/store paths to differ because files moved; derivation-path equality alone is not required.
+- [x] New directories follow the ownership rules; no empty future-service scaffolds or obsolete entry points remain.
+- [x] The three existing configuration outputs retain their names and evaluate at the new flake locations without lockfile updates.
+- [x] Both lockfiles are unchanged, and effective package selections, identities, settings, and state-version baselines match a pre-migration inventory. Compare normalized behavior, allowing source/store paths to differ because files moved; derivation-path equality alone is not required.
 - [ ] `bash scripts/check.sh all` succeeds, exercising formatting, Linux and Darwin evaluation, and validation error handling. Existing Linux and macOS CI jobs succeed through the same entry point.
 - [ ] Validation-script regression coverage runs from `scripts/check-test.sh` through local validation and CI, with no old-path wrapper. Any existing subsystem tests and fixtures follow the ownership rules and remain runnable after migration.
 - [ ] Build both Darwin system outputs on a suitable Darwin builder and the Linux activation package on a suitable Linux builder without activation. Record unavailable builders as unverified rather than substituting evaluation for build evidence.
-- [ ] Copied dotfiles are included in generated outputs, and generated live-link targets point to the intended `dotfiles/` paths without changing home-directory destinations.
-- [ ] Current operational documentation uses relocated entry points and distinguishes `system-config` from the retained `~/.config/nix` checkout. Historical references are not blindly rewritten.
-- [ ] No secrets, state files, private keys, infrastructure applies, host changes, or unrelated dependency updates are introduced.
+- [x] Copied dotfiles are included in generated outputs, and generated live-link targets point to the intended `dotfiles/` paths without changing home-directory destinations.
+- [x] Current operational documentation uses relocated entry points and distinguishes `system-config` from the retained `~/.config/nix` checkout. Historical references are not blindly rewritten.
+- [x] No secrets, state files, private keys, infrastructure applies, host changes, or unrelated dependency updates are introduced.
+- [x] Existing OpenTofu source, policy, CLI pin, and provider lock are byte-identical at `infra/tailscale/`; credential-free formatting, backend-disabled initialization, and validation succeed at that location.
+- [x] Existing local state and backups remain ignored, local, and unchanged; no second active state is introduced. Operator documentation prevents authenticated use of the relocated root before the explicit state handoff.
 
 ### Authorized operational completion
 
@@ -200,8 +216,25 @@ Renaming the remote repository and changing remotes are separately authorized pu
 
 Writing this specification or merging the structural changes does not satisfy the operational criteria by itself.
 
+### Implementation evidence
+
+- Rebased `docs/infra-4-structure` onto `origin/main` at `01ce185` and applied the source migration in its task worktree. The main checkout was not migrated.
+- `bash scripts/check.sh all` passed after the final module correction, including formatting, malformed-Git-index failure coverage, and all three configuration evaluations. Running the script by absolute path from outside the checkout also passed; help and invalid-argument paths returned the expected 0 and 2 exit codes.
+- Selected evaluated inventories matched the original baseline exactly for Apollo, Thales, and Charon, including ordered package lists and Fish initialization. The initial extraction changed Home Manager merge order; preserving the two original outer user-module definitions corrected it without priority overrides.
+- All 17 tracked dotfile/infrastructure payloads and all three dependency lockfiles are byte-identical after relocation.
+- Both final Darwin systems built successfully without activation. Generated Home Manager artifacts contain the three copied payloads unchanged and all three intended live links targeting `dotfiles/`.
+- OpenTofu formatting, backend-disabled initialization with the read-only provider lock, and validation passed at `infra/tailscale/` with tailnet credential variables removed from the environment. No authenticated plan, refresh, import, or apply was run.
+- All six inventoried local state/backup files remained unchanged at their original locations and ignored by Git. The relocated worktree root contains no active state, and the Nix source snapshot excludes state, operator secrets, worktrees, and provider caches.
+- Independent Nix clarity and migration-boundary reviews found no remaining substantive issue after the merge-order correction.
+- Subsequently rebased onto `origin/main` at `7a26e3f`. Preserved upstream repository-map and safe-formatting corrections and carried the newly integrated GitHub module into `infra/github/`, retaining its resource declarations and provider lock byte-for-byte. GitHub continues to use Terraform, not OpenTofu; its existing local state remains in the operator checkout until a separate handoff.
+- After that rebase, the full local Nix validation and credential-free GitHub Terraform formatting, backend-disabled initialization, and validation passed. The staged migration was restored without losing unaffected files, and all six current local state/backup files were unchanged.
+- Rebased again onto `origin/main` at `c8860fb`, preserving its reviewed-saved-plan workflow and split shared/provider-specific guides. The new Tailscale guide follows the directory rename into `infra/tailscale/`; command paths and links use `infra/`, and the common source-layout state-handoff gate remains enforced. All 48 unaffected migration paths matched the temporary stash exactly, all six local state/backup files were unchanged, and the full local Nix suite and integrity checks for 11 Markdown files passed.
+- The pre-PR review found that crash-log exclusions were still anchored only to `terraform/`. Added matching `infra/` exclusions while retaining the original protections for operator locations awaiting handoff; all eight old/new-root crash-log cases are ignored, and production Terraform sources remain trackable. A fresh comparison against immutable `origin/main` matched all three selected evaluated inventories, 19 relocated payload/provider files, and both Nix lockfiles exactly. Credential-free checks passed for both infrastructure modules.
+
+**Unverified gates:** The Linux activation build was attempted but failed because it requires `x86_64-linux`; this `aarch64-darwin` host has no remote builder configured. Hosted CI has not run for the unpushed implementation. Remote repository rename, operator-state handoff, live-link cutover, and host activation were not performed.
+
 ## Dependencies and review
 
-Coordinate the migration with concurrent infrastructure and validation work so callers are updated once against the current integration baseline. `infra/tailscale/` already matches the destination proposed in the older Tailscale design, but that design's deferred host-service scope is not adopted by INFRA-4.
+Coordinate the migration with concurrent infrastructure and validation work so callers are updated once against the current integration baseline. Preserve the existing Terraform-only implementation from `01ce185` while relocating it to `infra/tailscale/`. The older Tailscale design's deferred host-service scope is not adopted by INFRA-4.
 
-The user approved this specification, including the subsystem-local testing approach. Implementation planning has not started. There is no scheduled deadline, and no implementation, activation, or publication is authorized by this specification alone.
+The user approved this specification, including the subsystem-local testing approach, and requested implementation after rebasing onto latest main. Local state preservation is an explicit implementation constraint. There is no scheduled deadline; host activation, remote repository rename, publication, and operator state handoff remain separately authorized operations.

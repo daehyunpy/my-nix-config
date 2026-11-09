@@ -1,5 +1,7 @@
 # Tailscale tailnet management and deferred Nix integration
 
+> **Source-layout supersession (2026-11-08):** Historical paths below are preserved as deployment context. Current source is `infra/tailscale/`; use the [scoped workflow and state-handoff gate](../../../infra/CLAUDE.md) and [repository structure spec](2026-11-08-repository-structure-design.md). Source relocation does not relocate authoritative local state.
+
 ## Status and execution boundary
 
 **Terraform phase: implemented, applied, and verified with Cloudflare-only DNS.** `terraform/tailscale/` manages eight resources: the complete policy, DNS configuration, four device-key expiry settings, and the two routers' approved routes. Existing resources were imported, not recreated. The policy cleanup, Google DNS extension, and later Cloudflare-only removal were separately authorized, applied, and verified. Live DNS now matches the latest preference: only `1.1.1.1`, with a zero-change refreshed plan. Nix-based client/service management remains deferred, retained below and in the stash named `WIP: Tailscale Nix configuration (not applied)`.

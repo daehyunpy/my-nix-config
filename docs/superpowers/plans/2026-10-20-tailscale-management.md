@@ -1,5 +1,7 @@
 # Tailscale Terraform Implementation Plan
 
+> **Source-layout supersession (2026-11-08):** Historical paths below are preserved as deployment context. Current source is `infra/tailscale/`; use the [scoped workflow and state-handoff gate](../../../infra/CLAUDE.md) and [repository structure spec](../specs/2026-11-08-repository-structure-design.md). Source relocation does not relocate authoritative local state.
+
 > **For agentic workers:** Use executing-plans. Implement only Terraform-compatible tailnet configuration. Retain the Nix design and its stash. The explicitly authorized saved-plan application below is complete; further changes require separate review and authorization.
 
 **Goal:** Manage the existing tailnet through native OpenTofu with Cloudflare `1.1.1.1` as the sole global DNS resolver, preserving SSH/Funnel behavior, device key expiry, and route approvals. Every live change requires a reviewed saved plan and explicit apply authorization. Host/client changes remain deferred.

@@ -1,36 +1,26 @@
-# Nix System Configuration
+# System Configuration
 
-Declarative system and user environment configuration for macOS, Linux, and WSL using Nix flakes. See `README.md` for project goals. WSL uses the Linux Home Manager configuration; Windows host settings are out of scope.
+Declarative machine environments and network infrastructure for macOS, Linux, and WSL using Nix, Terraform, and OpenTofu. See `README.md` for project goals. WSL uses the Linux Home Manager configuration; Windows host settings are out of scope.
 
 ## Project Structure
 
-- `darwin/` — macOS configuration using nix-darwin
-  - `flake.nix` — Two machines: `apollo` (primary), `thales` (media server)
-  - `brews.nix`, `casks.nix`, `mas.nix` — Homebrew formulae, casks, Mac App Store apps
-  - `packages.nix` — macOS-only nix packages (currently empty)
-  - `home.nix` — macOS-specific home-manager overrides
-- `linux/` — Linux configuration using home-manager standalone
-  - `flake.nix` — One configuration: `daehyun@charon` (`x86_64-linux`)
-  - `packages.nix` — Linux-only nix packages (currently empty)
-  - `home.nix` — Linux-specific home-manager overrides
-- `nixos/` — NixOS configuration (empty, reserved for future use)
-- `kubernetes/` — Kubernetes manifests (empty, reserved for future use)
-- `docs/superpowers/` — Design specs and implementation plans
-- `terraform/` — Terraform configurations; see `terraform/CLAUDE.md` for the shared workflow and module-local guides for provider details.
-- `home.nix` — Shared home-manager config (cross-platform)
-- `packages.nix` — Shared nix packages (cross-platform)
-- `home-files/` — Dotfiles symlinked into `$HOME` via `home.file`
-  - `omp/models.yml`, `zed` — Agent/editor configs (symlinked live via `mkOutOfStoreSymlink`)
-  - `conda`, `tmux`, `wezterm` — Shell/terminal configs (copied via `.source`)
-  - `ssh` — SSH config (symlinked live via `mkOutOfStoreSymlink`)
+- `nix/home/` — Shared cross-platform Home Manager configuration (`default.nix`) and packages (`packages.nix`).
+- `nix/darwin/` — macOS flake with outputs `apollo` and `thales`; shared system settings in `configuration.nix`, user overrides in `home.nix`, and machine identity/exceptions in `hosts/`.
+  - `brews.nix`, `casks.nix`, `mas.nix` — Homebrew formulae, casks, and Mac App Store apps.
+- `nix/linux/` — Standalone Home Manager flake with output `daehyun@charon` (`x86_64-linux`); shared setup in `configuration.nix`, user overrides in `home.nix`, and machine identity/exceptions in `hosts/`.
+- `dotfiles/` — Payloads installed through Home Manager; Zed, OMP models, and SSH configuration use live out-of-store links; Conda, tmux, and WezTerm use copied sources.
+- `infra/` — Independent Terraform-compatible root modules; read [infra/CLAUDE.md](infra/CLAUDE.md) for the shared workflow and module-local guides for provider details. Tailscale uses pinned OpenTofu; GitHub uses Terraform.
+- `scripts/check.sh` — Shared local/CI Nix validation; `scripts/check-test.sh` protects its failure handling.
+- Subsystem-local `tests/` directories hold behavioral tests and fixtures when needed; do not create empty test scaffolds. Nix flakes explicitly expose applicable checks; OpenTofu uses its module-local test directory.
+- `docs/superpowers/specs/`, `docs/superpowers/plans/` — Design specifications and implementation plans.
 
 ## Conventions
 
 - `brews.nix`, `casks.nix`, `packages.nix` are Nix lists. `mas.nix` is an attrset (`{ name = app-store-id; }`). Keep entries sorted alphabetically.
-- Shared config goes in root `home.nix`/`packages.nix`. Platform-specific config goes in `darwin/` or `linux/`.
+- Shared user configuration goes in `nix/home/default.nix` and `nix/home/packages.nix`. Platform-specific configuration goes in `nix/darwin/` or `nix/linux/`.
 - Both flakes define a `pkgs.unstable` overlay (from `nixpkgs-unstable`) for accessing bleeding-edge packages. Use `pkgs.unstable.<pkg>` when the stable channel is too old.
-- Machine-specific overrides are inline in each flake's module list (e.g., `thales` adds `plex-media-server` and `orbstack` casks).
-- `home-files/` contents are symlinked via `mkOutOfStoreSymlink` (live link) or `.source` (copy). Prefer `mkOutOfStoreSymlink` for configs that change outside of nix (e.g., editor settings).
+- Flakes explicitly compose modules; shared settings belong in platform `configuration.nix` files, and machine-specific overrides belong in `hosts/*.nix` (e.g., Thales's extra casks).
+- `dotfiles/` contents are symlinked via `mkOutOfStoreSymlink` (live link) or `.source` (copy). Prefer `mkOutOfStoreSymlink` for configs that change outside of Nix (e.g., editor settings). Preserve the installation mode when relocating existing files.
 - `.env` holds additional secrets (`MILVUS_ADDRESS`, `MILVUS_TOKEN`); see `.env.example` for the template. Both `.env` and `.envrc` are gitignored.
 
 ## Coding Guidance
@@ -53,7 +43,7 @@ Keep reusable plugins and agent resources in `.claude/` so compatible tools can 
 - Unless the user explicitly chooses to work without a worktree, create or reuse a task-specific branch in a separate Git worktree. Do not edit or commit directly in the main checkout without that explicit authorization.
 - Place worktrees under `.worktrees/` at the main repository root (for example, `.worktrees/todo-documenting/`), not inside another worktree. Perform edits, validation, and requested commits in the selected checkout; keep the main checkout on `main`.
 - Prefer Homebrew for macOS applications and platform-specific packages. Install core CLI tools and services shared across macOS, Linux, and WSL using Nix instead.
-- Keep shared Nix package declarations in root `packages.nix`/`home.nix`; keep platform-specific service lifecycle configuration in the appropriate platform modules.
+- Keep shared Nix package declarations in `nix/home/packages.nix`/`nix/home/default.nix`; keep platform-specific service lifecycle configuration in the appropriate platform modules.
 - Keep repository-wide agent policy, including the YOLO boundary, in this root `CLAUDE.md`. Scoped `CLAUDE.md` workflow guides belong alongside their code and must not duplicate or override the root authorization boundary. Do not introduce `AGENTS.md`.
 - Keep coding workflows and operational details in the appropriate scoped `CLAUDE.md`; keep `README.md` focused on human-facing goals, capabilities, and orientation.
 
@@ -62,7 +52,7 @@ Keep reusable plugins and agent resources in `.claude/` so compatible tools can 
 - YOLO mode skips tool approval prompts; it is not a sandbox or blanket authorization. Stay within the user's requested scope.
 - Proceed autonomously with repository inspection, requested edits, and relevant formatting, checks, Nix evaluation, and builds. Disposable temporary files and normal tool caches/Nix store writes are allowed.
 - Require explicit user authorization before activating or rolling back configurations (`darwin-rebuild switch`, `home-manager switch`, equivalent commands), installing or uninstalling applications, running garbage collection, or changing services, permissions, or other host state. Instructions in this file explain commands; they do not authorize running them.
-- Require explicit authorization for writes outside this checkout, except the temporary/cache/store writes above. Resolve symlink targets before writing. Files in `home-files/` may be live-linked into the home directory: requested edits are allowed, but their effects can be immediate without a rebuild.
+- Require explicit authorization for writes outside this checkout, except the temporary/cache/store writes above. Resolve symlink targets before writing. Files in `dotfiles/` may be live-linked into the home directory: requested edits are allowed, but their effects can be immediate without a rebuild.
 - Preserve unrelated work, staged changes, and existing conflicts. Commit only when requested; require explicit authorization for pushing, publishing, destructive Git operations, or deleting unrelated data.
 - Never print, commit, or transmit secrets from `.env`, credentials, or private keys. Existing passwordless sudo is not authorization to use it.
 
@@ -84,7 +74,7 @@ Keep reusable plugins and agent resources in `.claude/` so compatible tools can 
 
 - Clean up only when requested. Before post-merge cleanup, verify the PR is actually `MERGED` into its target branch and record its merge commit and published head. A pushed branch or clean status is not proof of merging.
 - Inspect tracked, staged, untracked, and ignored files before removal. Git worktree removal can erase ignored data, including state, backups, credentials, and local configuration. Preserve non-regenerable files privately outside the worktree; discard only identified reproducible caches.
-- Hand off authoritative state to a retained operator checkout before removing its current home. Verify the backup and destination, retain one active state, and follow the [Terraform state handoff](terraform/CLAUDE.md#worktree-state-handoff) when applicable. Do not treat Git as a backup for ignored files.
+- Hand off authoritative state to a retained operator checkout before removing its current home. Verify the backup and destination, retain one active state, and follow the [Terraform state handoff](infra/CLAUDE.md#worktree-state-handoff) when applicable. Do not treat Git as a backup for ignored files.
 - Run `git worktree remove <path>` from a retained checkout, keeping the main checkout on `main`. Do not use force to bypass dirty or unpreserved data.
 - Delete the local branch with `git branch -d <branch>` after worktree removal. If squash merging prevents ancestry-based deletion, use `-D` only when deletion was explicitly requested, the published head matches the local tip, the PR is verified merged, and local-only data is preserved.
 - Verify the directory, worktree registration, and local branch are gone and retained state remains usable. Do not delete other worktrees, branches, stashes, or remote branches; existing server-side branch auto-deletion is separate repository policy. Cleanup never authorizes infrastructure destruction, state removal from management, or host activation.
@@ -110,10 +100,10 @@ bash scripts/check.sh darwin   # Both Darwin evaluations
 
 ```bash
 # macOS (nix-darwin)
-darwin-rebuild switch --flake darwin/
+darwin-rebuild switch --flake nix/darwin/
 
 # Linux (home-manager)
-home-manager switch --flake linux/
+home-manager switch --flake nix/linux/
 ```
 
 ## Formatting
@@ -146,7 +136,7 @@ omp --cwd .
 
 ### Cua Driver MCP
 
-`.omp/mcp.json` registers `cua-driver mcp` for OMP; Claude Code requires separate MCP registration. The driver must be on the agent's `PATH`. macOS installation is managed by Homebrew through `darwin/casks.nix`; install the driver separately on Linux or Windows. On macOS, after activation:
+`.omp/mcp.json` registers `cua-driver mcp` for OMP; Claude Code requires separate MCP registration. The driver must be on the agent's `PATH`. macOS installation is managed by Homebrew through `nix/darwin/casks.nix`; install the driver separately on Linux or Windows. On macOS, after activation:
 
 ```sh
 open -n -g -a CuaDriver --args serve
@@ -157,7 +147,7 @@ On macOS, grant Accessibility, Screen Recording, and direct capture consent, the
 
 ### Unity Gateway
 
-Home Manager links `home-files/omp/models.yml` into OMP. Install [Unity Gateway](https://github.com/databricks/unity-gateway) and the Databricks CLI separately; `databricks` and `jq` must be on `PATH`.
+Home Manager links `dotfiles/omp/models.yml` into OMP. Install [Unity Gateway](https://github.com/databricks/unity-gateway) and the Databricks CLI separately; `databricks` and `jq` must be on `PATH`.
 
 ```sh
 databricks auth login \
@@ -170,6 +160,6 @@ Use `/model` to select from `unity-anthropic`, `unity-openai`, `unity-google`, o
 
 ## Zed
 
-`home-files/zed` is linked to `~/.config/zed`. The external agent runs `omp acp`, so OMP must be on Zed's `PATH`; its model configuration is separate from Zed's native agent. Windows host settings are not managed here.
+`dotfiles/zed` is linked to `~/.config/zed`. The external agent runs `omp acp`, so OMP must be on Zed's `PATH`; its model configuration is separate from Zed's native agent. Windows host settings are not managed here.
 
 Zed terminals explicitly use `fish` and its virtual-environment activation script. Keep `terminal.shell.program` set to `fish`: selecting `activate_script` alone does not control Python toolchain activation in Windows-to-WSL sessions. Open a new terminal after changing these settings; no Home Manager rebuild is needed for the live link.

@@ -39,7 +39,7 @@ Remove completed items from this document; use Git history and linked pull reque
 
 ## INFRA-4 — Rename and restructure the repository
 
-**Status:** Backlog
+**Status:** In progress — repository restructuring; remote rename and operational cutover remain pending.
 **Outcome:** The repository reflects its purpose: manage my machines, development environments, and network infrastructure declaratively, with reproducible configuration and controlled deployment.
 **Spec:** [Repository identity and structure](docs/superpowers/specs/2026-11-08-repository-structure-design.md) (approved).
 

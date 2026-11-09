@@ -1,13 +1,15 @@
 # Terraform Workflow
 
-Each configuration directory under `terraform/` is an independent Terraform-compatible root module; `terraform/` itself is not one. Keep infrastructure policy and inventory authoritative in configuration. Follow the [repository authorization boundary](../CLAUDE.md#yolo-boundary); this guide defines workflow, not permission to change remote resources.
+Each configuration directory under `infra/` is an independent Terraform-compatible root module; `infra/` itself is not one. Keep infrastructure policy and inventory authoritative in configuration. Follow the [repository authorization boundary](../CLAUDE.md#yolo-boundary); this guide defines workflow, not permission to change remote resources.
 
 | Module guide | CLI | Command working directory |
 | --- | --- | --- |
-| [Tailscale](tailscale/CLAUDE.md) | OpenTofu pinned by `tailscale/.opentofu-version` | Repository root; use `tofu -chdir=terraform/tailscale` |
-| [GitHub](github/CLAUDE.md) | Terraform compatible with `github/main.tf` | `terraform/github/` |
+| [Tailscale](tailscale/CLAUDE.md) | OpenTofu pinned by `tailscale/.opentofu-version` | Repository root; use `tofu -chdir=infra/tailscale` |
+| [GitHub](github/CLAUDE.md) | Terraform compatible with `github/main.tf` | `infra/github/` |
 
 Read the module guide for authentication, commands, backend details, import identities, and provider-specific verification. Use the checkout holding that module's authoritative state for plans and state-changing operations, not a fresh worktree with an empty state.
+
+The source-only move from `terraform/` to `infra/` does not move existing local state or backups. They remain at their original operator-checkout paths until an explicitly authorized, exclusive [state handoff](#worktree-state-handoff). Do not plan, import, or apply in a relocated empty root; verify unchanged bytes and bindings, reject destination overwrite, and retire the former active location before operational use. Keep the existing local backends; source relocation does not authorize a new backend or a second active state.
 
 ## Checks and reviewed plans
 
@@ -42,7 +44,7 @@ A mismatch or verification error means the operation is incomplete. Report expec
 
 ## Worktree state handoff
 
-Before deleting a checkout holding authoritative local state:
+Before operational use of a relocated root or deleting a checkout holding authoritative local state:
 
 1. Ensure no concurrent state operation is running. Privately back up the active state and its local backups outside the worktree; do not print their contents.
 2. After merging, select the module's default state location in the retained checkout. Do not overwrite an existing destination; reconcile lineage, serial, bindings, workspace, and ownership first.
