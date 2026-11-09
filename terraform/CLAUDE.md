@@ -1,8 +1,8 @@
 # Terraform Workflow
 
-Each configuration directory under `terraform/` is an independent OpenTofu root module; `terraform/` itself is not one. Use the module's CLI pin and committed provider lock. Keep infrastructure policy and device inventory authoritative in configuration.
+Each configuration directory under `terraform/` is an independent Terraform-compatible root module; `terraform/` itself is not one. Tailscale uses pinned OpenTofu; GitHub uses Terraform under its module guide. Use each module's committed provider lock and existing authoritative state.
 
-Agents run the commands below from the repository root in the selected worktree. Follow the [repository authorization boundary](../CLAUDE.md#yolo-boundary); instructions and successful checks do not authorize remote changes.
+Run Tailscale commands from the repository root and GitHub commands from `terraform/github/`, in the checkout holding that module's state. Follow the [repository authorization boundary](../CLAUDE.md#yolo-boundary); instructions and successful checks do not authorize remote changes.
 
 ## Tailscale tailnet management
 
@@ -150,3 +150,33 @@ A fresh state should plan eight imports, no creates/deletes, and any separately 
 
 No host activation is part of this phase. Apollo's App Store client and encrypted state stay intact; Thales keeps its Homebrew daemon, and Poseidon keeps its Fedora 43 WSL vendor service. The [implementation plan](../docs/superpowers/plans/2026-10-20-tailscale-management.md) records current checks and deferred live gates.
 
+## GitHub Terraform workflow
+
+Read `github/CLAUDE.md` for provider authentication, backend details, and import identifiers. Run the commands below from the GitHub module directory in the active worktree, with its authentication configured.
+
+Use Terraform compatible with the module's `required_version`. Keep provider constraints and `.terraform.lock.hcl` tracked. Keep infrastructure policy in configuration rather than duplicating it in prose.
+
+### Checks and plans
+
+```sh
+terraform init
+terraform fmt -check
+terraform validate
+terraform plan -detailed-exitcode
+```
+
+Plan exit codes: `0` means no changes, `2` means proposed changes, and `1` means an error. Generate and review the plan, present the proposed actions and risks to the user, then stop for explicit approval of that reviewed plan before applying. A request to change a setting or a successful plan is not approval to apply an unseen plan. Never combine planning and applying in the same unattended tool call. Follow the root repository's authorization boundary for remote changes.
+
+After an authorized apply, verify the desired state before reporting completion:
+
+- Query the service's API or CLI and compare the effective remote settings with the approved changes, including protections that must remain unchanged.
+- Inspect refreshed Terraform state to confirm the intended resource identities and managed values, without printing secrets.
+- Run a fresh plan with refresh enabled and `-detailed-exitcode`; require exit `0` for no drift.
+
+An apply success message alone is not proof. Treat mismatches or verification errors as incomplete work; report expected versus observed state and do not apply corrective changes without approval of a new plan.
+
+### State
+
+Inspect the backend before planning or applying. Local state is not shared between worktrees or machines. If an existing resource is absent from state, import it using the module guide rather than creating a duplicate.
+
+Keep credentials, state, backups, provider caches, and saved plans out of Git. Never print credentials. Local state has no cross-machine locking; use one checkout/operator, or configure a shared backend before collaborative automation.

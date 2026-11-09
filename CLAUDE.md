@@ -16,7 +16,7 @@ Declarative system and user environment configuration for macOS, Linux, and WSL 
 - `nixos/` — NixOS configuration (empty, reserved for future use)
 - `kubernetes/` — Kubernetes manifests (empty, reserved for future use)
 - `docs/superpowers/` — Design specs and implementation plans
-- `terraform/` — Independent OpenTofu root modules; read [terraform/CLAUDE.md](terraform/CLAUDE.md) before working on them.
+- `terraform/` — Terraform configurations; see `terraform/CLAUDE.md` for the shared workflow and module-local guides for provider details.
 - `home.nix` — Shared home-manager config (cross-platform)
 - `packages.nix` — Shared nix packages (cross-platform)
 - `home-files/` — Dotfiles symlinked into `$HOME` via `home.file`
