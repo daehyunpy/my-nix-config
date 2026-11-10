@@ -1,6 +1,6 @@
 # Tailscale Tailnet Management
 
-Read the [shared Terraform workflow](../CLAUDE.md) for reviewed-plan approval, verification, backups, and state handoff. Run every command below from the repository root in the checkout holding this module's authoritative state.
+Read the [shared Terraform workflow](../CLAUDE.md) for reviewed-plan approval, verification, backups, runtime environment loading, and state handoff. Run every command below from the repository root in an operator checkout initialized against the authoritative state.
 
 This module owns the complete tailnet policy, DNS, device key-expiry settings, and approved subnet/exit routes. It does not manage tags, install clients, or change daemon preferences. Shared Home Manager tooling and Nix-managed client/services remain deferred in the [design spec](../../docs/superpowers/specs/2026-10-18-tailscale-management-design.md); the [implementation plan](../../docs/superpowers/plans/2026-10-20-tailscale-management.md) records completed work and deferred live gates. Use the native OpenTofu CLI; custom Python helpers remain deferred.
 
@@ -16,9 +16,9 @@ tofu -chdir=infra/tailscale validate
 
 ## Credentials and state
 
-The provider pins the inventoried tailnet in `main.tf`. Supply scoped credentials only through `TAILSCALE_OAUTH_CLIENT_ID` and `TAILSCALE_OAUTH_CLIENT_SECRET`; any `TAILSCALE_TAILNET` value must match it. Keep operator secrets outside Git and the Nix store in a mode-0600 private file. The repository's `.env.example` contains empty names only.
+The provider pins the inventoried tailnet in `main.tf`. Supply scoped credentials only through `TAILSCALE_OAUTH_CLIENT_ID` and `TAILSCALE_OAUTH_CLIENT_SECRET`; any `TAILSCALE_TAILNET` value must match it. Keep operator secrets outside Git and the Nix store in a mode-0600 private file. The repository's `.env.example` contains empty names only. Export the shared R2 variables and provider credentials before backend operations; root `.env` values are not loaded automatically, and worktrees do not receive that private file.
 
-Use the default local backend: no explicit backend declaration or custom location. After the exclusive source-layout handoff, the authoritative state is `infra/tailscale/terraform.tfstate` in the active operator checkout. OpenTofu uses OS locking for that file; temporary `.terraform.tfstate.lock.info` metadata is ignored, not a permanent lock to commit. Backend selection is deferred to `BACKLOG.md` (INFRA-6); no remote backend, host, or custom state path is selected. No state or credentials were transferred to Thales.
+The S3 backend uses the [shared R2 settings](../backend.s3.hcl); `backend.tf` declares key `tailscale/terraform.tfstate`. The local `infra/tailscale/terraform.tfstate` and older source-layout paths are historical migration sources, not an active default after cutover. Locate the existing authoritative state and follow the [shared migration procedure](../CLAUDE.md#worktree-state-handoff); backend selection does not establish completed migration. Never plan or import in an empty relocated root to replace existing state.
 
 ## Saved-plan commands
 
@@ -26,7 +26,7 @@ With credentials loaded and the authoritative state located, initialize and crea
 
 ```sh
 umask 077
-tofu -chdir=infra/tailscale init -input=false -lockfile=readonly
+tofu -chdir=infra/tailscale init -backend-config=../backend.s3.hcl -input=false -lockfile=readonly
 plan_dir="$(mktemp -d)"
 tofu -chdir=infra/tailscale plan -input=false -lock=true -out="$plan_dir/tailscale.tfplan"
 tofu -chdir=infra/tailscale show -no-color "$plan_dir/tailscale.tfplan"
@@ -50,20 +50,20 @@ The shared completion gate requires exit `0` with no drift. Policy validation do
 
 ## Backup and recovery commands
 
-Use this procedure for the shared before/after state-mutation backup requirement:
+Use this procedure for the shared before/after state-mutation backup requirement, with the authoritative backend initialized. R2 has no S3 bucket versioning; retain these private backups for historical recovery:
 
 ```sh
 set -eu
 umask 077
 backup_dir="$HOME/.config/tailscale-iac/backups/$(date -u +%Y-%m-%d)"
 mkdir -p "$backup_dir"
-backup=$(mktemp "$backup_dir/local-$(date -u +%H%M%S).XXXXXX")
+backup=$(mktemp "$backup_dir/state-$(date -u +%H%M%S).XXXXXX")
 tofu -chdir=infra/tailscale state pull > "$backup"
 jq -e '.lineage != null and .serial != null and .resources != null' "$backup" >/dev/null
 printf 'Validated private backup: %s\n' "$backup"
 ```
 
-For recovery, restore a verified private backup to the default state location with matching source and credentials before reviewing a plan. Follow the [shared handoff procedure](../CLAUDE.md#worktree-state-handoff) before retiring an operator checkout; this module requires all eight bindings and zero drift in the retained checkout.
+For recovery, restore a verified private backup to the intended authoritative backend/workspace under exclusive access, matching source, credentials, lineage, and serial checks; never create a local replacement state. Follow the [shared handoff procedure](../CLAUDE.md#worktree-state-handoff) before retiring an operator checkout; this module requires all eight bindings and zero drift in the retained checkout.
 
 ## Adoption and ownership
 
@@ -76,7 +76,7 @@ For recovery, restore a verified private backup to the default state location wi
 | `tailscale_device_key.managed` — Apollo, Muse, Thales, Poseidon | Current node IDs in `local.devices` |
 | `tailscale_device_subnet_routes.routers` — Thales, Poseidon | Current node IDs for `local.router_routes` members |
 
-A deliberately fresh adoption should plan eight imports, no creates/deletes, and any separately reviewed configuration updates. Existing state skips imports for tracked addresses. Keep import blocks as adoption records. Applying an import plan also applies its configuration updates; review the whole artifact.
+Only after establishing that no existing authoritative state exists, a deliberately fresh adoption should plan eight imports, no creates/deletes, and any separately reviewed configuration updates. Existing state skips imports for tracked addresses. Keep import blocks as adoption records. Applying an import plan also applies its configuration updates; review the whole artifact.
 
 The old Muse-tag proposal is superseded. Older state may contain obsolete tag bindings or Thales's historical device ID and `192.168.68.0/24` route. Reconcile those bindings only after a fresh inventory and private backup, using the current node ID and `192.168.2.0/24` subnet in configuration. Do not apply tag-destruction or missing-node creation plans to repair bookkeeping.
 

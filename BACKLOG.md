@@ -40,17 +40,6 @@ Remove completed items from this document; use Git history and linked pull reque
 - Device identities, authentication state, local preferences, and Apollo's encrypted-state protection are preserved; recovery access is established before migrating one host at a time.
 - Actual daemon connectivity, SSH, DNS, routing, and startup behavior are verified after separately authorized activation.
 
-## INFRA-6 — Choose OpenTofu state storage and execution
-
-**Status:** Backlog
-**Outcome:** Select a state-management/backend strategy after starting with default local state.
-
-**Done when:**
-- Evaluate all options without preselecting one: default local state, SSH-based execution, SMB/shared filesystems, rclone for backups or S3 serving, HTTP state services, S3-compatible storage, PostgreSQL, and managed cloud/state services.
-- Compare locking/concurrent writes, atomicity and interrupted-write recovery, durability/versioning, authentication/encryption, backups, operating complexity, and recovery when the tailnet or a host is unavailable.
-- Treat Thales as a candidate, not a selected host; no protocol, product, or custom state location is committed to before evaluation.
-- Plan any future migration with protected backups and verified locking/recovery before moving authoritative state.
-
 ## INFRA-8 — Rename the GitHub repository through Terraform
 
 **Status:** Backlog
@@ -59,9 +48,9 @@ Remove completed items from this document; use Git history and linked pull reque
 
 **Done when:**
 - Set `github_repository.config.name` to `system-config` in `infra/github/main.tf`, preserving the resource address, `prevent_destroy`, and the ruleset's repository reference.
-- Privately back up the existing local state and review a saved plan containing only the intended in-place rename and dependent reference updates, with no resource creation, destruction, replacement, or unrelated setting changes.
+- Privately back up the existing authoritative state and review a saved plan containing only the intended in-place rename and dependent reference updates, with no resource creation, destruction, replacement, or unrelated setting changes.
 - Apply only the exact reviewed plan after explicit user approval. Verify the repository's immutable identity, history, access, and existing ruleset identity/protections are preserved; require a fresh refreshed plan with exit 0 and no changes.
-- Update Git remotes and current documentation, operational links, and import examples to the new name. Keep the checkout at `~/.config/nix` and preserve local state and backup locations; do not rewrite historical evidence indiscriminately.
+- Update Git remotes and current documentation, operational links, and import examples to the new name. Keep the checkout at `~/.config/nix` and preserve the authoritative backend and private backups; do not rewrite historical evidence indiscriminately.
 
 ## INFRA-9 — Verify Linux Home Manager configuration builds
 
