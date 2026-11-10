@@ -39,14 +39,14 @@ The Dock pins `/System/Applications/Siri AI.app` for browsing Siri conversations
 
 ### Linux
 
-Replace `username@hostname` with a configuration from `nix/linux/flake.nix` (currently `daehyun@charon`):
+Poseidon (Fedora/WSL) uses the `daehyun@poseidon` configuration from `nix/linux/flake.nix`:
 
 ```sh
 # Bootstrap Home Manager
-nix run home-manager -- switch --flake ~/.config/nix/nix/linux#username@hostname
+nix run home-manager -- switch --flake ~/.config/nix/nix/linux#daehyun@poseidon
 
 # Apply changes
-home-manager switch --flake ~/.config/nix/nix/linux#username@hostname
+home-manager switch --flake ~/.config/nix/nix/linux#daehyun@poseidon
 ```
 
 To use the Nix-managed Fish as your login shell:
@@ -71,6 +71,7 @@ Tailscale commands, credentials, adoption, and provider-specific verification li
 
 ## Maintenance
 
+- Validate without activation: `bash scripts/check.sh` checks formatting and discovers every declared Home Manager and Darwin configuration; empty configuration sets or failed evaluations fail validation.
 - Update inputs: `nix flake update --flake nix/darwin` or `nix flake update --flake nix/linux`, then apply.
 - Garbage collection runs weekly and removes unreferenced generations older than 30 days, making them unavailable for rollback.
 - Approve trusted direnv configurations with `direnv allow`. `.env` is gitignored; see `.env.example`.

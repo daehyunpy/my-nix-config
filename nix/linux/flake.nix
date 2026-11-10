@@ -14,13 +14,13 @@
       home-manager,
     }:
     {
-      homeConfigurations."daehyun@charon" = home-manager.lib.homeManagerConfiguration {
+      homeConfigurations."daehyun@poseidon" = home-manager.lib.homeManagerConfiguration {
         pkgs = import nixpkgs { system = "x86_64-linux"; };
         modules = [
           ./configuration.nix
           ../home
           ./home.nix
-          ./hosts/charon.nix
+          ./hosts/poseidon.nix
         ];
         extraSpecialArgs = { inherit nixpkgs-unstable; };
       };

@@ -36,7 +36,6 @@ Remove completed items from this document; use Git history and linked pull reque
 **Done when:**
 - Home Manager installs the shared CLI, and reusable nix-darwin/NixOS modules or a Fedora/WSL vendor-service drop-in manage native services.
 - Review both the earlier Cursor implementation and the later stash against current package versions and host state before reusing them. Do not merge the Cursor branch wholesale: its `infra/tailscale/` root, Muse-tag policy, historical Thales identity/subnet, and assumption that Poseidon uses NixOS are superseded by the Terraform-only design and current inventory.
-- Rename the standalone Home Manager output from `daehyun@charon` to `daehyun@poseidon`, updating all active commands, checks, and documentation without an alias. Do not rename the OS, WSL registration, or Tailscale node.
 - Host package/service management remains separate from OpenTofu tailnet settings and deployment CI/CD.
 - Device identities, authentication state, local preferences, and Apollo's encrypted-state protection are preserved; recovery access is established before migrating one host at a time.
 - Actual daemon connectivity, SSH, DNS, routing, and startup behavior are verified after separately authorized activation.
@@ -51,20 +50,6 @@ Remove completed items from this document; use Git history and linked pull reque
 - Compare locking/concurrent writes, atomicity and interrupted-write recovery, durability/versioning, authentication/encryption, backups, operating complexity, and recovery when the tailnet or a host is unavailable.
 - Treat Thales as a candidate, not a selected host; no protocol, product, or custom state location is committed to before evaluation.
 - Plan any future migration with protected backups and verified locking/recovery before moving authoritative state.
-
-## INFRA-7 — Discover all declared Nix configurations in shared validation
-
-**Status:** Backlog
-**Outcome:** Local and CI validation cover every declared Home Manager and Darwin configuration without maintaining host-name lists.
-**Reference:** Discovery-based CI changes on `feat/tailscale-iac`, excluded from the Terraform-only port.
-**Work left behind:** The discovery implementation and workflow guidance remain committed on `feat/tailscale-iac` at `3cb17b6`; they were not brought into `feat/tailscale-terraform`. Use that branch as the reference when adapting this work to the current shared validation and single-file agent policy.
-
-**Done when:**
-- Move configuration discovery into `scripts/check.sh`, keeping it the shared local/CI entry point rather than restoring duplicated inline workflow commands.
-- Evaluate every declared `homeConfigurations` activation package and `darwinConfigurations` system, and fail when a configuration set is empty or any evaluation fails.
-- Preserve existing formatting, file-discovery error handling, platform selectors, and credential-free Terraform validation.
-- Verify coverage with an additional temporary configuration and verify that empty sets and failed evaluations return nonzero.
-- Document the discovery convention in `nix/CLAUDE.md` and update human-facing validation guidance as needed. Do not port `.github/workflows/CLAUDE.md`; repository-wide agent policy stays in the single root file.
 
 ## INFRA-8 — Rename the GitHub repository through Terraform
 
@@ -86,6 +71,6 @@ Remove completed items from this document; use Git history and linked pull reque
 
 **Done when:**
 - Select a suitable `x86_64-linux` host or CI runner. A remote builder configured on the Mac is not required.
-- Successfully run `nix build --no-link --no-update-lock-file './nix/linux#homeConfigurations."daehyun@charon".activationPackage'` on the selected Linux builder, using the committed lockfile.
+- Successfully run `nix build --no-link --no-update-lock-file './nix/linux#homeConfigurations."daehyun@poseidon".activationPackage'` on the selected Linux builder, using the committed lockfile.
 - Record the tested revision, build platform, and resulting activation-package output. Evaluation or obtaining a derivation path alone does not count as build verification.
 - Diagnose any build failure and review necessary configuration or dependency fixes explicitly; do not silently remove packages or update inputs to force success. Do not run Home Manager activation or change host services as part of this verification.

@@ -20,7 +20,7 @@ esac
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
 if [[ "$scope" == all ]]; then
-  printf '\n==> Checking validation error handling\n'
+  printf '\n==> Checking validation regressions\n'
   bash scripts/check-test.sh
 fi
 
@@ -42,18 +42,25 @@ if [[ "$scope" == all || "$scope" == format ]]; then
   fi
 fi
 
-if [[ "$scope" == all || "$scope" == linux ]]; then
-  printf '\n==> Evaluating Linux: daehyun@charon\n'
-  nix eval --no-update-lock-file --raw './nix/linux#homeConfigurations."daehyun@charon".activationPackage.drvPath'
+evaluate_configurations() {
+  local flake=$1 output=$2 build_attribute=$3
+  printf '\n==> Evaluating %s: %s\n' "$flake" "$output"
+  nix eval --no-update-lock-file --json "$flake#$output" --apply "
+    configurations:
+      if builtins.attrNames configurations == [] then
+        throw \"No $output configurations declared in $flake\"
+      else
+        builtins.mapAttrs (_: configuration: configuration.$build_attribute.drvPath) configurations
+  "
   printf '\n'
+}
+
+if [[ "$scope" == all || "$scope" == linux ]]; then
+  evaluate_configurations ./nix/linux homeConfigurations activationPackage
 fi
 
 if [[ "$scope" == all || "$scope" == darwin ]]; then
-  for host in apollo thales; do
-    printf '\n==> Evaluating Darwin: %s\n' "$host"
-    nix eval --no-update-lock-file --raw "./nix/darwin#darwinConfigurations.$host.system.drvPath"
-    printf '\n'
-  done
+  evaluate_configurations ./nix/darwin darwinConfigurations system
 fi
 
 printf '\nChecks passed (%s).\n' "$scope"
