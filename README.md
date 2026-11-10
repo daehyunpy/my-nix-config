@@ -39,7 +39,7 @@ The Dock pins `/System/Applications/Siri AI.app` for browsing Siri conversations
 
 ### Linux
 
-Poseidon (Fedora/WSL) uses the `daehyun@poseidon` configuration from `nix/linux/flake.nix`:
+Poseidon (Fedora/WSL) uses the `daehyun@poseidon` configuration from `nix/linux/flake.nix`. Its Nix-managed Mosh uses Fedora's `/usr/bin/ssh` for compatibility with Fedora's system crypto policy:
 
 ```sh
 # Bootstrap Home Manager
