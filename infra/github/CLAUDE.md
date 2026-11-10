@@ -2,11 +2,11 @@
 
 `main.tf` manages repository settings and the `main-protection` ruleset for `daehyunpy/my-nix-config`, separately from Nix. Keep the existing `github_repository_ruleset` resource; CI workflow implementation remains in `.github/workflows/validate.yml` at the repository root.
 
-Read the [shared Terraform workflow](../CLAUDE.md) for reviewed-plan approval, verification, backups, and state handoff. Run commands below from `infra/github/` in the checkout holding this module's authoritative state.
+Read the [shared Terraform workflow](../CLAUDE.md) for reviewed-plan approval, verification, backups, runtime environment loading, and state handoff. Run commands below from `infra/github/` in an operator checkout initialized against the authoritative state.
 
 ## CLI, authentication, and checks
 
-Use Terraform compatible with `required_version` in `main.tf` and the committed `.terraform.lock.hcl`. Use the existing GitHub CLI login with repository Administration read/write access. `gh auth token` must succeed; pass its token to the provider at runtime, never in configuration or a credentials file.
+Use Terraform 1.10 or newer, compatible with `required_version` in `main.tf`, and the committed `.terraform.lock.hcl`. Export the shared R2 environment before backend operations; the root `.env` is not loaded automatically or copied into worktrees. Supply repository Administration access through exported `GITHUB_TOKEN`: map the existing private environment value with `export GITHUB_TOKEN="$GITHUB_PERSONAL_ACCESS_TOKEN"`, or use `export GITHUB_TOKEN="$(gh auth token)"` with an authenticated GitHub CLI. Keep tokens out of Terraform configuration, backend arguments, and Git. Anonymous refreshes omit administrative fields and can report misleading differences.
 
 These local checks need no GitHub token. The current CI Terraform job validates Tailscale only:
 
@@ -16,17 +16,17 @@ terraform init -backend=false -input=false -lockfile=readonly
 terraform validate
 ```
 
-## Existing resources and local state
+## Existing resources and shared state
 
-The default local backend uses `terraform.tfstate` in this module directory. Locate existing authoritative state before starting work in another checkout; follow the shared handoff procedure rather than importing a second active copy.
+The S3 backend uses the [shared R2 settings](../backend.s3.hcl); `backend.tf` declares key `github/terraform.tfstate`. Existing local `terraform.tfstate` files (including historical source-layout paths) are migration sources, not the active default after cutover. Locate the authoritative state and follow the [shared migration procedure](../CLAUDE.md#worktree-state-handoff); selection alone is not proof of completed migration.
 
-For a deliberately fresh adoption, initialize and import both existing resources before planning. With existing state, import only bindings actually absent after checking inventory and ownership:
+Never initialize an empty root and import a second copy of these managed resources. Only for a deliberately fresh adoption, after proving no authoritative state exists, initialize the selected backend and import both existing resources before planning. With existing state, import only bindings actually absent after checking inventory and ownership:
 
 ```sh
-terraform init -input=false -lockfile=readonly
-env GITHUB_TOKEN="$(gh auth token)" terraform import \
+terraform init -backend-config=../backend.s3.hcl -input=false -lockfile=readonly
+terraform import \
   github_repository.config my-nix-config
-env GITHUB_TOKEN="$(gh auth token)" terraform import \
+terraform import \
   github_repository_ruleset.main my-nix-config:26810140
 ```
 
@@ -38,9 +38,9 @@ With authoritative state and authentication established, create and inspect the 
 
 ```sh
 umask 077
-terraform init -input=false -lockfile=readonly
+terraform init -backend-config=../backend.s3.hcl -input=false -lockfile=readonly
 plan_dir="$(mktemp -d)"
-env GITHUB_TOKEN="$(gh auth token)" terraform plan \
+terraform plan \
   -input=false -lock=true -out="$plan_dir/github.tfplan"
 terraform show -no-color "$plan_dir/github.tfplan"
 ```
@@ -48,20 +48,20 @@ terraform show -no-color "$plan_dir/github.tfplan"
 Stop for approval of this saved plan. After approval and the private backup below, apply it as a separate operation, retaining the same `plan_dir`:
 
 ```sh
-env GITHUB_TOKEN="$(gh auth token)" terraform apply \
+terraform apply \
   -input=false -lock=true "$plan_dir/github.tfplan"
 ```
 
 ## Backup commands
 
-Use this procedure for the shared before/after state-mutation backup requirement:
+Use this procedure for the shared before/after state-mutation backup requirement, with the authoritative backend initialized. R2 has no S3 bucket versioning; these private retained backups provide historical recovery:
 
 ```sh
 set -eu
 umask 077
 backup_dir="$HOME/.config/github-iac/backups/$(date -u +%Y-%m-%d)"
 mkdir -p "$backup_dir"
-backup=$(mktemp "$backup_dir/local-$(date -u +%H%M%S).XXXXXX")
+backup=$(mktemp "$backup_dir/state-$(date -u +%H%M%S).XXXXXX")
 terraform state pull > "$backup"
 jq -e '.lineage != null and .serial != null and .resources != null' "$backup" >/dev/null
 printf 'Validated private backup: %s\n' "$backup"
@@ -72,7 +72,7 @@ printf 'Validated private backup: %s\n' "$backup"
 Compare the repository settings and ruleset against the approved changes and `main.tf`, including preserved enforcement, branch scope, bypass actors, and protection rules. Confirm both resource identities and managed values in refreshed state, then require a zero-drift result from:
 
 ```sh
-env GITHUB_TOKEN="$(gh auth token)" terraform plan \
+terraform plan \
   -refresh=true -input=false -detailed-exitcode
 ```
 

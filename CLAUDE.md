@@ -13,7 +13,7 @@ Declarative machine environments and network infrastructure for macOS, Linux, an
 
 ## Local Secrets
 
-- `.env` holds additional secrets (`MILVUS_ADDRESS`, `MILVUS_TOKEN`); see `.env.example` for the template. Both `.env` and `.envrc` are gitignored.
+- `.env` holds runtime credentials and service settings; see `.env.example` for the template. Both `.env` and `.envrc` are gitignored.
 
 ## Coding Guidance
 
