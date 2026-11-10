@@ -71,6 +71,7 @@ Tailscale commands, credentials, adoption, and provider-specific verification li
 
 ## Maintenance
 
+- Validate without activation: `bash scripts/check.sh` checks formatting and discovers every declared Home Manager and Darwin configuration; empty configuration sets or failed evaluations fail validation.
 - Update inputs: `nix flake update --flake nix/darwin` or `nix flake update --flake nix/linux`, then apply.
 - Garbage collection runs weekly and removes unreferenced generations older than 30 days, making them unavailable for rollback.
 - Approve trusted direnv configurations with `direnv allow`. `.env` is gitignored; see `.env.example`.

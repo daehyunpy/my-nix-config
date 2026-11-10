@@ -51,20 +51,6 @@ Remove completed items from this document; use Git history and linked pull reque
 - Treat Thales as a candidate, not a selected host; no protocol, product, or custom state location is committed to before evaluation.
 - Plan any future migration with protected backups and verified locking/recovery before moving authoritative state.
 
-## INFRA-7 — Discover all declared Nix configurations in shared validation
-
-**Status:** Backlog
-**Outcome:** Local and CI validation cover every declared Home Manager and Darwin configuration without maintaining host-name lists.
-**Reference:** Discovery-based CI changes on `feat/tailscale-iac`, excluded from the Terraform-only port.
-**Work left behind:** The discovery implementation and workflow guidance remain committed on `feat/tailscale-iac` at `3cb17b6`; they were not brought into `feat/tailscale-terraform`. Use that branch as the reference when adapting this work to the current shared validation and single-file agent policy.
-
-**Done when:**
-- Move configuration discovery into `scripts/check.sh`, keeping it the shared local/CI entry point rather than restoring duplicated inline workflow commands.
-- Evaluate every declared `homeConfigurations` activation package and `darwinConfigurations` system, and fail when a configuration set is empty or any evaluation fails.
-- Preserve existing formatting, file-discovery error handling, platform selectors, and credential-free Terraform validation.
-- Verify coverage with an additional temporary configuration and verify that empty sets and failed evaluations return nonzero.
-- Document the discovery convention in `nix/CLAUDE.md` and update human-facing validation guidance as needed. Do not port `.github/workflows/CLAUDE.md`; repository-wide agent policy stays in the single root file.
-
 ## INFRA-8 — Rename the GitHub repository through Terraform
 
 **Status:** Backlog

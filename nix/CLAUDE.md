@@ -11,7 +11,7 @@ Paths and commands below are relative to the selected repository/worktree root, 
   - `brews.nix`, `casks.nix`, `mas.nix` — Homebrew formulae, casks, and Mac App Store apps.
 - `nix/linux/` — Independent standalone Home Manager flake with output `daehyun@poseidon` (`x86_64-linux`); shared setup in `configuration.nix`, user overrides in `home.nix`, and machine identity/exceptions in `hosts/`.
 - `dotfiles/` — Payloads installed through Home Manager; installation behavior is described below.
-- `scripts/check.sh`, `scripts/check-test.sh` — Shared local/CI Nix validation and its failure-handling regression check.
+- `scripts/check.sh`, `scripts/check-test.sh` — Shared local/CI Nix validation and its discovery, platform-selection, and failure-handling regression checks.
 
 WSL uses the Linux Home Manager configuration; Windows host settings are not managed here. There is no root flake.
 
@@ -45,11 +45,11 @@ Agents must run `bash scripts/check.sh` after changing Nix configuration and bef
 ```bash
 bash scripts/check.sh          # Full Nix validation suite
 bash scripts/check.sh format   # Formatting only
-bash scripts/check.sh linux    # Linux evaluation only
-bash scripts/check.sh darwin   # Both Darwin evaluations
+bash scripts/check.sh linux    # All Home Manager outputs in nix/linux
+bash scripts/check.sh darwin   # All Darwin outputs in nix/darwin
 ```
 
-- The full suite checks validation error handling and formatting with `nixfmt` from the locked Linux nixpkgs input, then evaluates `daehyun@poseidon`, `apollo`, and `thales`. Scoped commands are for iteration; run the full suite before completion.
+- The full suite checks validation regressions and formatting with `nixfmt` from the locked Linux nixpkgs input, then discovers and evaluates every `homeConfigurations` activation package in `nix/linux` and every `darwinConfigurations` system in `nix/darwin`. Empty configuration sets and discovery or evaluation failures return nonzero; adding or renaming an output requires no validation-script change. Scoped commands are for iteration; run the full suite before completion.
 - Requires Git and Nix with `nix-command` and `flakes` enabled. Nix may fetch the pinned formatter and inputs.
 - Formatting includes tracked and non-ignored untracked `.nix` files, skipping empty files. Git-backed flake evaluation excludes untracked files; stage newly imported files before evaluation, preserving unrelated staged changes.
 - Checks stop at the first failure with a nonzero exit status. Fix failures within scope; report blockers and any checks not completed. Never claim validation passed when it did not.

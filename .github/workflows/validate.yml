@@ -41,11 +41,11 @@ jobs:
       - uses: cachix/install-nix-action@v31.11.2
         with:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Check validation error handling
+      - name: Check validation regressions
         run: bash scripts/check-test.sh
       - name: Check formatting
         run: bash scripts/check.sh format
-      - name: Evaluate Linux configuration
+      - name: Evaluate Linux configurations
         run: bash scripts/check.sh linux
 
   darwin:
