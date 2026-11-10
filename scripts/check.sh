@@ -43,8 +43,8 @@ if [[ "$scope" == all || "$scope" == format ]]; then
 fi
 
 if [[ "$scope" == all || "$scope" == linux ]]; then
-  printf '\n==> Evaluating Linux: daehyun@charon\n'
-  nix eval --no-update-lock-file --raw './nix/linux#homeConfigurations."daehyun@charon".activationPackage.drvPath'
+  printf '\n==> Evaluating Linux: daehyun@poseidon\n'
+  nix eval --no-update-lock-file --raw './nix/linux#homeConfigurations."daehyun@poseidon".activationPackage.drvPath'
   printf '\n'
 fi
 

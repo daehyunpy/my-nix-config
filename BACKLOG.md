@@ -36,7 +36,6 @@ Remove completed items from this document; use Git history and linked pull reque
 **Done when:**
 - Home Manager installs the shared CLI, and reusable nix-darwin/NixOS modules or a Fedora/WSL vendor-service drop-in manage native services.
 - Review both the earlier Cursor implementation and the later stash against current package versions and host state before reusing them. Do not merge the Cursor branch wholesale: its `infra/tailscale/` root, Muse-tag policy, historical Thales identity/subnet, and assumption that Poseidon uses NixOS are superseded by the Terraform-only design and current inventory.
-- Rename the standalone Home Manager output from `daehyun@charon` to `daehyun@poseidon`, updating all active commands, checks, and documentation without an alias. Do not rename the OS, WSL registration, or Tailscale node.
 - Host package/service management remains separate from OpenTofu tailnet settings and deployment CI/CD.
 - Device identities, authentication state, local preferences, and Apollo's encrypted-state protection are preserved; recovery access is established before migrating one host at a time.
 - Actual daemon connectivity, SSH, DNS, routing, and startup behavior are verified after separately authorized activation.
@@ -86,6 +85,6 @@ Remove completed items from this document; use Git history and linked pull reque
 
 **Done when:**
 - Select a suitable `x86_64-linux` host or CI runner. A remote builder configured on the Mac is not required.
-- Successfully run `nix build --no-link --no-update-lock-file './nix/linux#homeConfigurations."daehyun@charon".activationPackage'` on the selected Linux builder, using the committed lockfile.
+- Successfully run `nix build --no-link --no-update-lock-file './nix/linux#homeConfigurations."daehyun@poseidon".activationPackage'` on the selected Linux builder, using the committed lockfile.
 - Record the tested revision, build platform, and resulting activation-package output. Evaluation or obtaining a derivation path alone does not count as build verification.
 - Diagnose any build failure and review necessary configuration or dependency fixes explicitly; do not silently remove packages or update inputs to force success. Do not run Home Manager activation or change host services as part of this verification.

@@ -9,7 +9,7 @@ Paths and commands below are relative to the selected repository/worktree root, 
 - `nix/home/default.nix`, `nix/home/packages.nix` — Shared cross-platform Home Manager configuration and packages.
 - `nix/darwin/` — Independent nix-darwin flake with outputs `apollo` and `thales`; shared system settings in `configuration.nix`, user overrides in `home.nix`, and machine identity/exceptions in `hosts/`.
   - `brews.nix`, `casks.nix`, `mas.nix` — Homebrew formulae, casks, and Mac App Store apps.
-- `nix/linux/` — Independent standalone Home Manager flake with output `daehyun@charon` (`x86_64-linux`); shared setup in `configuration.nix`, user overrides in `home.nix`, and machine identity/exceptions in `hosts/`.
+- `nix/linux/` — Independent standalone Home Manager flake with output `daehyun@poseidon` (`x86_64-linux`); shared setup in `configuration.nix`, user overrides in `home.nix`, and machine identity/exceptions in `hosts/`.
 - `dotfiles/` — Payloads installed through Home Manager; installation behavior is described below.
 - `scripts/check.sh`, `scripts/check-test.sh` — Shared local/CI Nix validation and its failure-handling regression check.
 
@@ -49,7 +49,7 @@ bash scripts/check.sh linux    # Linux evaluation only
 bash scripts/check.sh darwin   # Both Darwin evaluations
 ```
 
-- The full suite checks validation error handling and formatting with `nixfmt` from the locked Linux nixpkgs input, then evaluates `daehyun@charon`, `apollo`, and `thales`. Scoped commands are for iteration; run the full suite before completion.
+- The full suite checks validation error handling and formatting with `nixfmt` from the locked Linux nixpkgs input, then evaluates `daehyun@poseidon`, `apollo`, and `thales`. Scoped commands are for iteration; run the full suite before completion.
 - Requires Git and Nix with `nix-command` and `flakes` enabled. Nix may fetch the pinned formatter and inputs.
 - Formatting includes tracked and non-ignored untracked `.nix` files, skipping empty files. Git-backed flake evaluation excludes untracked files; stage newly imported files before evaluation, preserving unrelated staged changes.
 - Checks stop at the first failure with a nonzero exit status. Fix failures within scope; report blockers and any checks not completed. Never claim validation passed when it did not.
@@ -65,7 +65,7 @@ Activation remains subject to the root authorization boundary. These are command
 darwin-rebuild switch --flake nix/darwin/
 
 # Linux (home-manager)
-home-manager switch --flake nix/linux/
+home-manager switch --flake nix/linux#daehyun@poseidon
 ```
 
 ## Formatting

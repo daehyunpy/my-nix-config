@@ -39,14 +39,14 @@ The Dock pins `/System/Applications/Siri AI.app` for browsing Siri conversations
 
 ### Linux
 
-Replace `username@hostname` with a configuration from `nix/linux/flake.nix` (currently `daehyun@charon`):
+Poseidon (Fedora/WSL) uses the `daehyun@poseidon` configuration from `nix/linux/flake.nix`:
 
 ```sh
 # Bootstrap Home Manager
-nix run home-manager -- switch --flake ~/.config/nix/nix/linux#username@hostname
+nix run home-manager -- switch --flake ~/.config/nix/nix/linux#daehyun@poseidon
 
 # Apply changes
-home-manager switch --flake ~/.config/nix/nix/linux#username@hostname
+home-manager switch --flake ~/.config/nix/nix/linux#daehyun@poseidon
 ```
 
 To use the Nix-managed Fish as your login shell:
