@@ -10,7 +10,7 @@ lsp:
 
 modelRoles:
   # General model tiers.
-  default: openai-codex/gpt-6.1-sol:high
+  default: openai-codex/gpt-6.2-sol:high
   smol: openai-codex/gpt-6.1-terra:high
   slow: "@default:xhigh"
 
@@ -18,7 +18,7 @@ modelRoles:
   task: "@default"
   plan: "@slow"
   commit: "@smol"
-  advisor: openai-codex/gpt-6-astra:high
+  advisor: openai-codex/gpt-6.2-astra:high
 
   # Background work.
   tiny: openai-codex/gpt-6-luna:low
